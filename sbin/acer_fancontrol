@@ -1,0 +1,210 @@
+#!/bin/sh
+# acer5720_fancontrol.sh - control the CPU fan on an Acer 5720 with a 64 bit
+# Linux.
+# ***************************************************************************
+# Copyright (c) E2 Systems Limited 2008. This is Free Software (as in Beer),
+# but please respect the copyright.
+# ***************************************************************************
+# Principle of Operation
+# ***************************************************************************
+# On the Acer 5720, the ACPI Embedded Controller controls the CPU fan.
+#
+# Communication between the Operating System and the ACPI Embedded Controller is
+# documented in the the Differentiated System Description Table (DSDT).
+#
+# The DSDT is provided as part of of the BIOS. It is written in ACPI Source
+# Language (ASL) and compiled to ACPI Machine language (AML), intructions for a
+# bytecode interpreter that is part of the Operating System.
+#
+# The DSDT is accessible on Linux as /proc/acpi/dsdt; 'cat' it somewhere to
+# look at it.
+#
+# The Intel ASL compiler (iasl) compiles ASL to AML, and decompiles AML (eg. as
+# saved from /proc/acpi/dsdt) back to ASL.
+#
+# Which I did.
+#
+# As a result, I can see:
+# -   There is no _TZP. Which means that the OS is supposed to poll; there
+#     is no provision for asynchronous notification of temperature changes.
+#     (Support for asynchronous notifications would be signalled by having
+#     a _TZP that returned 0)
+# -   The _TMP method checks that the Embedded Controller is running, and that
+#     Temperature Sensing is enabled, and if so it reads a pair of values from
+#     a region of memory defined in the DSDT as 'NVST', picks the higher value,
+#     and writes it to the Embedded Controller, 'SKTA' in 'ERAM' (ie. SKTA is
+#     the command, and the value is its argument), before it returns this
+#     value to be used in the /proc/acpi/thermal_zone/TZ01/temperature string. 
+#
+# Having deduced that DTS1 and DTS2 are supposed to be the CPU temperatures,
+# I found that after enabling polling, and writing temperature values into these
+# memory locations, the fan behaves as it should.
+#
+# I think it likely that if you commanded the Embedded Controller directly,
+# you would achieve the same effect. The 'thinkpad_acpi' kernel module provides
+# a facility to do this from user space through the /proc file system, but
+# although the intrinsic capability is independent of the 'thinkpad-ness' of
+# the laptop, the module unsportingly refuses to load on my Acer. 
+#
+# The root cause of the problem appears to be the fact that under 64 bit Linux,
+# DTS1 and DTS2 don't get updated. It must be the Embedded Controller or SMM
+# BIOS code that is supposed to update them, since they aren't written anywhere
+# in the DSDT, and how could the Operating System possibly know that the
+# temperatures are meant to go at these locations, in single bytes, in degrees
+# Celsius. What I do not know is whether 64 bit Linux stops the Embedded
+# Controller writing values to DTS1 and DTS2, or whether it somehow prevents
+# the controller reading the source values from the CPU's in the first place, or
+# the updates are supposed to be done by BIOS SMM code, and the 64 bit Linux has
+# disabled SMI's, or whether the Embedded Controller sends directions to the OS
+# to update these locations which the OS ignores. The fact that setting
+# ec_intr=0 makes a difference perhaps lends support to this last analysis.
+#
+# If you boot with acpi_osi=Linux, a command is issued to the BIOS via the
+# SMI_CMD port that isn't executed for any other operating system (see the
+# OSMI(0x70) method call in the _OSI method in the DSDT).
+#
+# ec_intr=0 and acpi_osi=Linux together sort of work. 
+#
+# Anyway, those are the reasons for the existence of this script.
+# ***************************************************************************
+# This script does not check that it is actually running on an appropriate
+# target machine, and writes direct to main memory. Use at your own risk!
+# ***************************************************************************
+# Things you might think of varying or need to vary
+# set -x
+# The Patch Addresses. Select the one appropriate for your machine.
+# Acer Aspire 5315 with 512 MB of RAM
+#PATCH_ADDRESS=x1F6BCEAF
+# Acer Aspire 5720 with 1 GB of RAM
+#PATCH_ADDRESS=x3F6BCEAF
+# Acer Aspire 5720 with 2 GB of RAM
+PATCH_ADDRESS=x7F6BCEAF
+# ***************************************************************************
+# The fan-on and fan-off temperatures (in degrees Centigrade).
+# ***************************************************************************
+# The fan adopts different speeds, depending on the values written into DTS1
+# and DTS2. By experiment, setting the temperature and listening for a change
+# in the noisiness of the fan, I think the following are the break points, as
+# the temperature rises.
+#
+# - 0x32 - First speed
+# - 0x42 - Second speed
+# - 0x4a - Third speed
+# - 0x52 - Fourth speed
+#
+# As the temperature falls, the switch-off values are about 5 C lower. However,
+# I find the fan varying its speed annoying, so I only make the fan run faster
+# ***************************************************************************
+FAN_ON=65
+FAN_OFF=55
+# -  The sleep between temperature checks
+FAN_POLL=10
+# -  The thermal_zone polling_frequency.
+THERM_POLL=1
+# The mempat binary applies the patches, so needs to be in the PATH.
+# **************************************************************************
+# Function to read the thermal_zone temperature
+read_tz_temp() {
+    set -- `cat /proc/acpi/thermal_zone/TZ01/temperature`
+    tz_tmp=$2
+    export tz_tmp
+}
+# ***************************************************************************
+# Function to read the Core 2 Duo temperature
+read_core_temp() {
+    core_tmp=`
+    cat /sys/devices/platform/coretemp.*/temp1_input |
+    {
+        core_tmp=0
+        while read x
+        do
+            if [ "$x" -gt "$core_tmp" ]
+            then
+                core_tmp=$x
+            fi
+        done
+        expr $core_tmp / 1000
+    }
+    `
+    export core_tmp
+}
+# ***********************************************************************
+# Load the coretemp module.
+modprobe coretemp || {
+    echo "You must have module coretemp to monitor the CPU temperature"
+    exit 1
+}
+# ****************************************************************************
+# Loop, checking the temperature periodically.
+# -   Exit if it appears that the Embedded Controller is controlling the
+#     temperature without further assistance from this script; not any more.
+# -   Turn the fan up if the temperature exceeds a threshold, and the fan
+#     is on
+# -   Turn the fan on if the temperature exceeds the threshold, and the fan
+#     is not on
+# -   Turn the fan off if the temperature is low, and the fan is not off
+# ****************************************************************************
+# You need to poll the temperature. This is controlled by setting the
+# thermal_zone polling_frequency, thus
+echo -n $THERM_POLL > /proc/acpi/thermal_zone/TZ01/polling_frequency
+# Get the initial temperature, as recorded via the thermal_zone.
+read_tz_temp
+last_tmp=$tz_tmp
+while :
+do
+    read_tz_temp
+# *****************************************************************************
+# The test below is commented out, because of reports that the test can return
+# true even though the laptop's thermal control isn't working reliably.
+#    if [ "$last_tmp" != "$tz_tmp" ]
+#    then
+#
+# The Embedded Controller or SMM BIOS code is maintaining the temperature; we
+# are not needed
+#
+#        exit 0
+#    fi
+    read_core_temp
+#
+# If the fan is proving ineffectual, run it faster
+#
+    if [ "$core_tmp" -gt "$last_tmp" -a "$fan" = on ]
+    then 
+        if [ "$core_tmp" -ge  82 ]
+        then
+            mempat -x 5252 $PATCH_ADDRESS /dev/mem
+            echo "3rd gear"
+            last_tmp=82
+        elif [ "$core_tmp" -ge  74 ]
+        then
+            mempat -x 4a4a $PATCH_ADDRESS /dev/mem
+            echo "2nd gear"
+            last_tmp=74
+        else
+            mempat -x 4242 $PATCH_ADDRESS /dev/mem
+            echo "1st gear"
+            last_tmp=66
+        fi
+    elif [ "$core_tmp" -ge "$FAN_ON" -a "$fan" != on ]
+    then 
+#
+# Patch the DTS1 and DTS2 in NVST with a value that matches the first fan-on
+# threshold (50 C)
+#
+        mempat -x 3232 $PATCH_ADDRESS /dev/mem
+        echo "Clutch down"
+        fan=on
+        last_tmp=50
+    elif [ "$core_tmp" -lt "$FAN_OFF" -a "$fan" != off ]
+    then
+#
+# Patch the DTS1 and DTS2 in NVST with a value that is lower than the lowest
+# off threshold (40 C)
+#
+        mempat -x 2828 $PATCH_ADDRESS /dev/mem
+        echo "Ignition Off"
+        fan=off
+        last_tmp=40
+    fi
+    sleep "$FAN_POLL"
+done
