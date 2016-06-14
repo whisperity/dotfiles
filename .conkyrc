@@ -1,0 +1,106 @@
+alignment top_right 
+#border_margin 9 
+border_width 10 
+default_color white 
+double_buffer yes 
+draw_shades no 
+draw_outline no 
+draw_borders no 
+font arial 
+gap_x 5 
+gap_y 5 
+maximum_width 300 
+own_window yes
+own_window_type override 
+own_window_colour brown 
+own_window_transparent yes
+own_window_hints undecorated,below,sticky,skip_taskbar,skip_pager 
+stippled_borders 3 
+use_spacer yes 
+use_xft yes 
+update_interval 1.0 
+uppercase no 
+
+TEXT 
+${color #000000} 
+
+${font Purisa:style=Bold:size=12}SYSTEM INFORMATION ${font PizzaDude Bullets:size=8}${hr 2}${color #000000} 
+$nodename $sysname $kernel on $machine 
+${font PizzaDude Bullets:size=12}
+
+${font Aerial :style=Bold:size=8}Processor:${font Snap.se:size=8} ${color #000000} ${if_match ${cpu} <= 20}${cpu}%${else}${if_match ${cpu} <= 40}${cpu}%${else}${if_match ${cpu} <= 60}${cpu}%${else}${if_match ${cpu} <= 80}${cpu}%${else}${if_match ${cpu} <= 100}${cpu}%${else}${endif}${endif}${endif}${endif}${endif}${font Aerial :size=8} ${hr 2}${color #000000}  
+${alignc}${freq}MHz Load: ${loadavg} Temp: ${acpitemp} 
+$cpubar 
+${cpugraph 000000 000000} 
+NAME${goto 130}PID${goto 175}CPU%${goto 225}MEM% 
+${top name 1}${goto 120}${top pid 1}${goto 170}${top cpu 1}${goto 220}${top mem 1}
+${top name 2}${goto 120}${top pid 2}${goto 170}${top cpu 2}${goto 220}${top mem 2}
+${top name 3}${goto 120}${top pid 3}${goto 170}${top cpu 3}${goto 220}${top mem 3} 
+
+## MEMORY AND SWAP ##
+${font Aerial :style=Bold:size=8}Memory:${font Snap.se:size=8} ${color #000000} ${if_match ${memperc} <= 20}${memperc}%${else}${if_match ${memperc} <= 40}${memperc}%${else}${if_match ${memperc} <= 60}${memperc}%${else}${if_match ${memperc} <= 80}${memperc}%${else}${if_match ${memperc} <= 100}${memperc}%${else}${endif}${endif}${endif}${endif}${endif}${font Aerial :size=8} ${hr 2}${color #000000} 
+# 
+RAM: ${if_match ${memperc} <= 10}${mem}${else}${if_match ${memperc} <= 20}${mem}${else}${if_match ${memperc} <= 30}${mem}${else}${if_match ${memperc} <= 40}${mem}${else}${if_match ${memperc} <= 50}${mem}${else}${if_match ${memperc} <= 60}${mem}${else}${if_match ${memperc} <= 70}${mem}${else}${if_match ${memperc} <= 80}${mem}${else}${if_match ${memperc} <= 90}${mem}${else}${if_match ${memperc} <= 100}${mem}${else}${endif}${endif}${endif}${endif}${endif}${endif}${endif}${endif}${endif}${endif}${color #000000} ${membar 6}${color #000000} 
+# 
+Swap: ${if_match ${swapperc} <= 10}${swap}${else}${if_match ${swapperc} <= 20}${swap}${else}${if_match ${swapperc} <= 30}${swap}${else}${if_match ${swapperc} <= 40}${swap}${else}${if_match ${swapperc} <= 50}${swap}${else}${if_match ${swapperc} <= 60}${swap}${else}${if_match ${swapperc} <= 70}${swap}${else}${if_match ${swapperc} <= 80}${swap}${else}${if_match ${swapperc} <= 90}${swap}${else}${if_match ${swapperc} <= 100}${swap}${else}${endif}${endif}${endif}${endif}${endif}${endif}${endif}${endif}${endif}${endif}${color #000000} ${swapbar 6}${color #000000} 
+
+## STORAGE INFO ##
+${font Aerial :style=Bold:size=8}Storage ${font Aerial :size=8} ${hr 2}${color #000000} 
+${execp df -h | grep "/dev/sd" | awk '{ printf "%s: ${fs_used_perc %s}%% ${fs_bar %s}\n", $6, $6, $6}' }
+Throughput: ${diskio} 
+${diskiograph} 
+
+## NETWORK ##
+${font Aerial :style=Bold:size=8}Network (${addr eth0}) ${font Aerial :size=8} ${hr 2}${color #000000} 
+Down: ${color #000000}${downspeed eth0}/s ${alignr}Up: ${upspeed eth0}/s 
+${downspeedgraph eth0 25,140 000000 000000} ${alignr}${upspeedgraph eth0 
+25,140 000000 000000}${color #000000} 
+Total: ${totaldown eth0} ${alignr}Total: ${totalup eth0} 
+Inbound: ${tcp_portmon 1 32767 count} Outbound: ${tcp_portmon 32768 
+61000 count}${alignr}Total: ${tcp_portmon 1 65535 count} 
+
+## TIME ##
+${font Purisa :style=Bold:size=12}Time ${font Aerial :size=8}${hr 2}${color #000000} 
+${alignc}${time %k:%M:%S} 
+${alignc}${time %B %d %A}
+${font Purisa :style=Bold:size=12}Uptime ${font Aerial :size=8}${hr 2}${color #000000} 
+${alignc}${uptime} 
+
+## SHOW MUSIC DATA FROM RHYTHMBOX ## 
+${if_running rhythmbox}${color #000000}${font Purisa :style=Bold:size=12}Music ${font Aerial :size=8}${hr 2}${color #000000} 
+#
+${goto 40}${font Aerial :style=Bold:size=8}Artist: ${font Aerial :size=8}${color #000000}${exec rhythmbox-client --no-start --print-playing-format %aa} 
+# 
+${goto 40}${font Aerial :style=Bold:size=8}Title: ${font Aerial :size=8}${color #000000}${exec rhythmbox-client --no-start --print-playing-format %tt} 
+# 
+${goto 40}${font Aerial :style=Bold:size=8}Album: ${font Aerial :size=8}${color #000000}${exec rhythmbox-client --no-start --print-playing-format %at}
+${endif}
+#
+#
+## SHOW MOVIE TEXT IF TOTEM IS RUNNING ## 
+${if_running totem}${color #000000}${font Purisa :style=Bold:size=12}Movie ${font Aerial :size=8}${hr 2}${color #000000} 
+#
+${goto 40}${font Aerial :size=8}${color #000000}Movie info unaviable 
+${endif}
+#
+## TV GUIDE ##
+${font Purisa :style=Bold:size=12}TV Guide ${font Aerial :size=8}${hr 2}${color #000000} 
+${font Aerial :style=Bold:size=8}RTL Klub
+${font Aerial :size=8}${rss http://tv.animare.hu/rssfeed.aspx?tartalom=aktualistvmusor&tvcsatorna=5 2 item_titles 2} 
+
+${font Aerial :style=Bold:size=8}Cool
+${font Aerial :size=8}${rss http://tv.animare.hu/rssfeed.aspx?tartalom=aktualistvmusor&tvcsatorna=28 2 item_titles 2} 
+
+${font Aerial :style=Bold:size=8}AXN
+${font Aerial :size=8}${rss http://tv.animare.hu/rssfeed.aspx?tartalom=aktualistvmusor&tvcsatorna=27 2 item_titles 2} 
+
+${font Aerial :style=Bold:size=8}Discovery Channel
+${font Aerial :size=8}${rss http://tv.animare.hu/rssfeed.aspx?tartalom=aktualistvmusor&tvcsatorna=32 2 item_titles 2} 
+
+## LAST LOGS ##
+#${font Purisa :style=Bold:size=12}Logs ${font Aerial :size=8}${hr 2}${color #000000} 
+#${execi 30 tail -n1 /var/log/messages | fold -w50}
+#
+## FORTUNE COOKIE ##
+${font Purisa :style=Bold:size=12}Fortune cookie ${font Aerial :size=8}${hr 2}${color #000000} 
+${execi 30 fortune -s | fold -w50}
