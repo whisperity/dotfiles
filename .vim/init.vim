@@ -169,3 +169,7 @@ command C let @/=""
 " Quickly turn paste mode on or off
 command Pon set paste
 command Poff set nopaste
+
+" Folding control for markdown
+nmap <C-S-o> :foldopen <CR>
+nmap <C-S-p> :foldclose <CR>
