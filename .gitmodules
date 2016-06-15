@@ -19,3 +19,6 @@
 [submodule ".vim/skins/molokai"]
 	path = .vim/skins/molokai
 	url = https://github.com/tomasr/molokai.git
+[submodule ".bash-git-prompt"]
+	path = .bash-git-prompt
+	url = https://github.com/magicmonty/bash-git-prompt
