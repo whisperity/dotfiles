@@ -99,7 +99,7 @@ alias l='ls -CF'
 alias lh='ls -lh'
 
 alias ..='cd ..'
-alias tsearch='grep -RnwIi "." -e'
+alias fse='grep -RnwIi "." -e'
 
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
