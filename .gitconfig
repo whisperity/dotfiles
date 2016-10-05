@@ -43,6 +43,14 @@
 	hubremote-add = "!sh -c 'git remote add $1 http://github.com/$1/$2.git'" -
 	cbr = rev-parse --abbrev-ref HEAD
 	oldest-ancestor = !bash -c 'diff --old-line-format='' --new-line-format='' <(git rev-list --first-parent "${1:-master}") <(git rev-list --first-parent "${2:-HEAD}") | head -1' -
+	assume = update-index --assume-unchanged
+	unassume = update-index --no-assume-unchanged
+	assume-all = "!git st -s | awk {'print $2'} | xargs git assume"
+	assumeall = "!git assume-all"
+	unassume-all = "!git assumed | xargs git update-index --no-assume-unchanged"
+	unassumeall = "!git unassume-all"
+	assumed = "!git ls-files -v | grep ^h | cut -c 3-"
+	lsa = "!git assumed"
 [gc]
 	auto = 0
 	autopacklimit = 0
