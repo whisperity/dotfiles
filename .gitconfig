@@ -14,9 +14,9 @@
 	remote = green
 [color "diff"]
 	meta = yellow bold
-	frag = magenta bold # Line info
-	old = red bold      # Deletions
-	new = green bold    # Additions
+	frag = magenta bold   # Line info
+	old = red bold        # Deletions
+	new = green bold      # Additions
 	whitespace = red reverse
 [color "status"]
 	added = yellow
@@ -27,6 +27,7 @@
 [diff "bin"]
 	textconf = hexdump -v -C
 [alias]
+	# SVN-esque commands
 	st = status
 	ci = commit
 	br = branch
@@ -34,21 +35,35 @@
 	co = checkout
 	df = diff --stat --patch --raw
 	dc = diff --cached --stat --patch --raw
-	lg = log -p
+	ls = ls-files
+	ign = ls-files -o -i --exclude-standard
+	
+	# =========================================================
+	# Different log views
+	# - graph logs
 	lol = log --graph --decorate --pretty=oneline --abbrev-commit
 	lola = log --graph --decorate --pretty=oneline --abbrev-commit --all
 	log2 = log --graph --decorate --pretty=format:'------------------------------%n[%C(magenta)%h%Creset] %C(yellow)%cn <%ce>%Creset %C(cyan)%d%Creset %n%cd %n%Cgreen%s%Creset%n------------------------------' --abbrev-commit
-	ls = ls-files
-	ign = ls-files -o -i --exclude-standard
+	# - patchlog
+	lg = log -p 
+	# - date log (commit age oriented)
 	dlog = log --graph --decorate --abbrev-commit --date=short --date-order --pretty=format:'%Cred%h %C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%ad>%Creset'
+	# - changelog (user-oriented)
 	clog = log --date-order --pretty=format:'<%C(cyan)%an%Creset> [%ad] (%C(yellow)%h%Creset) %s'
-	dump = cat-file -p
-	fall = fetch -v --all
-	ffmerge = merge --ff-only
+	
+	# GitHub shortlinks
 	hubclone = "!sh -c 'git clone http://github.com/$1/$2.git --origin upstream'" -
 	hubremote-add = "!sh -c 'git remote add $1 http://github.com/$1/$2.git'" -
+	
+	# Lieutenant work helpers
+	recover = "!bash -c '~/bin/git-recover.sh $1'" -
+	rewrite = "!bash -c '~/bin/git-rewrite.sh $1 $2'" -
+	fall = fetch -v --all
+	ffmerge = merge --ff-only
 	cbr = rev-parse --abbrev-ref HEAD
 	oldest-ancestor = !bash -c 'diff --old-line-format='' --new-line-format='' <(git rev-list --first-parent "${1:-master}") <(git rev-list --first-parent "${2:-HEAD}") | head -1' -
+	
+	# Assume (mark change as unchanged)
 	assume = update-index --assume-unchanged
 	unassume = update-index --no-assume-unchanged
 	assume-all = "!git st -s | awk {'print $2'} | xargs git assume"
@@ -57,6 +72,9 @@
 	unassumeall = "!git unassume-all"
 	assumed = "!git ls-files -v | grep ^h | cut -c 3-"
 	lsa = "!git assumed"
+	
+	# Miscellaneous
+	dump = cat-file -p
 [gc]
 	auto = 0
 	autopacklimit = 0
