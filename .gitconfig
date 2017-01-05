@@ -45,7 +45,7 @@
 	lola = log --graph --decorate --pretty=oneline --abbrev-commit --all
 	log2 = log --graph --decorate --pretty=format:'------------------------------%n[%C(magenta)%h%Creset] %C(yellow)%cn <%ce>%Creset %C(cyan)%d%Creset %n%cd %n%Cgreen%s%Creset%n------------------------------' --abbrev-commit
 	# - patchlog
-	lg = log -p 
+	lg = log -p
 	# - date log (commit age oriented)
 	dlog = log --graph --decorate --abbrev-commit --date=short --date-order --pretty=format:'%Cred%h %C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%ad>%Creset'
 	# - changelog (user-oriented)
@@ -75,6 +75,9 @@
 	
 	# Miscellaneous
 	dump = cat-file -p
+	whoami = "!whoami() { \
+			echo \"$(git config --get user.name) <$(git config --get user.email)>\"; \
+		}; whoami" -
 [gc]
 	auto = 0
 	autopacklimit = 0
