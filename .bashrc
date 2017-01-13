@@ -100,6 +100,7 @@ alias lh='ls -lh'
 
 alias ..='cd ..'
 alias fse='grep -RnwIi "." -e'
+alias killpython="ps -opid,cmd | tail -n +2 | grep python | awk '{print \$1 }' | xargs kill -2"
 
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
