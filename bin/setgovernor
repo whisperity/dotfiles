@@ -1,0 +1,15 @@
+#!/bin/bash
+
+if [ $EUID -ne 0 ]
+then
+  echo "You must be root to run this script" 1>&2
+  exit 1
+fi
+
+if [ $# -ne 1 ]
+then
+  echo "Invalid arguments. Valid arguments are: (performance|powersave|ondemand|conservative)"
+else
+  echo "$1" | tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
+  cpufreq-info | grep governor
+fi
