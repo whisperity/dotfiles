@@ -43,6 +43,9 @@ let g:ycm_autoclose_preview_window_after_insertion = 1
 " Key to toggle Nerd Tree
 map <C-n> :NERDTreeToggle<CR>
 
+" Key to toggle Undo Tree
+map <F5> :UndotreeToggle<cr>
+
 " Clang Format
 let g:clang_format#code_style = 'llvm'
 map <C-f> :ClangFormat <CR>
