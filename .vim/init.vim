@@ -109,12 +109,12 @@ set mouse=a
 
 " Set the command window height to 2 lines, to avoid many cases of having
 " to "press <Enter> to continue"
-" set cmdheight=2
+set cmdheight=2
 
 " tabs to spaces
 set expandtab
 
-set shiftwidth=4
+set shiftwidth=2
 set tabstop=2
 
 set smarttab
