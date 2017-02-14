@@ -147,6 +147,15 @@ autocmd BufReadPost *
 " Remember info about open buffers on close
 set viminfo^=%
 
+" Ensure that the viminfo file is hidden after a leave
+" (This is NOT automatic on Windows...)
+if has("win32")
+  autocmd VimLeave * !attrib +h ~/.viminfo
+elseif has("unix")
+  " But when ran in Git Bash, it is NOT a 'win32' environment...
+  autocmd VimLeave * !if [ "$(type -t attrib)" == 'file' ]; then attrib +h ~/.viminfo; fi
+endif
+
 " Smart way to move between windows
 map <C-j> <C-W>j
 map <C-k> <C-W>k
