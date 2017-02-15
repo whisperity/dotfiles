@@ -74,6 +74,7 @@
 	lsa = "!git assumed"
 	
 	# Miscellaneous
+	d = describe --always --tags --dirty="-dirty"
 	dump = cat-file -p
 	whoami = "!whoami() { \
 			echo \"$(git config --get user.name) <$(git config --get user.email)>\"; \
