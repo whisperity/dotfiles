@@ -53,7 +53,7 @@
 	
 	# GitHub shortlinks
 	hubclone = "!sh -c 'git clone http://github.com/$1/$2.git --origin upstream'" -
-	hubremote-add = "!sh -c 'git remote add $1 http://github.com/$1/$2.git'" -
+	hubremote-add = "!sh -c 'git remote add $1 https://github.com/$1/$2.git'" -
 	
 	# Lieutenant work helpers
 	recover = "!bash -c '~/bin/git-recover.sh $1'" -
