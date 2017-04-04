@@ -121,4 +121,7 @@ GIT_PROMPT_FETCH_REMOTE_STATUS=0
 GIT_PROMPT_SHOW_UPSTREAM=0
 GIT_PROMPT_SHOW_UNTRACKED_FILES=no
 GIT_PROMPT_THEME=Default_Ubuntu
-source ~/.bash-git-prompt/gitprompt.sh
+
+if [ -z "$no_git_prompt" ]; then
+  source ~/.bash-git-prompt/gitprompt.sh
+fi
