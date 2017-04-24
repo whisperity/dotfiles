@@ -47,7 +47,8 @@ do
             # Show the commit's log entry
             git --no-pager log -n 1 --decorate \
                 --pretty=format:'%x09[%C(magenta)%h%Creset] %C(yellow)%cn <%ce>%Creset %n%x09%cd %n%x09%Cgreen%s%Creset' \
-                --abbrev-commit
+                --abbrev-commit \
+                "$HASH"
 
             git branch "$SHORTNAME" "$HASH"
             echo
