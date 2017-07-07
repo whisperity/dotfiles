@@ -48,7 +48,7 @@
 	lg = log -p
 	# - date log (commit age oriented)
 	dlog = log --graph --decorate --abbrev-commit --date=short --date-order --pretty=format:'%Cred%h %C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%ad>%Creset'
-	# - changelog (user-oriented)
+	# - changelog (user oriented)
 	clog = log --date-order --pretty=format:'<%C(cyan)%an%Creset> [%ad] (%C(yellow)%h%Creset) %s'
 
 	# GitHub shortlinks
@@ -58,7 +58,7 @@
 	# Lieutenant work helpers
 	recover = "!bash -c '~/bin/git-recover.sh $1'" -
 	rewrite = "!bash -c '~/bin/git-rewrite.sh $1 $2'" -
-	fall = fetch -v --all
+	fall = fetch --verbose --all --prune
 	ffmerge = merge --ff-only
 	cbr = rev-parse --abbrev-ref HEAD
 
