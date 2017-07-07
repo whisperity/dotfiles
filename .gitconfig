@@ -37,7 +37,7 @@
 	dc = diff --cached --stat --patch --raw
 	ls = ls-files
 	ign = ls-files -o -i --exclude-standard
-	
+
 	# =========================================================
 	# Different log views
 	# - graph logs
@@ -50,20 +50,29 @@
 	dlog = log --graph --decorate --abbrev-commit --date=short --date-order --pretty=format:'%Cred%h %C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%ad>%Creset'
 	# - changelog (user-oriented)
 	clog = log --date-order --pretty=format:'<%C(cyan)%an%Creset> [%ad] (%C(yellow)%h%Creset) %s'
-	
+
 	# GitHub shortlinks
 	hubclone = "!sh -c 'git clone http://github.com/$1/$2.git --origin upstream'" -
-	hubremote-add = "!sh -c 'git remote add $1 https://github.com/$1/$2.git'" -
-	
+	hubremote-add = "!sh -c 'git remote add $1 http://github.com/$1/$2.git'" -
+
 	# Lieutenant work helpers
 	recover = "!bash -c '~/bin/git-recover.sh $1'" -
 	rewrite = "!bash -c '~/bin/git-rewrite.sh $1 $2'" -
 	fall = fetch -v --all
 	ffmerge = merge --ff-only
 	cbr = rev-parse --abbrev-ref HEAD
+
+	# Show the oldest ancestor (the branching point) between master and HEAD
+	# (or first and second argument). For example, this is the commit a rebase
+	# will go back to.
 	oldest-ancestor = !bash -c 'diff --old-line-format='' --new-line-format='' <(git rev-list --first-parent "${1:-master}") <(git rev-list --first-parent "${2:-HEAD}") | head -1' -
-	
-	# Assume (mark change as unchanged)
+
+	# Show all remote branches of the origin repository that has been merged
+	# into upstream/master, but exclude master, as it should trivially be merged:
+	# $ git upstreamed master upstream origin
+	upstreamed = !bash -c 'git branch --merged "${2:-upstream}"/"${1:-master}" --remotes | grep "${3:-origin}" | grep -v "${1:-master}"'
+
+	# Assume (consider change as unchanged)
 	assume = update-index --assume-unchanged
 	unassume = update-index --no-assume-unchanged
 	assume-all = "!git st -s | awk {'print $2'} | xargs git assume"
@@ -72,7 +81,7 @@
 	unassumeall = "!git unassume-all"
 	assumed = "!git ls-files -v | grep ^h | cut -c 3-"
 	lsa = "!git assumed"
-	
+
 	# Miscellaneous
 	d = describe --always --tags --dirty="-dirty"
 	dump = cat-file -p
