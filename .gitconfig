@@ -70,7 +70,7 @@
 	# Show all remote branches of the origin repository that has been merged
 	# into upstream/master, but exclude master, as it should trivially be merged:
 	# $ git upstreamed master upstream origin
-	upstreamed = !bash -c 'git branch --merged "${2:-upstream}"/"${1:-master}" --remotes | grep "${3:-origin}" | grep -v "${1:-master}"'
+	upstreamed = !bash -c 'git branch --list --remotes --merged "${2:-upstream}/${1:-master}" | grep \"^[ \\t]*${3:-origin}/\" | grep -v "${1:-master}"' -
 
 	# Assume (consider change as unchanged)
 	assume = update-index --assume-unchanged
