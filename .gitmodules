@@ -1,30 +1,33 @@
-[submodule ".vim/bundle/nerdtree"]
-	path = .vim/bundle/nerdtree
-	url = https://github.com/scrooloose/nerdtree.git
-[submodule ".vim/bundle/undotree"]
-	path = .vim/bundle/undotree
-	url = https://github.com/mbbill/undotree
-[submodule ".vim/bundle/syntastic"]
-	path = .vim/bundle/syntastic
-	url = https://github.com/scrooloose/syntastic.git
-[submodule ".vim/bundle/vim-airline"]
-	path = .vim/bundle/vim-airline
-	url = https://github.com/bling/vim-airline.git
-[submodule ".vim/bundle/vim-clang-format"]
-	path = .vim/bundle/vim-clang-format
-	url = https://github.com/rhysd/vim-clang-format.git
-[submodule ".vim/bundle/vim-fugitive"]
-	path = .vim/bundle/vim-fugitive
-	url = https://github.com/tpope/vim-fugitive.git
-[submodule ".vim/bundle/vim-markdown"]
-	path = .vim/bundle/vim-markdown
-	url = https://github.com/plasticboy/vim-markdown.git
-[submodule ".vim/skins/molokai"]
-	path = .vim/skins/molokai
-	url = https://github.com/tomasr/molokai.git
-[submodule ".bash-git-prompt"]
+[submodule "Bash Git prompt"]
 	path = .bash-git-prompt
-	url = https://github.com/magicmonty/bash-git-prompt
-[submodule ".vim/bundle/vim-gitgutter"]
+	url = http://github.com/magicmonty/bash-git-prompt.git
+[submodule "(Vim) AirLine"]
+	path = .vim/bundle/vim-airline
+	url = http://github.com/bling/vim-airline.git
+[submodule "(Vim) Clang-Format"]
+	path = .vim/bundle/vim-clang-format
+	url = http://github.com/rhysd/vim-clang-format.git
+[submodule "(Vim) Fu-Git-ive"]
+	path = .vim/bundle/vim-fugitive
+	url = http://github.com/tpope/vim-fugitive.git
+[submodule "(Vim) Git Gutter"]
 	path = .vim/bundle/vim-gitgutter
-	url = https://github.com/airblade/vim-gitgutter
+	url = http://github.com/airblade/vim-gitgutter.git
+[submodule "(Vim) Markdown"]
+	path = .vim/bundle/vim-markdown
+	url = http://github.com/plasticboy/vim-markdown.git
+[submodule "(Vim) NERDTree"]
+	path = .vim/bundle/nerdtree
+	url = http://github.com/scrooloose/nerdtree.git
+[submodule "(Vim) Syntastic"]
+	path = .vim/bundle/syntastic
+	url = http://github.com/scrooloose/syntastic.git
+[submodule "(Vim) TeX"]
+	path = .vim/bundle/vimtex
+	url = http://github.com/lervag/vimtex.git
+[submodule "(Vim) UndoTree"]
+	path = .vim/bundle/undotree
+	url = http://github.com/mbbill/undotree.git
+[submodule "(Vim) Molokai (skin)"]
+	path = .vim/skins/molokai
+	url = http://github.com/tomasr/molokai.git
