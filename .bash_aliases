@@ -18,4 +18,4 @@ alias killpython="ps -opid,cmd | tail -n +2 | grep python | awk '{print \$1 }' |
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
 
 # Add the current working directory to PATH.
-alias wd2path='export PATH="$(pwd):$PATH"
+alias wd2path='export PATH="$(pwd):$PATH"'
