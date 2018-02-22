@@ -130,6 +130,10 @@ set laststatus=2
 " Ignore compiled files
 set wildignore=*.o,*~,*.pyc
 
+" Show trailing whitespaces.
+set list
+set listchars=tab:>.,trail:.,extends:#,nbsp:.
+
 " No annoying sound on errors
 "set noerrorbells
 "set novisualbell
@@ -177,7 +181,9 @@ nnoremap <F3> :bnext <CR>
 nnoremap <F2> :bprevious <CR>
 nnoremap <F4> :buffers<CR>:buffer<Space>
 
+" Close the current buffer.
 command Bc bp|bd#
+
 command C let @/=""
 
 " Quickly turn paste mode on or off
@@ -187,3 +193,12 @@ command Poff set nopaste
 " Folding control for markdown
 nmap <C-S-o> :foldopen <CR>
 nmap <C-S-p> :foldclose <CR>
+
+" Only do this part when compiled with support for autocommands.
+if has("autocmd")
+    " Use filetype detection and file-based automatic indenting.
+    filetype plugin indent on
+
+    " Use actual tab chars in Makefiles. They mess up when non tabs are used.
+    autocmd FileType make set tabstop=8 shiftwidth=8 softtabstop=0 noexpandtab
+endif
