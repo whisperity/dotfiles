@@ -11,7 +11,8 @@ Installed from package manager
         cpufreq-utils \
         htop \
         iotop \
-        smartmontools
+        smartmontools \
+        tree
 
 To be installed manually
 ------------------------
