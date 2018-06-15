@@ -26,6 +26,12 @@
 	renames = copies
 [diff "bin"]
 	textconf = hexdump -v -C
+[gc]
+	auto = 0
+	autopacklimit = 0
+	packrefs = 0
+[push]
+	default = simple
 [alias]
 	# SVN-esque commands
 	st = status
@@ -88,7 +94,3 @@
 	whoami = "!whoami() { \
 			echo \"$(git config --get user.name) <$(git config --get user.email)>\"; \
 		}; whoami" -
-[gc]
-	auto = 0
-	autopacklimit = 0
-	packrefs = 0
