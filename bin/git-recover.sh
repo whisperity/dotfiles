@@ -97,8 +97,8 @@ fi
 
 if [ $LOST_FOUND_CREATED -eq 1 ]
 then
-    echo "rm -r lost+found" >> recover-undo.sh
+    echo "rm -r $(pwd)/lost+found" >> recover-undo.sh
 fi
-echo "rm recover-undo.sh" >> recover-undo.sh
+echo "rm $(pwd)/recover-undo.sh" >> recover-undo.sh
 
 chmod u+x recover-undo.sh
