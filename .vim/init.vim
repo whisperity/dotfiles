@@ -177,13 +177,14 @@ noremap  <buffer> <silent> gk k
 noremap  <buffer> <silent> gj j
 
 " Buffer switch
-nnoremap <F3> :bnext <CR>
-nnoremap <F2> :bprevious <CR>
-nnoremap <F4> :buffers<CR>:buffer<Space>
+nnoremap <F2> :buffers<CR>:buffer<Space>
+nnoremap <F4> :bnext <CR>
+nnoremap <F3> :bprevious <CR>
 
 " Close the current buffer.
 command Bc bp|bd#
 
+" Clear highlighted searches.
 command C let @/=""
 
 " Quickly turn paste mode on or off
