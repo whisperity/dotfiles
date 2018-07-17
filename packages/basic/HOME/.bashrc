@@ -56,13 +56,99 @@ if [ -n "$force_color_prompt" ]; then
     fi
 fi
 
-if [ "$color_prompt" = yes ]; then
+
+# Put together a nice prompt, first the basics.
+prompt_basic()
+{
+    local RESET='\[\e[0m\]'
+    local Red='\[\e[1;31m\]'
+    local Green='\[\e[1;32m\]'
+    local Yellow='\[\e[1;33m\]'
+    local LBlue='\[\e[1;34m\]'
+    local White='\[\e[1;37m\]'
+
     if [ ${EUID} -eq 0 ];
     then
-        PS1='\[\033[01;31m\]\A\[\033[00m\] ${debian_chroot:+($debian_chroot)}\[\033[01;31m\]\u@\h:\[\033[01;33m\]\w\[\033[01;31m\]\$\[\033[00m\] '
+        PROMPT_USERNAME="${Red}\u${RESET}"
+        PROMPT_HOSTNAME="${Red}\h${RESET}"
+        PROMPT_FOLDER="${Yellow}\w${RESET}"
+        PROMPT_CHAR="${Red}\\\$${RESET}"
     else
-        PS1='\[\033[01;37m\]\A\[\033[00m\] ${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+        PROMPT_USERNAME="${Green}\u${RESET}"
+        PROMPT_HOSTNAME="${Yellow}\h${RESET}"
+        PROMPT_FOLDER="${LBlue}\w${RESET}"
+        PROMPT_CHAR="${White}\\\$${RESET}"
     fi
+
+    echo -en "${PROMPT_USERNAME}@${PROMPT_HOSTNAME}:${PROMPT_FOLDER} ${PROMPT_CHAR} "
+}
+
+prompt_time()
+{
+    local RESET='\[\e[0m\]'
+    local White='\[\e[1;37m\]'
+
+    echo -en "${White}\A${RESET}"
+}
+
+# Helper function to nicely format the number of jobs running in the shell.
+prompt_jobs()
+{
+  local running=$(jobs -rp | wc -l)
+  local stopped=$(jobs -sp | wc -l)
+
+  local RESET='\e[0m'
+  local Magenta='\e[1;35m'
+  local Cyan='\e[1;36m'
+
+  ((running || stopped)) && echo -n " "
+  ((running)) && echo -en "${Cyan}R:${running}${RESET}"
+  ((running && stopped)) && echo -en "/"
+  ((stopped)) && echo -en "${Magenta}S:${stopped}${RESET}"
+}
+
+
+prompt_chroot()
+{
+    local RESET='\e[0m'
+    local LBlue='\e[1;34m'
+
+    if [ ! -z ${debian_chroot} ];
+    then
+      echo -en " ${LBlue}${debian_chroot}${RESET} "
+    fi
+
+}
+
+prompt_exitcode()
+{
+    local RESET='\e[0m'
+    local Red='\e[1;31m'
+    local Green='\e[0;32m'
+    local DYellow='\e[0;33m'
+    local DBlue='\e[0;34m'
+    local Purple='\e[0;35m'
+
+    # Exit code can be a 3-character long number at max (0..256 or -127..128).
+    # Pad this number and justify to the right so it looks good.
+    local Length=$(echo -n "$1" | wc -c)
+    local Padding=$((3 - ${Length}))
+
+    if [ "$1" != 0 ];
+    then
+        echo -en "$(printf "%${Padding}s")${Red}$1${RESET}"
+    else
+        echo -en "$(printf "%${Padding}s")${DYellow}$1${RESET}"
+    fi
+}
+
+
+if [ "$color_prompt" = yes ]; then
+    # Saving out exitcode first to ensure it is picked up properly.
+    PROMPT_EXITCODE='$(prompt_exitcode $?)'
+    PROMPT_JOBS='`if [ -n "$(jobs -p)" ]; then echo "$(prompt_jobs)"; fi`'
+
+    PS1="${PROMPT_EXITCODE} $(prompt_time)$(prompt_chroot)${PROMPT_JOBS} $(prompt_basic)"
 else
     PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
 fi
