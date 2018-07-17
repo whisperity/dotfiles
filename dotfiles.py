@@ -79,6 +79,20 @@ if len(args.PACKAGE) == 0:
 
     sys.exit(0)
 
+# Translate globber expressions such as "foo.bar.*" into actual package list
+for all_marker in [package for package in args.PACKAGE
+                   if package.endswith('*') or package.endswith('__ALL__')]:
+    namespace = all_marker.replace('*', '').replace('__ALL__', '')
+
+    packages = [package for package in AVAILABLE_PACKAGES
+                if package.startswith(namespace)]
+    for package in packages:
+        print("Marked '%s' for installation." % package)
+
+    # Update the remaining package list to include all the marked packages.
+    args.PACKAGE = packages + [package for package in args.PACKAGE
+                               if package != all_marker]
+
 # Run the package installs in topological order.
 invalid_packages = [package for package in args.PACKAGE
                     if package not in AVAILABLE_PACKAGES]
