@@ -1,23 +1,23 @@
 {
-  "description": "Vim status line",
+  "description": "The ultimate undo history visualizer for Vim",
   "dependencies": [
     "vim.pathogen"
   ],
   "prefetch": [
     {
       "kind": "git clone",
-      "remote": "http://github.com/vim-airline/vim-airline"
+      "remote": "http://github.com/mbbill/undotree"
     }
   ],
   "install": [
     {
       "kind": "copy tree",
-      "folder": "$PREFETCH_DIR/vim-airline",
-      "to": "$HOME/.vim/bundle/vim-airline"
+      "folder": "$PREFETCH_DIR/undotree",
+      "to": "$HOME/.vim/bundle/undotree"
     },
     {
       "kind": "append",
-      "file": "airline.vimrc",
+      "file": "undotree.vimrc",
       "to": "$HOME/.vim/init.vim"
     }
   ]

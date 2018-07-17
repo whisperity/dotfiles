@@ -1,0 +1,19 @@
+{
+  "description": "Vim support for (La)TeX code editing",
+  "dependencies": [
+    "vim.pathogen"
+  ],
+  "prefetch": [
+    {
+      "kind": "git clone",
+      "remote": "http://github.com/lervag/vimtex"
+    }
+  ],
+  "install": [
+    {
+      "kind": "copy tree",
+      "folder": "$PREFETCH_DIR/vimtex",
+      "to": "$HOME/.vim/bundle/vimtex"
+    }
+  ]
+}

@@ -1,23 +1,23 @@
 {
-  "description": "Vim status line",
+  "description": "Vim syntax checking extension",
   "dependencies": [
     "vim.pathogen"
   ],
   "prefetch": [
     {
       "kind": "git clone",
-      "remote": "http://github.com/vim-airline/vim-airline"
+      "remote": "http://github.com/scrooloose/syntastic"
     }
   ],
   "install": [
     {
       "kind": "copy tree",
-      "folder": "$PREFETCH_DIR/vim-airline",
-      "to": "$HOME/.vim/bundle/vim-airline"
+      "folder": "$PREFETCH_DIR/syntastic",
+      "to": "$HOME/.vim/bundle/syntastic"
     },
     {
       "kind": "append",
-      "file": "airline.vimrc",
+      "file": "syntastic.vimrc",
       "to": "$HOME/.vim/init.vim"
     }
   ]

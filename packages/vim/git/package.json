@@ -1,0 +1,28 @@
+{
+  "description": "Vim plugins for Git status (gutter annotations) and invoking Git actions",
+  "dependencies": [
+    "vim.pathogen"
+  ],
+  "prefetch": [
+    {
+      "kind": "git clone",
+      "remote": "http://github.com/tpope/vim-fugitive"
+    },
+    {
+      "kind": "git clone",
+      "remote": "http://github.com/airblade/vim-gitgutter"
+    }
+  ],
+  "install": [
+    {
+      "kind": "copy tree",
+      "folder": "$PREFETCH_DIR/vim-fugitive",
+      "to": "$HOME/.vim/bundle/vim-fugitive"
+    },
+    {
+      "kind": "copy tree",
+      "folder": "$PREFETCH_DIR/vim-gitgutter",
+      "to": "$HOME/.vim/bundle/vim-gitgutter"
+    }
+  ]
+}

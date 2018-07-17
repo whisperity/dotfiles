@@ -1,23 +1,23 @@
 {
-  "description": "Vim status line",
+  "description": "File system tree plugin for Vim",
   "dependencies": [
     "vim.pathogen"
   ],
   "prefetch": [
     {
       "kind": "git clone",
-      "remote": "http://github.com/vim-airline/vim-airline"
+      "remote": "http://github.com/scrooloose/nerdtree"
     }
   ],
   "install": [
     {
       "kind": "copy tree",
-      "folder": "$PREFETCH_DIR/vim-airline",
-      "to": "$HOME/.vim/bundle/vim-airline"
+      "folder": "$PREFETCH_DIR/nerdtree",
+      "to": "$HOME/.vim/bundle/nerdtree"
     },
     {
       "kind": "append",
-      "file": "airline.vimrc",
+      "file": "nerdtree.vimrc",
       "to": "$HOME/.vim/init.vim"
     }
   ]

@@ -24,7 +24,7 @@
     },
     {
       "kind": "append",
-      "file": "pathogen-vim-load.vimrc",
+      "file": "pathogen.vimrc",
       "to": "$HOME/.vim/init.vim"
     }
   ]
