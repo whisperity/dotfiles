@@ -4,8 +4,6 @@ if has('nvim')
   let g:pathogen_disabled = ['YouCompleteMe']
 endif
 
-execute pathogen#infect()
-
 " Neovim
 if has('nvim')
   tnoremap <Esc> <C-\><C-n>

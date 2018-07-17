@@ -1,9 +1,6 @@
 [submodule "Bash Git prompt"]
 	path = .bash-git-prompt
 	url = http://github.com/magicmonty/bash-git-prompt.git
-[submodule "(Vim) AirLine"]
-	path = .vim/bundle/vim-airline
-	url = http://github.com/bling/vim-airline.git
 [submodule "(Vim) Clang-Format"]
 	path = .vim/bundle/vim-clang-format
 	url = http://github.com/rhysd/vim-clang-format.git
@@ -28,6 +25,3 @@
 [submodule "(Vim) UndoTree"]
 	path = .vim/bundle/undotree
 	url = http://github.com/mbbill/undotree.git
-[submodule "(Vim) Molokai (skin)"]
-	path = .vim/skins/molokai
-	url = http://github.com/tomasr/molokai.git

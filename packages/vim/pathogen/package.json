@@ -1,0 +1,31 @@
+{
+  "description": "pathogen.vim: Manage Vim plugins with ease!",
+  "dependencies": [
+    "basic"
+  ],
+  "prefetch": [
+    {
+      "kind": "git clone",
+      "remote": "http://github.com/tpope/vim-pathogen"
+    }
+  ],
+  "install": [
+    {
+      "kind": "make folders",
+      "folders": [
+        "$HOME/.vim/autoload",
+        "$HOME/.vim/bundle"
+      ]
+    },
+    {
+      "kind": "copy",
+      "file": "$PREFETCH_DIR/vim-pathogen/autoload/pathogen.vim",
+      "to": "$HOME/.vim/autoload/pathogen.vim"
+    },
+    {
+      "kind": "append",
+      "file": "pathogen-vim-load.vimrc",
+      "to": "$HOME/.vim/init.vim"
+    }
+  ]
+}

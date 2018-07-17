@@ -145,7 +145,8 @@ def install_package(package):
                     print("Cloning remote content from '%s'..."
                           % command['remote'])
                     subprocess.call(['git', 'clone', command['remote'],
-                                     '--origin', 'upstream'])
+                                     '--origin', 'upstream',
+                                     '--depth', str(1)])
         except Exception as e:
             print("Couldn't fetch '%s': '%s'!" % (package, e),
                   file=sys.stderr)
@@ -179,7 +180,7 @@ def install_package(package):
             elif kind == 'make folders':
                 for folder in command['folders']:
                     output = os.path.expandvars(folder)
-                    print("    ---> Creating output folder '%s'" % output)
+                    print("    ---\ Creating output folder '%s'" % output)
                     os.makedirs(output)
             elif kind == 'extract multiple':
                 from_root_folder = command['root']
@@ -188,7 +189,7 @@ def install_package(package):
                       % (from_root_folder, to_root_folder))
 
                 for f in command['files']:
-                    print("      - %s" % f)
+                    print("       :- %s" % f)
                     shutil.copy(os.path.join(from_root_folder, f),
                                 os.path.join(to_root_folder, f))
             elif kind == 'copy':
@@ -197,6 +198,13 @@ def install_package(package):
                 print("    ---> Copying file '%s' to '%s'"
                       % (from_file, to_file))
                 shutil.copy(from_file, to_file)
+            elif kind == 'copy tree':
+                from_folder = __expand(command['folder'])
+                to_folder = os.path.expandvars(command['to'])
+                print("    ---> Copying folder '%s' to '%s'"
+                      % (from_folder, to_folder))
+                shutil.copytree(from_folder, to_folder)
+
             elif kind == 'append':
                 from_file = __expand(command['file'])
                 to_file = os.path.expandvars(command['to'])
@@ -213,6 +221,9 @@ def install_package(package):
         return False
     finally:
         os.chdir(script_directory)
+
+        if prefetch_dir:
+            shutil.rmtree(prefetch_dir, True)
 
 
 # Check the depencies for the packages that the user wants to install.

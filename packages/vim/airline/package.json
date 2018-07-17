@@ -1,0 +1,19 @@
+{
+  "description": "Vim status line",
+  "dependencies": [
+    "vim.pathogen"
+  ],
+  "prefetch": [
+    {
+      "kind": "git clone",
+      "remote": "http://github.com/vim-airline/vim-airline"
+    }
+  ],
+  "install": [
+    {
+      "kind": "copy tree",
+      "folder": "$PREFETCH_DIR/vim-airline",
+      "to": "$HOME/.vim/bundle/vim-airline"
+    }
+  ]
+}
