@@ -1,0 +1,50 @@
+{
+  "description": "Basic user environment files. (This package is tailored for Ubuntu.)",
+  "prefetch": [
+    {
+      "kind": "git clone",
+      "remote": "http://github.com/tomasr/molokai.git"
+    }
+  ],
+  "install": [
+    {
+      "kind": "extract multiple",
+      "root": "HOME",
+      "files": [
+        ".profile",
+        ".bashrc",
+        ".bash_aliases",
+        ".gitconfig"
+      ]
+    },
+    {
+      "kind": "make folders",
+      "folders": [
+        "$HOME/.vim",
+        "$HOME/.vim/colors"
+      ]
+    },
+    {
+      "kind": "extract multiple",
+      "root": "HOME",
+      "files": [
+        ".vimrc",
+        ".vim/init.vim"
+      ]
+    },
+    {
+      "kind": "copy",
+      "file": "$PREFETCH_DIR/molokai/colors/molokai.vim",
+      "to": "$HOME/.vim/colors/molokai.vim"
+    },
+    {
+      "kind": "make folders",
+      "folders": [ "$HOME/.config/htop" ]
+    },
+    {
+      "kind": "extract multiple",
+      "root": "HOME",
+      "files": [ ".config/htop/htoprc" ]
+    }
+  ]
+}

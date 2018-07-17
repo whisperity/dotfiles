@@ -1,1 +1,0 @@
-../skins/molokai/colors/molokai.vim

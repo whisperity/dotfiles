@@ -4,7 +4,10 @@ import argparse
 import fnmatch
 import json
 import os
+import shutil
+import subprocess
 import sys
+import tempfile
 
 if __name__ != "__main__":
     raise ImportError("Do not use this as a module.")
@@ -121,7 +124,95 @@ def check_dependencies(dependencies):
 
 
 def install_package(package):
-    pass
+    package_data = get_package_data(package)
+    if 'install' not in package_data:
+        print("'%s' is a virtual package - no install actions done." % package)
+        return True
+
+    prefetch_dir = None
+    if 'prefetch' in package_data:
+        print("Obtaining extra content for install of '%s'..." % package)
+
+        # Create a temporary directory for this operation
+        prefetch_dir = tempfile.mkdtemp(None, "dotfiles-")
+
+        try:
+            os.chdir(prefetch_dir)
+
+            for command in package_data['prefetch']:
+                kind = command['kind']
+                if kind == 'git clone':
+                    print("Cloning remote content from '%s'..."
+                          % command['remote'])
+                    subprocess.call(['git', 'clone', command['remote'],
+                                     '--origin', 'upstream'])
+        except Exception as e:
+            print("Couldn't fetch '%s': '%s'!" % (package, e),
+                  file=sys.stderr)
+            print(e)
+            return False
+        finally:
+            os.chdir(script_directory)
+
+
+    def __expand(path):
+        """
+        Helper method for expanding not only the environment variables in an
+        install action, but script-specific variables.
+        """
+
+        if '$PREFETCH_DIR' in path:
+            if not prefetch_dir:
+                raise ValueError("Invalid directive: '$PREFETCH_DIR' used "
+                                 "without any prefetch command executed.")
+            path = path.replace('$PREFETCH_DIR', prefetch_dir)
+        return os.path.expandvars(path)
+
+
+    try:
+        os.chdir(os.path.dirname(packagename_to_file(package)))
+
+        for command in package_data['install']:
+            kind = command['kind']
+            if kind == 'shell':
+                subprocess.call(command['command'], shell=True)
+            elif kind == 'make folders':
+                for folder in command['folders']:
+                    output = os.path.expandvars(folder)
+                    print("    ---> Creating output folder '%s'" % output)
+                    os.makedirs(output)
+            elif kind == 'extract multiple':
+                from_root_folder = command['root']
+                to_root_folder = os.path.expandvars('$' + command['root'])
+                print("    ---: Copying files from '%s' to '%s'"
+                      % (from_root_folder, to_root_folder))
+
+                for f in command['files']:
+                    print("      - %s" % f)
+                    shutil.copy(os.path.join(from_root_folder, f),
+                                os.path.join(to_root_folder, f))
+            elif kind == 'copy':
+                from_file = __expand(command['file'])
+                to_file = os.path.expandvars(command['to'])
+                print("    ---> Copying file '%s' to '%s'"
+                      % (from_file, to_file))
+                shutil.copy(from_file, to_file)
+            elif kind == 'append':
+                from_file = __expand(command['file'])
+                to_file = os.path.expandvars(command['to'])
+                print("    ---> Appending package file '%s' to '%s'"
+                      % (from_file, to_file))
+                with open(to_file, 'a') as to:
+                    with open(from_file, 'r') as in_file:
+                        to.write(in_file.read())
+
+        return True
+    except Exception as e:
+        print("Couldn't install '%s': '%s'!" % (package, e), file=sys.stderr)
+        print(e)
+        return False
+    finally:
+        os.chdir(script_directory)
 
 
 # Check the depencies for the packages that the user wants to install.
@@ -154,8 +245,14 @@ while any(WORK_QUEUE):
     print("Preparing to install package '%s'..." % package)
 
     WORK_QUEUE = [p for p in WORK_QUEUE if p != package]
-    install_package(package)
 
+    success = install_package(package)
+    if not success:
+        print(" !! Failed to install '%s'" % package)
+        PACKAGE_STATUS[package] = 'failed'
+        break  # Explicitly break the loop and write the statuses.
+
+    print("Installed package '%s'." % package)
     PACKAGE_STATUS[package] = 'installed'
 
 with open(os.path.join(os.path.expanduser('~'),
