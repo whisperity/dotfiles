@@ -1,0 +1,24 @@
+{
+  "description": "Change Bash prompt to show Git statuses in a working directory",
+  "dependencies": [
+    "basic"
+  ],
+  "prefetch": [
+    {
+      "kind": "git clone",
+      "remote": "http://github.com/magicmonty/bash-git-prompt"
+    }
+  ],
+  "install": [
+    {
+      "kind": "copy tree",
+      "folder": "$PREFETCH_DIR/bash-git-prompt",
+      "to": "$HOME/.bash-git-prompt"
+    },
+    {
+      "kind": "append",
+      "file": "bash-git-prompt.sh",
+      "to": "$HOME/.bashrc"
+    }
+  ]
+}

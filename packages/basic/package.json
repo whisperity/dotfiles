@@ -1,5 +1,5 @@
 {
-  "description": "Basic user environment files. (This package is tailored for Ubuntu.)",
+  "description": "Basic user environment files. (This package is initially tailored for use on a default Ubuntu-made user account.)",
   "prefetch": [
     {
       "kind": "git clone",

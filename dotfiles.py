@@ -72,7 +72,8 @@ if len(args.PACKAGE) == 0:
 
         with open(packagename_to_file(package), 'r') as packagefile:
             package_data = json.load(packagefile)
-            print("        %s" % package_data['description'], end='')
+            print()  # Put a linebreak here too.
+            print("          %s" % package_data['description'], end='')
 
         print()  # Linebreak.
 
