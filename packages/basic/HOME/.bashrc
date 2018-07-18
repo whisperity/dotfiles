@@ -60,6 +60,10 @@ fi
 # Put together a nice prompt, first the basics.
 prompt_basic()
 {
+    # This function prints the escape sequences >directly< as this is only used
+    # to embed into PS1. This function does not depend on the environment of
+    # the shell as this only emits Bash shell sequences (such as \u) which are
+    # then parsed by the shell.
     local RESET='\[\e[0m\]'
     local Red='\[\e[1;31m\]'
     local Green='\[\e[1;32m\]'
@@ -80,7 +84,7 @@ prompt_basic()
         PROMPT_CHAR="${White}\\\$${RESET}"
     fi
 
-    echo -en "${PROMPT_USERNAME}@${PROMPT_HOSTNAME}:${PROMPT_FOLDER} ${PROMPT_CHAR} "
+    echo -en "${PROMPT_USERNAME}@${PROMPT_HOSTNAME}:${PROMPT_FOLDER} ${PROMPT_CHAR}"
 }
 
 prompt_time()
@@ -91,64 +95,83 @@ prompt_time()
     echo -en "${White}\A${RESET}"
 }
 
-# Helper function to nicely format the number of jobs running in the shell.
-prompt_jobs()
+# Helper functions to format the exit code in the prompt.
+# These functions are broken up into multiple parts because their output is
+# parametric on the current execution environment.
+__prompt_exitcode_padding()
 {
-  local running=$(jobs -rp | wc -l)
-  local stopped=$(jobs -sp | wc -l)
-
-  local RESET='\e[0m'
-  local Magenta='\e[1;35m'
-  local Cyan='\e[1;36m'
-
-  ((running || stopped)) && echo -n " "
-  ((running)) && echo -en "${Cyan}R:${running}${RESET}"
-  ((running && stopped)) && echo -en "/"
-  ((stopped)) && echo -en "${Magenta}S:${stopped}${RESET}"
-}
-
-
-prompt_chroot()
-{
-    local RESET='\e[0m'
-    local LBlue='\e[1;34m'
-
-    if [ ! -z ${debian_chroot} ];
-    then
-      echo -en " ${LBlue}${debian_chroot}${RESET} "
-    fi
-
-}
-
-prompt_exitcode()
-{
-    local RESET='\e[0m'
-    local Red='\e[1;31m'
-    local Green='\e[0;32m'
-    local DYellow='\e[0;33m'
-    local DBlue='\e[0;34m'
-    local Purple='\e[0;35m'
-
-    # Exit code can be a 3-character long number at max (0..256 or -127..128).
+    # Exit code can be a 3-character long number at max (0..255).
     # Pad this number and justify to the right so it looks good.
     local Length=$(echo -n "$1" | wc -c)
     local Padding=$((3 - ${Length}))
+    echo -n "$(printf "%${Padding}s")"
+}
+
+__prompt_exitcode_colour()
+{
+    local Red='\e[1;31m'
+    local DYellow='\e[0;33m'
 
     if [ "$1" != 0 ];
     then
-        echo -en "$(printf "%${Padding}s")${Red}$1${RESET}"
+        echo -en "${Red}"
     else
-        echo -en "$(printf "%${Padding}s")${DYellow}$1${RESET}"
+        echo -en "${DYellow}"
     fi
 }
 
+set_prompt_exitcode()
+{
+    # Set the exit code to be printed at the shell. The colour part of the
+    # print contains colours, which are 0-length strings, thus these need to
+    # be escaped between \[ and \].
+    # The padding is a valid lengthy string so it must be calculated into line
+    # length.
+
+    PS1+='$(exit_c=$?; __prompt_exitcode_padding $exit_c; '
+    PS1+='printf %s \[$(__prompt_exitcode_colour $exit_c)\]'
+    PS1+='$exit_c \[\e[0m\])'
+}
+
+# Helper function to nicely format the number of jobs running in the shell.
+__prompt_jobs_running()
+{
+    local running=$(jobs -rp | wc -l)
+    ((running)) && echo -n "R:${running}"
+}
+
+__prompt_jobs_separator()
+{
+    local running=$(jobs -rp | wc -l)
+    local stopped=$(jobs -sp | wc -l)
+    ((running && stopped)) && echo -n ","
+}
+
+__prompt_jobs_stopped()
+{
+    local stopped=$(jobs -sp | wc -l)
+    ((stopped)) && echo -n "S:${stopped}"
+}
+
+set_prompt_jobs()
+{
+    local RESET='\[\e[0m\]'
+    local Magenta='\[\e[1;35m\]'
+    local Cyan='\[\e[1;36m\]'
+
+    PS1+='$( if [[ "$(jobs -p | wc -l)" -gt 0 ]]; then echo -n ""; '
+    PS1+='echo -n "'${Cyan}'"; __prompt_jobs_running; echo -n "'${RESET}'";'
+    PS1+='__prompt_jobs_separator;'
+    PS1+='echo -n "'${Magenta}'"; __prompt_jobs_stopped; echo -n "'${RESET}'";'
+    PS1+='echo -n " "; fi)'
+}
 
 if [ "$color_prompt" = yes ]; then
-    # Saving out exitcode first to ensure it is picked up properly.
-    PROMPT_EXITCODE='$(prompt_exitcode $?)'
-    PROMPT_JOBS='`if [ -n "$(jobs -p)" ]; then echo "$(prompt_jobs)"; fi`'
-
-    PS1="${PROMPT_EXITCODE} $(prompt_time)$(prompt_chroot)${PROMPT_JOBS} $(prompt_basic)"
+    PS1=""
+    set_prompt_exitcode  # This must come first so other function calls don't mess up $?.
+    PS1+=" $(prompt_time) "
+    set_prompt_jobs
+    PS1+="$(prompt_basic) "
 else
     PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
 fi
