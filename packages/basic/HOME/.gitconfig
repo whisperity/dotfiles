@@ -45,7 +45,7 @@
 	ign = ls-files -o -i --exclude-standard
 
 	# =========================================================
-	# Different log views
+	# Different log views.
 	# - graph logs
 	lol = log --graph --decorate --pretty=oneline --abbrev-commit
 	lola = log --graph --decorate --pretty=oneline --abbrev-commit --all
@@ -59,16 +59,22 @@
 	# - lieutenant changelog (author and committer)
 	lclog = log --date-order --pretty=format:'<%C(cyan)%an%Creset (%C(cyan)%ad%Creset)> [%C(bold blue)%cn%Creset (%C(bold blue)%cd%Creset)] (%C(yellow)%h%Creset) %s'
 
-	# GitHub shortlinks
+	# GitHub shortlinks.
 	hubclone = "!sh -c 'git clone http://github.com/$1/$2.git --origin upstream'" -
 	hubremote-add = "!sh -c 'git remote add $1 http://github.com/$1/$2.git'" -
 
-	# Lieutenant work helpers
+	# Lieutenant work helpers.
 	recover = "!bash -c '~/bin/git-recover.sh $1'" -
 	rewrite = "!bash -c '~/bin/git-rewrite.sh $1 $2'" -
 	fall = fetch --verbose --all --prune
 	ffmerge = merge --ff-only
 	cbr = rev-parse --abbrev-ref HEAD
+	rbum = rebase -i upstream/master
+	conflicts = "!${EDITOR} $(git status --short | grep \"^[DAU][DAU] \" | cut -d' ' -f2 | tr '\n' ' ')"
+	farbc = "!fix-all() { \
+			git status --short | cut -d" " -f2 | xargs git add; \
+			git rebase --continue; \
+		}; fix-all" -
 
 	# Show the oldest ancestor (the branching point) between master and HEAD
 	# (or first and second argument). For example, this is the commit a rebase
