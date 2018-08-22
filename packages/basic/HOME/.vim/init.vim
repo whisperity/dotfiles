@@ -27,6 +27,8 @@ filetype plugin indent on
 set number
 "set relativenumber
 
+" Preserve a changed buffer if a new file is opened rather than forcing a
+" write or undo.
 set hidden
 
 " Set to auto read when a file is changed from the outside
@@ -73,9 +75,6 @@ set smarttab
 set showmatch
 " Matching angle brackets for metaprograms
 set matchpairs+=<:>
-
-" For airline
-set laststatus=2
 
 " Ignore compiled files
 set wildignore=*.o,*~,*.pyc
@@ -141,7 +140,8 @@ command C let @/=""
 command Pon set paste
 command Poff set nopaste
 
-" Folding control
+" Folding control.
+set nofoldenable " Off by default.
 nmap <C-S-o> :foldopen <CR>
 nmap <C-S-p> :foldclose <CR>
 

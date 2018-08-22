@@ -1,3 +1,6 @@
+" Ensure every window has a status line.
+set laststatus=2
+
 " Airline
 set t_Co=256
 let g:airline_powerline_fonts = 1
