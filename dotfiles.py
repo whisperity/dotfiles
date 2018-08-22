@@ -219,7 +219,6 @@ def install_package(package):
                 print("    ---> Copying folder '%s' to '%s'"
                       % (from_folder, to_folder))
                 shutil.copytree(from_folder, to_folder)
-
             elif kind == 'append':
                 from_file = __expand(command['file'])
                 to_file = os.path.expandvars(command['to'])
@@ -228,6 +227,13 @@ def install_package(package):
                 with open(to_file, 'a') as to:
                     with open(from_file, 'r') as in_file:
                         to.write(in_file.read())
+            elif kind == 'append text':
+                to_file = os.path.expandvars(command['to'])
+                print("    ---> Appending text to '%s'"
+                      % (to_file))
+                with open(to_file, 'a') as to:
+                    to.write(command['text'])
+                    to.write('\n')
 
         return True
     except Exception as e:

@@ -16,8 +16,13 @@
       "to": "$HOME/.vim/bundle/nerdtree"
     },
     {
-      "kind": "append",
-      "file": "nerdtree.vimrc",
+      "kind": "copy",
+      "file": "config.vim",
+      "to": "$HOME/.vim/config/nerdtree.vim"
+    },
+    {
+      "kind": "append text",
+      "text": "source ~/.vim/config/nerdtree.vim",
       "to": "$HOME/.vim/init.vim"
     }
   ]

@@ -16,8 +16,13 @@
       "to": "$HOME/.vim/bundle/vim-airline"
     },
     {
-      "kind": "append",
-      "file": "airline.vimrc",
+      "kind": "copy",
+      "file": "config.vim",
+      "to": "$HOME/.vim/config/vim-airline.vim"
+    },
+    {
+      "kind": "append text",
+      "text": "source ~/.vim/config/vim-airline.vim",
       "to": "$HOME/.vim/init.vim"
     }
   ]

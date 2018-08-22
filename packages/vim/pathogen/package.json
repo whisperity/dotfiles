@@ -14,7 +14,8 @@
       "kind": "make folders",
       "folders": [
         "$HOME/.vim/autoload",
-        "$HOME/.vim/bundle"
+        "$HOME/.vim/bundle",
+        "$HOME/.vim/config"
       ]
     },
     {
@@ -23,8 +24,13 @@
       "to": "$HOME/.vim/autoload/pathogen.vim"
     },
     {
-      "kind": "append",
-      "file": "pathogen.vimrc",
+      "kind": "copy",
+      "file": "config.vim",
+      "to": "$HOME/.vim/config/pathogen.vim"
+    },
+    {
+      "kind": "append text",
+      "text": "source ~/.vim/config/pathogen.vim",
       "to": "$HOME/.vim/init.vim"
     }
   ]

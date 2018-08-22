@@ -7,4 +7,3 @@ let g:syntastic_cpp_remove_include_errors = 1
 let g:syntastic_cpp_compiler = 'clang++'
 
 let g:syntastic_python_checkers=['python', 'pep8']
-

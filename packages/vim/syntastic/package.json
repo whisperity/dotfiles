@@ -16,8 +16,13 @@
       "to": "$HOME/.vim/bundle/syntastic"
     },
     {
-      "kind": "append",
-      "file": "syntastic.vimrc",
+      "kind": "copy",
+      "file": "config.vim",
+      "to": "$HOME/.vim/config/syntastic.vim"
+    },
+    {
+      "kind": "append text",
+      "text": "source ~/.vim/config/syntastic.vim",
       "to": "$HOME/.vim/init.vim"
     }
   ]
