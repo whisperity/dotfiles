@@ -1,8 +1,5 @@
 {
   "description": "pathogen.vim: Manage Vim plugins with ease!",
-  "dependencies": [
-    "basic"
-  ],
   "prefetch": [
     {
       "kind": "git clone",

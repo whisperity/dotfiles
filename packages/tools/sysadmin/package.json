@@ -1,0 +1,10 @@
+{
+  "description": "Installs some common and most wanted system administration and maintenance tools.",
+  "superuser": true,
+  "install": [
+    {
+      "kind": "shell",
+      "command": "sudo apt-get install -y --no-install-recommends aptitude cpufreq-utils iotop smartmontools"
+    }
+  ]
+}

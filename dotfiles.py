@@ -55,6 +55,11 @@ def packagename_to_file(packagename):
                         'package.json')
 
 
+def get_package_data(package):
+    with open(packagename_to_file(package), 'r') as package_file:
+        return json.load(package_file)
+
+
 package_files = [os.path.join(dirpath, f)
                 for dirpath, dirnames, files in os.walk(package_directory)
                 for f in fnmatch.filter(files, 'package.json')]
@@ -65,13 +70,14 @@ if len(args.PACKAGE) == 0:
     print("Listing available packages...")
 
     for package in AVAILABLE_PACKAGES:
+        package_data = get_package_data(package)
+
         print("    - %s" % package, end='')
 
         if package in PACKAGE_STATUS:
             print("       (%s)" % PACKAGE_STATUS[package], end='')
 
-        with open(packagename_to_file(package), 'r') as packagefile:
-            package_data = json.load(packagefile)
+        if 'description' in package_data:
             print()  # Put a linebreak here too.
             print("          %s" % package_data['description'], end='')
 
@@ -103,9 +109,28 @@ if any(invalid_packages):
     sys.exit(1)
 
 
-def get_package_data(package):
-    with open(packagename_to_file(package), 'r') as package_file:
-        return json.load(package_file)
+def add_parent_package_as_dependency(package, package_data):
+    if 'depend_on_parent' in package_data and \
+            not package_data['depend_on_parent']:
+        # Don't add as a dependency if the current package is explicitly
+        # marked not to have their parent as a dependency.
+        return
+
+    try:
+        parent_name = '.'.join(package.split('.')[:-1])
+        get_package_data(parent_name)
+    except:
+        # The parent is not a package, don't do anything.
+        return
+
+    if 'dependencies' not in package_data:
+        package_data['dependencies'] = []
+
+    if parent_name not in package_data['dependencies']:
+        print("  -< Automatically marked parent '%s' as dependency."
+              % parent_name)
+        package_data['dependencies'] = \
+            [parent_name] + package_data['dependencies']
 
 
 def is_installed(package):
@@ -128,6 +153,7 @@ def check_dependencies(dependencies):
 
         print("  -> Checking dependency '%s'..." % dependency)
         dependency_data = get_package_data(dependency)
+        add_parent_package_as_dependency(dependency, dependency_data)
         if 'dependencies' in dependency_data and \
                 any(dependency_data['dependencies']):
             unmet_dependencies.extend(
@@ -196,7 +222,7 @@ def install_package(package):
                 for folder in command['folders']:
                     output = os.path.expandvars(folder)
                     print("    ---\ Creating output folder '%s'" % output)
-                    os.makedirs(output)
+                    os.makedirs(output, exist_ok=True)
             elif kind == 'extract multiple':
                 from_root_folder = command['root']
                 to_root_folder = os.path.expandvars('$' + command['root'])
@@ -249,6 +275,7 @@ def install_package(package):
 
 # Check the depencies for the packages that the user wants to install.
 WORK_QUEUE = []
+
 for package in args.PACKAGE:
     # Check if the package is already installed. In this case, do nothing.
     if is_installed(package):
@@ -261,8 +288,9 @@ for package in args.PACKAGE:
         continue
 
     print("Checking package '%s'..." % package)
-
     package_data = get_package_data(package)
+
+    add_parent_package_as_dependency(package, package_data)
     unmet_dependencies = []
     if 'dependencies' in package_data and any(package_data['dependencies']):
         unmet_dependencies = check_dependencies(package_data['dependencies'])
@@ -271,6 +299,47 @@ for package in args.PACKAGE:
                   % (package, ', '.join(unmet_dependencies)))
 
     WORK_QUEUE = unmet_dependencies + [package] + WORK_QUEUE
+
+
+# Preparation and cleanup steps before actual install.
+def deduplicate_work_queue():
+    seen = set()
+    seen_add = seen.add
+    return [x for x in WORK_QUEUE if not (x in seen or seen_add(x))]
+
+
+WORK_QUEUE = deduplicate_work_queue()
+
+
+def check_superuser():
+    print("Testing access to the 'sudo' command, please enter your password "
+          "as prompted.")
+
+    try:
+        res = subprocess.check_call(
+            ['sudo', 'echo', "Hello, dotfiles found 'sudo' rights. :-)"])
+        return not res
+    except Exception as e:
+        print("Checking 'sudo' access failed.", file=sys.stderr)
+        print(str(e), file=sys.stderr)
+        sys.exit(1)
+
+
+HAS_SUPERUSER_CHECKED = False
+for package in WORK_QUEUE:
+    package_data = get_package_data(package)
+
+    if 'superuser' in package_data and package_data['superuser'] == True and \
+            not HAS_SUPERUSER_CHECKED:
+        print("Package '%s' requires superuser rights to install." % package)
+        test = check_superuser()
+        if not test:
+            print("ERROR: Can't install '%s' as user presented no superuser "
+                  "access!" % package, file=sys.stderr)
+            sys.exit(1)
+        else:
+            HAS_SUPERUSER_CHECKED = test
+
 
 while any(WORK_QUEUE):
     package = WORK_QUEUE[0]
@@ -287,7 +356,7 @@ while any(WORK_QUEUE):
     print("Installed package '%s'." % package)
     PACKAGE_STATUS[package] = 'installed'
 
-with open(os.path.join(os.path.expanduser('~'),
+    with open(os.path.join(os.path.expanduser('~'),
                            '.dotfiles'), 'w') as status:
         json.dump(PACKAGE_STATUS, status,
                   indent=2, sort_keys=True)

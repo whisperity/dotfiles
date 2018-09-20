@@ -1,11 +1,5 @@
 {
-  "description": "Basic user environment files. (This package is initially tailored for use on a default Ubuntu-made user account.)",
-  "prefetch": [
-    {
-      "kind": "git clone",
-      "remote": "http://github.com/tomasr/molokai.git"
-    }
-  ],
+  "description": "Basic user environment files. (This package is initially tailored for use on a default Ubuntu 16.04 user account.)",
   "install": [
     {
       "kind": "extract multiple",
@@ -16,26 +10,6 @@
         ".bash_aliases",
         ".gitconfig"
       ]
-    },
-    {
-      "kind": "make folders",
-      "folders": [
-        "$HOME/.vim",
-        "$HOME/.vim/colors"
-      ]
-    },
-    {
-      "kind": "extract multiple",
-      "root": "HOME",
-      "files": [
-        ".vimrc",
-        ".vim/init.vim"
-      ]
-    },
-    {
-      "kind": "copy",
-      "file": "$PREFETCH_DIR/molokai/colors/molokai.vim",
-      "to": "$HOME/.vim/colors/molokai.vim"
     },
     {
       "kind": "make folders",
