@@ -7,12 +7,22 @@ systems. These packages are described here.
 Installed from package manager
 ------------------------------
 
+### For developer work
+
     sudo apt-get install --no-install-recommends \
-        cpufreq-utils \
+        byobu \
         htop \
-        iotop \
-        smartmontools \
+        mc \
         tree
+
+### For system administartion
+
+    sudo apt-get install --no-install-recommends \
+        aptitude \
+        cpufreq-utils \
+        iotop \
+        smartmontools
+
 
 To be installed manually
 ------------------------
