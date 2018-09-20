@@ -4,7 +4,7 @@
   "install": [
     {
       "kind": "shell",
-      "command": "sudo apt-get install -y --no-install-recommends byobu htop mc tree"
+      "command": "sudo apt-get install -y --no-install-recommends byobu gitk htop mc meld tree"
     }
   ]
 }

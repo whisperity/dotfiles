@@ -1,5 +1,4 @@
 {
-  "dependencies": [ "basic" ],
   "superuser": true,
   "prefetch": [
     {
