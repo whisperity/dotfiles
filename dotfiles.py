@@ -85,19 +85,24 @@ if len(args.PACKAGE) == 0:
 
     sys.exit(0)
 
-# Translate globber expressions such as "foo.bar.*" into actual package list
-for all_marker in [package for package in args.PACKAGE
-                   if package.endswith('*') or package.endswith('__ALL__')]:
-    namespace = all_marker.replace('*', '').replace('__ALL__', '')
+# Translate globber expressions such as "foo.bar.*" into actual package list.
+specified_packages = args.PACKAGE[:]
+args.PACKAGE = []
+for package in specified_packages:
+    if not package.endswith(('*', '__ALL__')):
+        args.PACKAGE.append(package)
+        continue
 
-    packages = [package for package in AVAILABLE_PACKAGES
-                if package.startswith(namespace)]
-    for package in packages:
+    namespace = package.replace('*', '').replace('__ALL__', '')
+    globbed_packages = [package for package in AVAILABLE_PACKAGES
+                        if package.startswith(namespace)]
+    for package in globbed_packages:
         print("Marked '%s' for installation." % package)
 
     # Update the remaining package list to include all the marked packages.
-    args.PACKAGE = packages + [package for package in args.PACKAGE
-                               if package != all_marker]
+    args.PACKAGE = args.PACKAGE + globbed_packages
+
+del specified_packages
 
 # Run the package installs in topological order.
 invalid_packages = [package for package in args.PACKAGE
@@ -277,6 +282,9 @@ def install_package(package):
 WORK_QUEUE = []
 
 for package in args.PACKAGE:
+    print("Checking package '%s'..." % package)
+    package_data = get_package_data(package)
+
     # Check if the package is already installed. In this case, do nothing.
     if is_installed(package):
         print("%s is already installed -- skipping." % package)
@@ -287,9 +295,6 @@ for package in args.PACKAGE:
         # user also specified it.
         continue
 
-    print("Checking package '%s'..." % package)
-    package_data = get_package_data(package)
-
     add_parent_package_as_dependency(package, package_data)
     unmet_dependencies = []
     if 'dependencies' in package_data and any(package_data['dependencies']):
@@ -298,7 +303,7 @@ for package in args.PACKAGE:
             print("Unmet dependencies for '%s': %s"
                   % (package, ', '.join(unmet_dependencies)))
 
-    WORK_QUEUE = unmet_dependencies + [package] + WORK_QUEUE
+    WORK_QUEUE = WORK_QUEUE + unmet_dependencies + [package]
 
 
 # Preparation and cleanup steps before actual install.
