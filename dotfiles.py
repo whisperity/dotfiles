@@ -169,6 +169,76 @@ def check_dependencies(dependencies):
     return unmet_dependencies
 
 
+# Check the depencies for the packages that the user wants to install.
+WORK_QUEUE = []
+
+for package in args.PACKAGE:
+    print("Checking package '%s'..." % package)
+    package_data = get_package_data(package)
+
+    # Check if the package is already installed. In this case, do nothing.
+    if is_installed(package):
+        print("%s is already installed -- skipping." % package)
+        continue
+
+    if package in WORK_QUEUE:
+        # Don't check a package again if it was found as a dependency and the
+        # user also specified it.
+        continue
+
+    add_parent_package_as_dependency(package, package_data)
+    unmet_dependencies = []
+    if 'dependencies' in package_data and any(package_data['dependencies']):
+        unmet_dependencies = check_dependencies(package_data['dependencies'])
+        if any(unmet_dependencies):
+            print("Unmet dependencies for '%s': %s"
+                  % (package, ', '.join(unmet_dependencies)))
+
+    WORK_QUEUE = WORK_QUEUE + unmet_dependencies + [package]
+
+
+# Preparation and cleanup steps before actual install.
+def deduplicate_work_queue():
+    seen = set()
+    seen_add = seen.add
+    return [x for x in WORK_QUEUE if not (x in seen or seen_add(x))]
+
+
+WORK_QUEUE = deduplicate_work_queue()
+
+
+def check_superuser():
+    print("Testing access to the 'sudo' command, please enter your password "
+          "as prompted.")
+    print("If you don't have superuser, please press Ctrl-D.")
+
+    try:
+        res = subprocess.check_call(
+            ['sudo', 'echo', "Hello, dotfiles found 'sudo' rights. :-)"])
+        return not res
+    except Exception as e:
+        print("Checking 'sudo' access failed.", file=sys.stderr)
+        print(str(e), file=sys.stderr)
+        return False
+
+
+HAS_SUPERUSER_CHECKED = None
+for package in WORK_QUEUE:
+    package_data = get_package_data(package)
+
+    if 'superuser' in package_data and not HAS_SUPERUSER_CHECKED:
+        if package_data['superuser'] == True:
+            print("Package '%s' requires superuser rights to install."
+                  % package)
+            test = check_superuser()
+            if not test:
+                print("ERROR: Can't install '%s' as user presented no "
+                      "superuser access!" % package, file=sys.stderr)
+                sys.exit(1)
+            else:
+                HAS_SUPERUSER_CHECKED = True
+
+
 def install_package(package):
     package_data = get_package_data(package)
     if 'install' not in package_data:
@@ -302,75 +372,6 @@ def install_package(package):
         if prefetch_dir:
             shutil.rmtree(prefetch_dir, True)
 
-
-# Check the depencies for the packages that the user wants to install.
-WORK_QUEUE = []
-
-for package in args.PACKAGE:
-    print("Checking package '%s'..." % package)
-    package_data = get_package_data(package)
-
-    # Check if the package is already installed. In this case, do nothing.
-    if is_installed(package):
-        print("%s is already installed -- skipping." % package)
-        continue
-
-    if package in WORK_QUEUE:
-        # Don't check a package again if it was found as a dependency and the
-        # user also specified it.
-        continue
-
-    add_parent_package_as_dependency(package, package_data)
-    unmet_dependencies = []
-    if 'dependencies' in package_data and any(package_data['dependencies']):
-        unmet_dependencies = check_dependencies(package_data['dependencies'])
-        if any(unmet_dependencies):
-            print("Unmet dependencies for '%s': %s"
-                  % (package, ', '.join(unmet_dependencies)))
-
-    WORK_QUEUE = WORK_QUEUE + unmet_dependencies + [package]
-
-
-# Preparation and cleanup steps before actual install.
-def deduplicate_work_queue():
-    seen = set()
-    seen_add = seen.add
-    return [x for x in WORK_QUEUE if not (x in seen or seen_add(x))]
-
-
-WORK_QUEUE = deduplicate_work_queue()
-
-
-def check_superuser():
-    print("Testing access to the 'sudo' command, please enter your password "
-          "as prompted.")
-    print("If you don't have superuser, please press Ctrl-D.")
-
-    try:
-        res = subprocess.check_call(
-            ['sudo', 'echo', "Hello, dotfiles found 'sudo' rights. :-)"])
-        return not res
-    except Exception as e:
-        print("Checking 'sudo' access failed.", file=sys.stderr)
-        print(str(e), file=sys.stderr)
-        return False
-
-
-HAS_SUPERUSER_CHECKED = None
-for package in WORK_QUEUE:
-    package_data = get_package_data(package)
-
-    if 'superuser' in package_data and not HAS_SUPERUSER_CHECKED:
-        if package_data['superuser'] == True:
-            print("Package '%s' requires superuser rights to install."
-                  % package)
-            test = check_superuser()
-            if not test:
-                print("ERROR: Can't install '%s' as user presented no "
-                      "superuser access!" % package, file=sys.stderr)
-                sys.exit(1)
-            else:
-                HAS_SUPERUSER_CHECKED = True
 
 while any(WORK_QUEUE):
     package = WORK_QUEUE[0]
