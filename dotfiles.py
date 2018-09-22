@@ -175,31 +175,8 @@ def install_package(package):
         print("'%s' is a virtual package - no install actions done." % package)
         return True
 
+    package_dir = os.path.dirname(packagename_to_file(package))
     prefetch_dir = None
-    if 'prefetch' in package_data:
-        print("Obtaining extra content for install of '%s'..." % package)
-
-        # Create a temporary directory for this operation
-        prefetch_dir = tempfile.mkdtemp(None, "dotfiles-")
-
-        try:
-            os.chdir(prefetch_dir)
-
-            for command in package_data['prefetch']:
-                kind = command['kind']
-                if kind == 'git clone':
-                    print("Cloning remote content from '%s'..."
-                          % command['remote'])
-                    subprocess.call(['git', 'clone', command['remote'],
-                                     '--origin', 'upstream',
-                                     '--depth', str(1)])
-        except Exception as e:
-            print("Couldn't fetch '%s': '%s'!" % (package, e),
-                  file=sys.stderr)
-            print(e)
-            return False
-        finally:
-            os.chdir(script_directory)
 
 
     def __expand(path):
@@ -213,16 +190,64 @@ def install_package(package):
                 raise ValueError("Invalid directive: '$PREFETCH_DIR' used "
                                  "without any prefetch command executed.")
             path = path.replace('$PREFETCH_DIR', prefetch_dir)
-        return os.path.expandvars(path)
+
+        path = path.replace('$PACKAGE_DIR', package_dir)
+        path = os.path.expandvars(path)
+
+        return path
+
+
+    def __exec_shell(action):
+        """
+        Executes a "shell" action of a package.
+        """
+        cmdline = action['command']
+        if isinstance(cmdline, str):
+            cmdline = [cmdline]
+
+        cmdline = [__expand(c) for c in cmdline]
+        subprocess.call(cmdline, shell=True)
+
+
+    if 'prefetch' in package_data:
+        print("Obtaining extra content for install of '%s'..." % package)
+
+        # Create a temporary directory for this operation
+        prefetch_dir = tempfile.mkdtemp(None, "dotfiles-")
+
+        try:
+            os.chdir(prefetch_dir)
+            for command in package_data['prefetch']:
+                kind = command['kind']
+                if kind == 'git clone':
+                    print("Cloning remote content from '%s'..."
+                          % command['remote'])
+                    subprocess.call(['git', 'clone', command['remote'],
+                                     '--origin', 'upstream',
+                                     '--depth', str(1)])
+                elif kind == 'shell':
+                    __exec_shell(command)
+                elif kind == 'shell multiple':
+                    for shell_cmd in command['commands']:
+                        __exec_shell({'command': shell_cmd})
+        except Exception as e:
+            print("Couldn't fetch '%s': '%s'!" % (package, e),
+                  file=sys.stderr)
+            print(e)
+            return False
+        finally:
+            os.chdir(script_directory)
 
 
     try:
-        os.chdir(os.path.dirname(packagename_to_file(package)))
-
+        os.chdir(package_dir)
         for command in package_data['install']:
             kind = command['kind']
             if kind == 'shell':
-                subprocess.call(command['command'], shell=True)
+                __exec_shell(command)
+            elif kind == 'shell multiple':
+                for shell_cmd in command['commands']:
+                    __exec_shell({'command': shell_cmd})
             elif kind == 'make folders':
                 for folder in command['folders']:
                     output = os.path.expandvars(folder)
@@ -319,6 +344,7 @@ WORK_QUEUE = deduplicate_work_queue()
 def check_superuser():
     print("Testing access to the 'sudo' command, please enter your password "
           "as prompted.")
+    print("If you don't have superuser, please press Ctrl-D.")
 
     try:
         res = subprocess.check_call(
@@ -327,24 +353,24 @@ def check_superuser():
     except Exception as e:
         print("Checking 'sudo' access failed.", file=sys.stderr)
         print(str(e), file=sys.stderr)
-        sys.exit(1)
+        return False
 
 
-HAS_SUPERUSER_CHECKED = False
+HAS_SUPERUSER_CHECKED = None
 for package in WORK_QUEUE:
     package_data = get_package_data(package)
 
-    if 'superuser' in package_data and package_data['superuser'] == True and \
-            not HAS_SUPERUSER_CHECKED:
-        print("Package '%s' requires superuser rights to install." % package)
-        test = check_superuser()
-        if not test:
-            print("ERROR: Can't install '%s' as user presented no superuser "
-                  "access!" % package, file=sys.stderr)
-            sys.exit(1)
-        else:
-            HAS_SUPERUSER_CHECKED = test
-
+    if 'superuser' in package_data and not HAS_SUPERUSER_CHECKED:
+        if package_data['superuser'] == True:
+            print("Package '%s' requires superuser rights to install."
+                  % package)
+            test = check_superuser()
+            if not test:
+                print("ERROR: Can't install '%s' as user presented no "
+                      "superuser access!" % package, file=sys.stderr)
+                sys.exit(1)
+            else:
+                HAS_SUPERUSER_CHECKED = True
 
 while any(WORK_QUEUE):
     package = WORK_QUEUE[0]
