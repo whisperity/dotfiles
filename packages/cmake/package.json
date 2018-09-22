@@ -1,0 +1,30 @@
+{
+  "description": "CMake is a cross-platform open-source build system designed to generate build tooling invocations (such as for 'make' and 'ninja') based on build instructions written in a common DSL. It also allows for extensive modularisation and automatic finding of environment dependencies, etc.",
+  "superuser": false,
+  "prefetch": [
+    {
+      "kind": "shell multiple",
+      "commands": [
+        "echo $($PACKAGE_DIR/select-latest-version.py) > $PREFETCH_DIR/url.txt",
+        "wget \"$(cat $PREFETCH_DIR/url.txt)\" -O cmake.tar.gz",
+        "tar -xf cmake.tar.gz",
+        "mv cmake-* cmake"
+     ]
+    }
+  ],
+  "install": [
+    {
+      "kind": "make folders",
+      "folders": [ "$HOME/bin", "$HOME/opt" ]
+    },
+    {
+      "kind": "copy tree",
+      "folder": "$PREFETCH_DIR/cmake",
+      "to": "$HOME/opt/cmake"
+    },
+    {
+      "kind": "shell",
+      "command": "cd $HOME/bin; ln -s ../opt/cmake/bin/* ."
+    }
+  ]
+}
