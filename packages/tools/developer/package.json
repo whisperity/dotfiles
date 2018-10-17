@@ -1,10 +1,19 @@
 {
   "description": "Installs some common and most wanted developer environment tools.",
   "superuser": true,
-  "install": [
+  "prefetch": [
     {
       "kind": "shell",
-      "command": "sudo apt-get install -y --no-install-recommends byobu gitk htop mc meld tree"
+      "command": "$PACKAGE_DIR/../fd.sh"
+    }
+  ],
+  "install": [
+    {
+      "kind": "shell multiple",
+      "commands": [
+        "sudo apt-get install -y --no-install-recommends byobu gitk htop mc meld tree",
+        "sudo dpkg --install $PREFETCH_DIR/fd.deb"
+      ]
     }
   ]
 }
