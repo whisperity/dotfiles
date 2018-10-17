@@ -1,4 +1,5 @@
 {
+  "description": "Installs Vim, a pluginable command-line text editor",
   "superuser": true,
   "prefetch": [
     {

@@ -70,6 +70,9 @@ if len(args.PACKAGE) == 0:
     print("Listing available packages...")
 
     for package in AVAILABLE_PACKAGES:
+        if package.startswith('internal'):
+            continue
+
         package_data = get_package_data(package)
 
         print("    - %s" % package, end='')
@@ -142,6 +145,10 @@ def is_installed(package):
     return package in PACKAGE_STATUS and PACKAGE_STATUS[package] == 'installed'
 
 
+def is_configuration_package(package):
+    return 'enable' in get_package_data(package)
+
+
 def check_dependencies(dependencies):
     unmet_dependencies = []
 
@@ -176,10 +183,21 @@ for package in args.PACKAGE:
     print("Checking package '%s'..." % package)
     package_data = get_package_data(package)
 
+    if is_configuration_package(package):
+        print("%s a configuration package that is not to be installed, "
+              "it's life is restricted to helping another package's "
+              "installation process!" % package, file=sys.stderr)
+        sys.exit(1)
+
     # Check if the package is already installed. In this case, do nothing.
     if is_installed(package):
         print("%s is already installed -- skipping." % package)
         continue
+
+    if 'install' in package_data and 'enable' in package_data:
+        print("%s package's descriptor is corrupt, it contains both an "
+              "INSTALL and ENABLE statement." % package, file=sys.stderr)
+        sys.exit(1)
 
     if package in WORK_QUEUE:
         # Don't check a package again if it was found as a dependency and the
@@ -205,7 +223,7 @@ def deduplicate_work_queue():
 
 
 WORK_QUEUE = deduplicate_work_queue()
-
+print("Will install the following packages:\n    %s" % ', '.join(WORK_QUEUE))
 
 def check_superuser():
     print("Testing access to the 'sudo' command, please enter your password "
@@ -239,10 +257,89 @@ for package in WORK_QUEUE:
                 HAS_SUPERUSER_CHECKED = True
 
 
+def execute_prepare_actions(actions, arg_expansion, shell_executor):
+    """
+    Executes the given actions (for 'prefetch' and 'cleanup' commands) with
+    the given argument expansion and shell execution lambda.
+    """
+    for command in actions:
+        kind = command['kind']
+        if kind == 'git clone':
+            print("Cloning remote content from '%s'..."
+                  % command['remote'])
+            subprocess.call(['git', 'clone', command['remote'],
+                             '--origin', 'upstream',
+                             '--depth', str(1)])
+        elif kind == 'shell':
+            shell_executor(command)
+        elif kind == 'shell multiple':
+            for shell_cmd in command['commands']:
+                shell_executor({'command': shell_cmd})
+
+
+def execute_install_actions(actions, arg_expansion, shell_executor):
+    """
+    Executes the given actions (for 'install' and 'enable') with the
+    given argument expansion and shell execution lambda.
+    """
+    for command in actions:
+        kind = command['kind']
+        if kind == 'shell':
+            shell_executor(command)
+        elif kind == 'shell multiple':
+            for shell_cmd in command['commands']:
+                shell_executor({'command': shell_cmd})
+        elif kind == 'make folders':
+            for folder in command['folders']:
+                output = os.path.expandvars(folder)
+                print("    ---\ Creating output folder '%s'" % output)
+                os.makedirs(output, exist_ok=True)
+        elif kind == 'extract multiple':
+            from_root_folder = command['root']
+            to_root_folder = os.path.expandvars('$' + command['root'])
+            print("    ---: Copying files from '%s' to '%s'"
+                  % (from_root_folder, to_root_folder))
+
+            for f in command['files']:
+                print("       :- %s" % f)
+                shutil.copy(os.path.join(from_root_folder, f),
+                            os.path.join(to_root_folder, f))
+        elif kind == 'copy':
+            from_file = arg_expansion(command['file'])
+            to_file = os.path.expandvars(command['to'])
+            print("    ---> Copying file '%s' to '%s'"
+                  % (from_file, to_file))
+            shutil.copy(from_file, to_file)
+        elif kind == 'copy tree':
+            from_folder = arg_expansion(command['folder'])
+            to_folder = os.path.expandvars(command['to'])
+            print("    ---> Copying folder '%s' to '%s'"
+                  % (from_folder, to_folder))
+            shutil.copytree(from_folder, to_folder)
+        elif kind == 'append':
+            from_file = arg_expansion(command['file'])
+            to_file = os.path.expandvars(command['to'])
+            print("    ---> Appending package file '%s' to '%s'"
+                  % (from_file, to_file))
+            with open(to_file, 'a') as to:
+                with open(from_file, 'r') as in_file:
+                    to.write(in_file.read())
+        elif kind == 'append text':
+            to_file = os.path.expandvars(command['to'])
+            print("    ---> Appending text to '%s'"
+                  % (to_file))
+            with open(to_file, 'a') as to:
+                to.write(command['text'])
+                to.write('\n')
+
+
+PACKAGE_TO_PREFETCH_DIR = {}
+
+
 def install_package(package):
     package_data = get_package_data(package)
-    if 'install' not in package_data:
-        print("'%s' is a virtual package - no install actions done." % package)
+    if 'install' not in package_data and 'enable' not in package_data:
+        print("'%s' is a virtual package - no actions done." % package)
         return True
 
     package_dir = os.path.dirname(packagename_to_file(package))
@@ -261,6 +358,7 @@ def install_package(package):
                                  "without any prefetch command executed.")
             path = path.replace('$PREFETCH_DIR', prefetch_dir)
 
+        path = path.replace('$SCRIPT_DIR', script_directory)
         path = path.replace('$PACKAGE_DIR', package_dir)
         path = os.path.expandvars(path)
 
@@ -284,22 +382,13 @@ def install_package(package):
 
         # Create a temporary directory for this operation
         prefetch_dir = tempfile.mkdtemp(None, "dotfiles-")
+        PACKAGE_TO_PREFETCH_DIR[package] = prefetch_dir
 
         try:
             os.chdir(prefetch_dir)
-            for command in package_data['prefetch']:
-                kind = command['kind']
-                if kind == 'git clone':
-                    print("Cloning remote content from '%s'..."
-                          % command['remote'])
-                    subprocess.call(['git', 'clone', command['remote'],
-                                     '--origin', 'upstream',
-                                     '--depth', str(1)])
-                elif kind == 'shell':
-                    __exec_shell(command)
-                elif kind == 'shell multiple':
-                    for shell_cmd in command['commands']:
-                        __exec_shell({'command': shell_cmd})
+            execute_prepare_actions(package_data['prefetch'],
+                                    __expand,
+                                    __exec_shell)
         except Exception as e:
             print("Couldn't fetch '%s': '%s'!" % (package, e),
                   file=sys.stderr)
@@ -311,56 +400,16 @@ def install_package(package):
 
     try:
         os.chdir(package_dir)
-        for command in package_data['install']:
-            kind = command['kind']
-            if kind == 'shell':
-                __exec_shell(command)
-            elif kind == 'shell multiple':
-                for shell_cmd in command['commands']:
-                    __exec_shell({'command': shell_cmd})
-            elif kind == 'make folders':
-                for folder in command['folders']:
-                    output = os.path.expandvars(folder)
-                    print("    ---\ Creating output folder '%s'" % output)
-                    os.makedirs(output, exist_ok=True)
-            elif kind == 'extract multiple':
-                from_root_folder = command['root']
-                to_root_folder = os.path.expandvars('$' + command['root'])
-                print("    ---: Copying files from '%s' to '%s'"
-                      % (from_root_folder, to_root_folder))
+        install_like_directive = 'install' if 'install' in package_data \
+                                 else 'enable' if 'enable' in package_data \
+                                 else None
+        if not install_like_directive:
+            raise KeyError("Invalid state: package data for %s did not "
+                           "contain any install-like directive?" % package)
 
-                for f in command['files']:
-                    print("       :- %s" % f)
-                    shutil.copy(os.path.join(from_root_folder, f),
-                                os.path.join(to_root_folder, f))
-            elif kind == 'copy':
-                from_file = __expand(command['file'])
-                to_file = os.path.expandvars(command['to'])
-                print("    ---> Copying file '%s' to '%s'"
-                      % (from_file, to_file))
-                shutil.copy(from_file, to_file)
-            elif kind == 'copy tree':
-                from_folder = __expand(command['folder'])
-                to_folder = os.path.expandvars(command['to'])
-                print("    ---> Copying folder '%s' to '%s'"
-                      % (from_folder, to_folder))
-                shutil.copytree(from_folder, to_folder)
-            elif kind == 'append':
-                from_file = __expand(command['file'])
-                to_file = os.path.expandvars(command['to'])
-                print("    ---> Appending package file '%s' to '%s'"
-                      % (from_file, to_file))
-                with open(to_file, 'a') as to:
-                    with open(from_file, 'r') as in_file:
-                        to.write(in_file.read())
-            elif kind == 'append text':
-                to_file = os.path.expandvars(command['to'])
-                print("    ---> Appending text to '%s'"
-                      % (to_file))
-                with open(to_file, 'a') as to:
-                    to.write(command['text'])
-                    to.write('\n')
-
+        execute_install_actions(package_data[install_like_directive],
+                                __expand,
+                                __exec_shell)
         return True
     except Exception as e:
         print("Couldn't install '%s': '%s'!" % (package, e), file=sys.stderr)
@@ -369,26 +418,110 @@ def install_package(package):
     finally:
         os.chdir(script_directory)
 
-        if prefetch_dir:
+        if prefetch_dir and 'cleanup' not in package_data:
+            # Cleanup the prefetch automatically if there is no cleanup
+            # actions in the configuration.
             shutil.rmtree(prefetch_dir, True)
+            del PACKAGE_TO_PREFETCH_DIR[package]
 
 
+CLEANUP_PACKAGES = []
 while any(WORK_QUEUE):
     package = WORK_QUEUE[0]
-    print("Preparing to install package '%s'..." % package)
+
+    configure = is_configuration_package(package)
+    print("Preparing to %s package '%s'..." %
+          ('configure' if configure else 'install',
+           package))
 
     WORK_QUEUE = [p for p in WORK_QUEUE if p != package]
 
     success = install_package(package)
     if not success:
-        print(" !! Failed to install '%s'" % package)
+        print(" !! Failed to %s '%s'" %
+              ('configure' if configure else 'install', package))
         PACKAGE_STATUS[package] = 'failed'
         break  # Explicitly break the loop and write the statuses.
 
-    print("Installed package '%s'." % package)
-    PACKAGE_STATUS[package] = 'installed'
+    print("%s package '%s'." % ('Configured' if configure else 'Installed',
+                                package))
+    if not configure:
+        PACKAGE_STATUS[package] = 'installed'
+    else:
+        CLEANUP_PACKAGES.append(package)
 
     with open(os.path.join(os.path.expanduser('~'),
                            '.dotfiles'), 'w') as status:
         json.dump(PACKAGE_STATUS, status,
                   indent=2, sort_keys=True)
+
+def cleanup_package(package):
+    package_data = get_package_data(package)
+    if 'cleanup' not in package_data:
+        print("'%s' is an install package - no actions done." % package)
+        return True
+
+    package_dir = os.path.dirname(packagename_to_file(package))
+    prefetch_dir = PACKAGE_TO_PREFETCH_DIR.get(package, None)
+
+    def __expand(path):
+        """
+        Helper method for expanding not only the environment variables in an
+        install action, but script-specific variables.
+        """
+
+        if '$PREFETCH_DIR' in path:
+            if not prefetch_dir:
+                raise ValueError("Invalid directive: '$PREFETCH_DIR' used "
+                                 "without any prefetch command executed.")
+            path = path.replace('$PREFETCH_DIR', prefetch_dir)
+
+        path = path.replace('$SCRIPT_DIR', script_directory)
+        path = path.replace('$PACKAGE_DIR', package_dir)
+        path = os.path.expandvars(path)
+
+        return path
+
+
+    def __exec_shell(action):
+        """
+        Executes a "shell" action of a package.
+        """
+        cmdline = action['command']
+        if isinstance(cmdline, str):
+            cmdline = [cmdline]
+
+        cmdline = [__expand(c) for c in cmdline]
+        subprocess.call(cmdline, shell=True)
+
+
+    if 'cleanup' in package_data:
+        print("Performing extra cleanup steps after usage of '%s'..." %
+              package)
+
+        try:
+            execute_prepare_actions(package_data['cleanup'],
+                                    __expand,
+                                    __exec_shell)
+            return True
+        except Exception as e:
+            print("Couldn't clean up '%s': '%s'!" % (package, e),
+                  file=sys.stderr)
+            print(e)
+            return False
+        finally:
+            os.chdir(script_directory)
+
+            if prefetch_dir:
+                # If it was not cleaned up earlier, delete the prefetch now.
+                shutil.rmtree(prefetch_dir, True)
+                del PACKAGE_TO_PREFETCH_DIR[package]
+
+
+
+for package in CLEANUP_PACKAGES:
+    print("Cleaning up package '%s'..." % package)
+    success = cleanup_package(package)
+
+    if not success:
+        print(" !! Failed to clean up '%s'" % package)

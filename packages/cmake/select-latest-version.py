@@ -3,7 +3,7 @@
 import re
 import subprocess
 import sys
-import urllib
+import urllib.request
 from bs4 import BeautifulSoup
 from distutils.version import LooseVersion
 

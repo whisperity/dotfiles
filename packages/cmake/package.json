@@ -1,11 +1,12 @@
 {
   "description": "CMake is a cross-platform open-source build system designed to generate build tooling invocations (such as for 'make' and 'ninja') based on build instructions written in a common DSL. It also allows for extensive modularisation and automatic finding of environment dependencies, etc.",
-  "superuser": false,
+  "dependencies": [ "internal.virtualenv" ],
   "prefetch": [
     {
       "kind": "shell multiple",
       "commands": [
-        "echo $($PACKAGE_DIR/select-latest-version.py) > $PREFETCH_DIR/url.txt",
+        "bash -c 'source $HOME/dotfiles-venv/bin/activate; pip install bs4 lxml'",
+        "bash -c 'source $HOME/dotfiles-venv/bin/activate; $PACKAGE_DIR/select-latest-version.py > $PREFETCH_DIR/url.txt'",
         "wget \"$(cat $PREFETCH_DIR/url.txt)\" -O cmake.tar.gz",
         "tar -xf cmake.tar.gz",
         "mv cmake-* cmake"
