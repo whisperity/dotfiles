@@ -4,6 +4,7 @@ import argparse
 import fnmatch
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -257,7 +258,8 @@ for package in WORK_QUEUE:
                 HAS_SUPERUSER_CHECKED = True
 
 
-def execute_prepare_actions(actions, arg_expansion, shell_executor):
+def execute_prepare_actions(package_name, actions,
+                            arg_expansion, shell_executor):
     """
     Executes the given actions (for 'prefetch' and 'cleanup' commands) with
     the given argument expansion and shell execution lambda.
@@ -275,6 +277,21 @@ def execute_prepare_actions(actions, arg_expansion, shell_executor):
         elif kind == 'shell multiple':
             for shell_cmd in command['commands']:
                 shell_executor({'command': shell_cmd})
+        elif kind == 'prompt user':
+            var_name = command['short-name']
+
+            print("\n-------- REQUESTING USER INPUT -------")
+            print("Package '%s' requires you to provide '%s'"
+                  % (package_name, var_name))
+            if 'description' in command:
+                print("    %s " % command['description'])
+            value = input(">> %s: " % var_name)
+
+            with open(os.path.join(arg_expansion('$PREFETCH_DIR'),
+                                   'var-' + command['variable']),
+                      'w') as varfile:
+                varfile.write(value)
+            print("\n")
 
 
 def execute_install_actions(actions, arg_expansion, shell_executor):
@@ -282,6 +299,28 @@ def execute_install_actions(actions, arg_expansion, shell_executor):
     Executes the given actions (for 'install' and 'enable') with the
     given argument expansion and shell execution lambda.
     """
+
+    uservar_re = re.compile(r'\$<(?P<key>[\w_-]+)>',
+                            re.MULTILINE | re.UNICODE)
+
+
+    def __replace_uservar(match):
+        var_name = match.group('key')
+        try:
+            with open(os.path.join(arg_expansion('$PREFETCH_DIR'),
+                                   'var-' + var_name),
+                      'r') as varfile:
+                value = varfile.read()
+
+            return value
+        except OSError:
+            print("Error! Package requested to write user input to file "
+                  "but no user input for variable '%s' was provide!"
+                  % var_name,
+                  file=sys.stderr)
+            raise
+
+
     for command in actions:
         kind = command['kind']
         if kind == 'shell':
@@ -331,6 +370,15 @@ def execute_install_actions(actions, arg_expansion, shell_executor):
             with open(to_file, 'a') as to:
                 to.write(command['text'])
                 to.write('\n')
+        elif kind == 'replace user input':
+             to_file = os.path.expandvars(command['file'])
+             print("    ---> Saving user configuration to '%s'" % to_file)
+             with open(to_file, 'r+') as to:
+                 content = to.read()
+                 content = re.sub(uservar_re, __replace_uservar, content)
+                 to.seek(0)
+                 to.write(content)
+                 to.truncate(to.tell())
 
 
 PACKAGE_TO_PREFETCH_DIR = {}
@@ -386,7 +434,8 @@ def install_package(package):
 
         try:
             os.chdir(prefetch_dir)
-            execute_prepare_actions(package_data['prefetch'],
+            execute_prepare_actions(package,
+                                    package_data['prefetch'],
                                     __expand,
                                     __exec_shell)
         except Exception as e:
@@ -500,7 +549,8 @@ def cleanup_package(package):
               package)
 
         try:
-            execute_prepare_actions(package_data['cleanup'],
+            execute_prepare_actions(package,
+                                    package_data['cleanup'],
                                     __expand,
                                     __exec_shell)
             return True

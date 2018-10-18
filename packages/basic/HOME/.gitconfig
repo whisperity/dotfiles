@@ -1,6 +1,6 @@
 [user]
-	name = Git User - Please Set
-	email = git.user@please.set
+	name = $<GIT_USERNAME>
+	email = $<GIT_USEREMAIL>
 [apply]
 	whitespace = fix
 [core]
