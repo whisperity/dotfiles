@@ -5,7 +5,7 @@
     {
       "kind": "shell multiple",
       "commands": [
-        "$PACKAGE_DIR/get_release.sh",
+        "$PACKAGE_DIR/get-release.sh",
         "tar -xf virtualenv.tar.gz",
         "mv pypa-virtualenv-* virtualenv"
       ]
