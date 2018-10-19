@@ -98,8 +98,15 @@ for package in specified_packages:
         continue
 
     namespace = package.replace('*', '').replace('__ALL__', '')
+    if namespace.startswith('internal'):
+        print("%s a configuration package group that is not to be installed, "
+              "it's life is restricted to helping another package's "
+              "installation process!" % package, file=sys.stderr)
+        sys.exit(1)
+
     globbed_packages = [package for package in AVAILABLE_PACKAGES
-                        if package.startswith(namespace)]
+                        if package.startswith(namespace) and
+                           not package.startswith('internal')]
     for package in globbed_packages:
         print("Marked '%s' for installation." % package)
 
