@@ -19,11 +19,6 @@
       "kind": "copy",
       "file": "config.vim",
       "to": "$HOME/.vim/config/vim-clang-format.vim"
-    },
-    {
-      "kind": "append text",
-      "text": "source ~/.vim/config/vim-clang-format.vim",
-      "to": "$HOME/.vim/init.vim"
     }
   ]
 }

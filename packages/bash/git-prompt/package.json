@@ -11,14 +11,18 @@
   ],
   "install": [
     {
-      "kind": "copy tree",
-      "folder": "$PREFETCH_DIR/bash-git-prompt",
-      "to": "$HOME/.bash-git-prompt"
+      "kind": "make folders",
+      "folders": [ "$HOME/.bash.d" ]
     },
     {
-      "kind": "append",
-      "file": "bash-git-prompt.sh",
-      "to": "$HOME/.bashrc"
+      "kind": "copy tree",
+      "folder": "$PREFETCH_DIR/bash-git-prompt",
+      "to": "$HOME/.bash.d/git-prompt"
+    },
+    {
+      "kind": "copy",
+      "file": "git-prompt.sh",
+      "to": "$HOME/.bash.d/git-prompt.sh"
     }
   ]
 }

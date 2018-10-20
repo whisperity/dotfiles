@@ -153,3 +153,8 @@ if has("autocmd")
     " Use actual tab chars in Makefiles. They mess up when non tabs are used.
     autocmd FileType make set tabstop=8 shiftwidth=8 softtabstop=0 noexpandtab
 endif
+
+" Load additional configuration files for plugins
+for f in split(glob('~/.vim/config/*.vim'), '\n')
+    exe 'source' f
+endfor

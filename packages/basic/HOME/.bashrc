@@ -4,8 +4,8 @@
 
 # If not running interactively, don't do anything
 case $- in
-    *i*) ;;
-      *) return;;
+  *i*) ;;
+    *) return;;
 esac
 
 # don't put duplicate lines or lines starting with space in the history.
@@ -32,12 +32,12 @@ shopt -s checkwinsize
 
 # set variable identifying the chroot you work in (used in the prompt below)
 if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
-    debian_chroot=$(cat /etc/debian_chroot)
+  debian_chroot=$(cat /etc/debian_chroot)
 fi
 
 # set a fancy prompt (non-color, unless we know we "want" color)
 case "$TERM" in
-    xterm-color|*-256color|screen) color_prompt=yes;;
+  xterm-color|*-256color|screen) color_prompt=yes;;
 esac
 
 # uncomment for a colored prompt, if the terminal has the capability; turned
@@ -46,53 +46,52 @@ esac
 force_color_prompt=yes
 
 if [ -n "$force_color_prompt" ]; then
-    if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
-	# We have color support; assume it's compliant with Ecma-48
-	# (ISO/IEC-6429). (Lack of such support is extremely rare, and such
-	# a case would tend to support setf rather than setaf.)
-	color_prompt=yes
-    else
-	color_prompt=
-    fi
+  if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
+    # We have color support; assume it's compliant with Ecma-48
+    # (ISO/IEC-6429). (Lack of such support is extremely rare, and such
+    # a case would tend to support setf rather than setaf.)
+    color_prompt=yes
+  else
+    color_prompt=
+  fi
 fi
-
 
 # Put together a nice prompt, first the basics.
 prompt_basic()
 {
-    # This function prints the escape sequences >directly< as this is only used
-    # to embed into PS1. This function does not depend on the environment of
-    # the shell as this only emits Bash shell sequences (such as \u) which are
-    # then parsed by the shell.
-    local RESET='\[\e[0m\]'
-    local Red='\[\e[1;31m\]'
-    local Green='\[\e[1;32m\]'
-    local Yellow='\[\e[1;33m\]'
-    local LBlue='\[\e[1;34m\]'
-    local White='\[\e[1;37m\]'
+  # This function prints the escape sequences >directly< as this is only used
+  # to embed into PS1. This function does not depend on the environment of
+  # the shell as this only emits Bash shell sequences (such as \u) which are
+  # then parsed by the shell.
+  local RESET='\[\e[0m\]'
+  local Red='\[\e[1;31m\]'
+  local Green='\[\e[1;32m\]'
+  local Yellow='\[\e[1;33m\]'
+  local LBlue='\[\e[1;34m\]'
+  local White='\[\e[1;37m\]'
 
-    if [ ${EUID} -eq 0 ];
-    then
-        PROMPT_USERNAME="${Red}\u${RESET}"
-        PROMPT_HOSTNAME="${Red}\h${RESET}"
-        PROMPT_FOLDER="${Yellow}\w${RESET}"
-        PROMPT_CHAR="${Red}\\\$${RESET}"
-    else
-        PROMPT_USERNAME="${Green}\u${RESET}"
-        PROMPT_HOSTNAME="${Yellow}\h${RESET}"
-        PROMPT_FOLDER="${LBlue}\w${RESET}"
-        PROMPT_CHAR="${White}\\\$${RESET}"
-    fi
+  if [ ${EUID} -eq 0 ];
+  then
+    PROMPT_USERNAME="${Red}\u${RESET}"
+    PROMPT_HOSTNAME="${Red}\h${RESET}"
+    PROMPT_FOLDER="${Yellow}\w${RESET}"
+    PROMPT_CHAR="${Red}\\\$${RESET}"
+  else
+    PROMPT_USERNAME="${Green}\u${RESET}"
+    PROMPT_HOSTNAME="${Yellow}\h${RESET}"
+    PROMPT_FOLDER="${LBlue}\w${RESET}"
+    PROMPT_CHAR="${White}\\\$${RESET}"
+  fi
 
-    echo -en "${PROMPT_USERNAME}@${PROMPT_HOSTNAME}:${PROMPT_FOLDER} ${PROMPT_CHAR}"
+  echo -en "${PROMPT_USERNAME}@${PROMPT_HOSTNAME}:${PROMPT_FOLDER} ${PROMPT_CHAR}"
 }
 
 prompt_time()
 {
-    local RESET='\[\e[0m\]'
-    local White='\[\e[1;37m\]'
+  local RESET='\[\e[0m\]'
+  local White='\[\e[1;37m\]'
 
-    echo -en "${White}\A${RESET}"
+  echo -en "${White}\A${RESET}"
 }
 
 # Helper functions to format the exit code in the prompt.
@@ -100,119 +99,130 @@ prompt_time()
 # parametric on the current execution environment.
 __prompt_exitcode_padding()
 {
-    # Exit code can be a 3-character long number at max (0..255).
-    # Pad this number and justify to the right so it looks good.
-    local Length=$(echo -n "$1" | wc -c)
-    local Padding=$((3 - ${Length}))
-    echo -n "$(printf "%${Padding}s")"
+  # Exit code can be a 3-character long number at max (0..255).
+  # Pad this number and justify to the right so it looks good.
+  local Length=$(echo -n "$1" | wc -c)
+  local Padding=$((3 - ${Length}))
+  echo -n "$(printf "%${Padding}s")"
 }
 
 __prompt_exitcode_colour()
 {
-    local Red='\e[1;31m'
-    local DYellow='\e[0;33m'
+  local Red='\e[1;31m'
+  local DYellow='\e[0;33m'
 
-    if [ "$1" != 0 ];
-    then
-        echo -en "${Red}"
-    else
-        echo -en "${DYellow}"
-    fi
+  if [ "$1" != 0 ];
+  then
+      echo -en "${Red}"
+  else
+      echo -en "${DYellow}"
+  fi
 }
 
 set_prompt_exitcode()
 {
-    # Set the exit code to be printed at the shell. The colour part of the
-    # print contains colours, which are 0-length strings, thus these need to
-    # be escaped between \[ and \].
-    # The padding is a valid lengthy string so it must be calculated into line
-    # length.
+  # Set the exit code to be printed at the shell. The colour part of the
+  # print contains colours, which are 0-length strings, thus these need to
+  # be escaped between \[ and \].
+  # The padding is a valid lengthy string so it must be calculated into line
+  # length.
 
-    PS1+='$(exit_c=$?; __prompt_exitcode_padding $exit_c; '
-    PS1+='printf %s \[$(__prompt_exitcode_colour $exit_c)\]'
-    PS1+='$exit_c \[\e[0m\])'
+  PS1+='$(exit_c=$?; __prompt_exitcode_padding $exit_c; '
+  PS1+='printf %s \[$(__prompt_exitcode_colour $exit_c)\]'
+  PS1+='$exit_c \[\e[0m\])'
 }
 
 # Helper function to nicely format the number of jobs running in the shell.
 __prompt_jobs_running()
 {
-    local running=$(jobs -rp | wc -l)
-    ((running)) && echo -n "R:${running}"
+  local running=$(jobs -rp | wc -l)
+  ((running)) && echo -n "R:${running}"
 }
 
 __prompt_jobs_separator()
 {
-    local running=$(jobs -rp | wc -l)
-    local stopped=$(jobs -sp | wc -l)
-    ((running && stopped)) && echo -n ","
+  local running=$(jobs -rp | wc -l)
+  local stopped=$(jobs -sp | wc -l)
+  ((running && stopped)) && echo -n ","
 }
 
 __prompt_jobs_stopped()
 {
-    local stopped=$(jobs -sp | wc -l)
-    ((stopped)) && echo -n "S:${stopped}"
+  local stopped=$(jobs -sp | wc -l)
+  ((stopped)) && echo -n "S:${stopped}"
 }
 
 set_prompt_jobs()
 {
-    local RESET='\[\e[0m\]'
-    local Magenta='\[\e[1;35m\]'
-    local Cyan='\[\e[1;36m\]'
+  local RESET='\[\e[0m\]'
+  local Magenta='\[\e[1;35m\]'
+  local Cyan='\[\e[1;36m\]'
 
-    PS1+='$( if [[ "$(jobs -p | wc -l)" -gt 0 ]]; then echo -n ""; '
-    PS1+='echo -n "'${Cyan}'"; __prompt_jobs_running; echo -n "'${RESET}'";'
-    PS1+='__prompt_jobs_separator;'
-    PS1+='echo -n "'${Magenta}'"; __prompt_jobs_stopped; echo -n "'${RESET}'";'
-    PS1+='echo -n " "; fi)'
+  PS1+='$( if [[ "$(jobs -p | wc -l)" -gt 0 ]]; then echo -n ""; '
+  PS1+='echo -n "'${Cyan}'"; __prompt_jobs_running; echo -n "'${RESET}'";'
+  PS1+='__prompt_jobs_separator;'
+  PS1+='echo -n "'${Magenta}'"; __prompt_jobs_stopped; echo -n "'${RESET}'";'
+  PS1+='echo -n " "; fi)'
 }
 
 if [ "$color_prompt" = yes ]; then
-    PS1=""
-    set_prompt_exitcode  # This must come first so other function calls don't mess up $?.
-    PS1+=" $(prompt_time) "
-    set_prompt_jobs
-    PS1+="$(prompt_basic) "
+  PS1=""
+  set_prompt_exitcode  # This must come first so other function calls don't mess up $?.
+  PS1+=" $(prompt_time) "
+  set_prompt_jobs
+  PS1+="$(prompt_basic) "
 else
-    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+  PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
 fi
 unset color_prompt force_color_prompt
 
 # If this is an xterm set the title to user@host:dir
 case "$TERM" in
 xterm*|rxvt*)
-    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
-    ;;
+  PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+  ;;
 *)
-    ;;
+  ;;
 esac
 
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
-    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
-    alias ls='ls --color=auto'
-    #alias dir='dir --color=auto'
-    #alias vdir='vdir --color=auto'
+  test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+  alias ls='ls --color=auto'
+  #alias dir='dir --color=auto'
+  #alias vdir='vdir --color=auto'
 
-    alias grep='grep --color=auto'
-    alias fgrep='fgrep --color=auto'
-    alias egrep='egrep --color=auto'
+  alias grep='grep --color=auto'
+  alias fgrep='fgrep --color=auto'
+  alias egrep='egrep --color=auto'
 fi
 
 # colored GCC warnings and errors
 #export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
+
+# Use the best editor possible :)
+export EDITOR="vim"
+export VISUAL="${EDITOR}"
+
+# The user's own 'bin' should be in the PATH too.
+export PATH="${HOME}/bin:${PATH}"
 
 # Alias definitions.
 # You may want to put all your additions into a separate file like
 # ~/.bash_aliases, instead of adding them here directly.
 # See /usr/share/doc/bash-doc/examples in the bash-doc package.
 if [ -f ~/.bash_aliases ]; then
-    . ~/.bash_aliases
+  . ~/.bash_aliases
 fi
 
-export EDITOR="vim"
-export VISUAL="${EDITOR}"
-
-export PATH="${HOME}/bin:${PATH}"
+# Load additional tools maybe installed by the user.
+if [ -d ~/.bash.d ]; then
+  for e in ~/.bash.d/*; do
+    if [ -f $e ]; then
+      . $e
+    fi
+  done
+fi
 
 # enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile

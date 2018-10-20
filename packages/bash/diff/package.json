@@ -16,7 +16,10 @@
   "install": [
     {
       "kind": "make folders",
-      "folders": [ "$HOME/bin" ]
+      "folders": [
+        "$HOME/.bash.d",
+        "$HOME/bin"
+      ]
     },
     {
       "kind": "shell",
@@ -32,9 +35,9 @@
       "command": "git config --global core.pager \"diff-so-fancy | less --tabs=4 -RFX\""
     },
     {
-      "kind": "append",
-      "file": "$PACKAGE_DIR/alias.sh",
-      "to": "$HOME/.bash_aliases"
+      "kind": "copy",
+      "file": "colourdiff.sh",
+      "to": "$HOME/.bash.d/colourdiff.sh"
     }
   ]
 }

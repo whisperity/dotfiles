@@ -24,11 +24,6 @@
       "kind": "copy",
       "file": "config.vim",
       "to": "$HOME/.vim/config/pathogen.vim"
-    },
-    {
-      "kind": "append text",
-      "text": "source ~/.vim/config/pathogen.vim",
-      "to": "$HOME/.vim/init.vim"
     }
   ]
 }

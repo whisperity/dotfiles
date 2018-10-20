@@ -19,11 +19,6 @@
       "kind": "copy",
       "file": "config.vim",
       "to": "$HOME/.vim/config/undotree.vim"
-    },
-    {
-      "kind": "append text",
-      "text": "source ~/.vim/config/undotree.vim",
-      "to": "$HOME/.vim/init.vim"
     }
   ]
 }
