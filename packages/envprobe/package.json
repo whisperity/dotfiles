@@ -1,0 +1,35 @@
+{
+  "description": "Envprobe is a Shell environment variable management tool written in Python, which can also save and load variable differences on request.",
+  "dependencies": [
+    "basic"
+  ],
+  "prefetch": [
+    {
+      "kind": "shell multiple",
+      "commands": [
+        "wget https://api.github.com/repos/whisperity/envprobe/tarball/master -O envprobe.tar.gz",
+        "tar -xf envprobe.tar.gz",
+        "mv whisperity-envprobe-* envprobe"
+      ]
+    }
+  ],
+  "install": [
+    {
+      "kind": "make folders",
+      "folders": [
+        "$HOME/.bash.d",
+        "$HOME/opt"
+      ]
+    },
+    {
+      "kind": "copy tree",
+      "folder": "$PREFETCH_DIR/envprobe",
+      "to": "$HOME/opt/envprobe"
+    },
+    {
+      "kind": "copy",
+      "file": "envprobe.sh",
+      "to": "$HOME/.bash.d/zzzzzz_zloadlast_envprobe.sh"
+    }
+  ]
+}
