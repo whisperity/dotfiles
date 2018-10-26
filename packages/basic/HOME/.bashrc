@@ -205,7 +205,10 @@ export EDITOR="vim"
 export VISUAL="${EDITOR}"
 
 # The user's own 'bin' should be in the PATH too.
-export PATH="${HOME}/bin:${PATH}"
+if [[ ":${PATH}:" != *":${HOME}/bin:"* ]]
+then
+  export PATH="${HOME}/bin:${PATH}"
+fi
 
 # Alias definitions.
 # You may want to put all your additions into a separate file like

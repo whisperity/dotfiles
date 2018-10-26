@@ -1,4 +1,3 @@
-
 _diffc() {
   if [ $# -lt 2 ]
   then
