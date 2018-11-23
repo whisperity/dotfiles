@@ -29,7 +29,7 @@
     {
       "kind": "copy",
       "file": "envprobe.sh",
-      "to": "$HOME/.bash.d/zzzzzz_zloadlast_envprobe.sh"
+      "to": "$HOME/.bash.d/zzzzzz_loadlast_envprobe.sh"
     }
   ]
 }

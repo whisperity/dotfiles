@@ -4,7 +4,7 @@
   "enable": [
     {
       "kind": "shell",
-      "command": "$HOME/opt/virtualenv/virtualenv.py --python $(which python3) $HOME/dotfiles-venv"
+      "command": "$HOME/opt/virtualenv/src/virtualenv.py --python $(which python3) $HOME/dotfiles-venv"
     }
   ],
   "cleanup": [
