@@ -1,0 +1,31 @@
+#!/bin/bash
+
+if [[ ${EUID} -ne 0 ]]
+then
+  echo "Must be run as root." >&2
+  exit 1
+fi
+
+DEFAULT_LINE=$(cat /etc/default/grub | grep "GRUB_DEFAULT" | grep -v "^#")
+if [[ ! "${DEFAULT_LINE}" =~ "saved" ]]
+then
+  echo "Grub default configuration is not set to saved value." >&2
+  echo "Please chage GRUB_DEFAULT to 'saved' in /etc/default/grub" >&2
+  echo "then execute \`update-grub2\`." >&2
+  exit 1
+fi
+
+WINDOWS_ENTRY=$(grep "menuentry" /boot/grub/grub.cfg | grep "Windows")
+WINDOWS_ENTRY_NAME=$(echo ${WINDOWS_ENTRY}  | \
+                     sed "s/^menuentry '//" | \
+                     sed "s/'.*$//")
+
+grub-reboot "${WINDOWS_ENTRY_NAME}"
+if [[ $? -ne 0 ]]
+then
+  echo "Error: calling grub-reboot failed." >&2
+  exit 1
+fi
+
+echo "Grub has been set to boot \"${WINDOWS_ENTRY_NAME}\""
+echo "Please \`reboot\` now..."
