@@ -17,7 +17,6 @@
     {
       "kind": "make folders",
       "folders": [
-        "$HOME/.bash.d",
         "$HOME/bin"
       ]
     },

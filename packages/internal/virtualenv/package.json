@@ -9,10 +9,8 @@
   ],
   "cleanup": [
     {
-      "kind": "shell multiple",
-      "commands": [
-        "rm -rf $HOME/dotfiles-venv"
-      ]
+      "kind": "shell",
+      "command": "rm -rf $HOME/dotfiles-venv"
     }
   ]
 }

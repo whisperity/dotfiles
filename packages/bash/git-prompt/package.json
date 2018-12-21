@@ -11,10 +11,6 @@
   ],
   "install": [
     {
-      "kind": "make folders",
-      "folders": [ "$HOME/.bash.d" ]
-    },
-    {
       "kind": "copy tree",
       "folder": "$PREFETCH_DIR/bash-git-prompt",
       "to": "$HOME/.bash.d/git-prompt"
