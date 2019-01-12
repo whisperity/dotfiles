@@ -1,0 +1,18 @@
+{
+  "description": "Installs ccache, the compiler result caching.",
+  "dependencies": [
+    "bash"
+  ],
+  "superuser": true,
+  "install": [
+    {
+      "kind": "shell",
+      "command": "sudo apt-get install -y --no-install-recommends ccache"
+    },
+    {
+      "kind": "copy",
+      "file": "enable-ccache.sh",
+      "to": "$HOME/.bash.d/enable-ccache.sh"
+    }
+  ]
+}
