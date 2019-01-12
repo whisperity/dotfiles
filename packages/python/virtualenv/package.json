@@ -1,6 +1,7 @@
 {
   "description": "Download and install the latest version of Python virtualenv.",
   "depend_on_parent" : false,
+  "superuser": true,
   "prefetch": [
     {
       "kind": "shell multiple",
@@ -13,13 +14,18 @@
   ],
   "install": [
     {
+      "kind": "shell",
+      "command": "sudo apt-get install -y --no-install-recommends python3-distutils"
+    },
+    {
       "kind": "make folders",
       "folders": [ "$HOME/opt" ]
     },
     {
       "kind": "shell multiple",
       "commands": [
-        "mv $PREFETCH_DIR/virtualenv $HOME/opt/virtualenv"
+        "mv $PREFETCH_DIR/virtualenv $HOME/opt/virtualenv",
+        "bash -c 'cd $HOME/opt/virtualenv; ln -s $(find . -name virtualenv.py -type f) virtualenv_s.py'"
       ]
     }
   ]
