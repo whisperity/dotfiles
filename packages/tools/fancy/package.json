@@ -1,0 +1,24 @@
+{
+  "description": "Installs some fancy utilities that make shell experiences better and quicker.",
+  "superuser": true,
+  "prefetch": [
+    {
+      "kind": "shell multiple",
+      "commands": [
+        "$PACKAGE_DIR/fd.sh",
+        "$PACKAGE_DIR/bat.sh",
+        "$PACKAGE_DIR/hexyl.sh"
+      ]
+    }
+  ],
+  "install": [
+    {
+      "kind": "shell multiple",
+      "commands": [
+        "sudo dpkg --install $PREFETCH_DIR/fd.deb",
+        "sudo dpkg --install $PREFETCH_DIR/bat.deb",
+        "sudo dpkg --install $PREFETCH_DIR/hexyl.deb"
+      ]
+    }
+  ]
+}

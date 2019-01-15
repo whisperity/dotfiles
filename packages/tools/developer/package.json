@@ -1,12 +1,6 @@
 {
   "description": "Installs some common and most wanted developer environment tools.",
   "superuser": true,
-  "prefetch": [
-    {
-      "kind": "shell",
-      "command": "$PACKAGE_DIR/../fd.sh"
-    }
-  ],
   "install": [
     {
       "kind": "shell",
