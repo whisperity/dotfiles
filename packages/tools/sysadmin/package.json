@@ -1,18 +1,16 @@
 {
   "description": "Installs some common and most wanted system administration and maintenance tools.",
   "superuser": true,
-  "prefetch": [
-    {
-      "kind": "shell",
-      "command": "$PACKAGE_DIR/../fd.sh"
-    }
-  ],
   "install": [
     {
-      "kind": "shell multiple",
+      "kind": "shell",
+      "command": "sudo apt-get install -y --no-install-recommends aptitude finger iotop lynx smartmontools traceroute"
+    },
+    {
+      "kind": "shell tryinorder",
       "commands": [
-        "sudo apt-get install -y --no-install-recommends aptitude cpufreq-utils finger iotop lynx smartmontools traceroute",
-        "sudo dpkg --install $PREFETCH_DIR/fd.deb"
+        "sudo apt-get install -y --no-install-recommends cpufreq-utils",
+        "sudo apt-get install -y --no-install-recommends cpufrequtils"
       ]
     }
   ]

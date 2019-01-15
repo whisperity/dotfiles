@@ -281,6 +281,11 @@ def execute_prepare_actions(package_name, actions,
                              '--depth', str(1)])
         elif kind == 'shell':
             shell_executor(command)
+        elif kind == 'shell tryinorder':
+            for shell_cmd in command['commands']:
+                success = shell_executor({'command': shell_cmd})
+                if success:
+                    break
         elif kind == 'shell multiple':
             for shell_cmd in command['commands']:
                 shell_executor({'command': shell_cmd})
@@ -332,6 +337,11 @@ def execute_install_actions(actions, arg_expansion, shell_executor):
         kind = command['kind']
         if kind == 'shell':
             shell_executor(command)
+        elif kind == 'shell tryinorder':
+            for shell_cmd in command['commands']:
+                success = shell_executor({'command': shell_cmd})
+                if success:
+                    break
         elif kind == 'shell multiple':
             for shell_cmd in command['commands']:
                 shell_executor({'command': shell_cmd})
@@ -422,14 +432,16 @@ def install_package(package):
 
     def __exec_shell(action):
         """
-        Executes a "shell" action of a package.
+        Executes a "shell" action of a package. Returns whether the return
+        code of the command was 0 (success).
         """
         cmdline = action['command']
         if isinstance(cmdline, str):
             cmdline = [cmdline]
 
         cmdline = [__expand(c) for c in cmdline]
-        subprocess.call(cmdline, shell=True)
+        retcode = subprocess.call(cmdline, shell=True)
+        return retcode == 0
 
 
     if 'prefetch' in package_data:
@@ -541,14 +553,16 @@ def cleanup_package(package):
 
     def __exec_shell(action):
         """
-        Executes a "shell" action of a package.
+        Executes a "shell" action of a package. Returns whether the return code
+        of the command was 0 (success).
         """
         cmdline = action['command']
         if isinstance(cmdline, str):
             cmdline = [cmdline]
 
         cmdline = [__expand(c) for c in cmdline]
-        subprocess.call(cmdline, shell=True)
+        retcode = subprocess.call(cmdline, shell=True)
+        return retcode == 0
 
 
     if 'cleanup' in package_data:

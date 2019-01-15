@@ -9,11 +9,8 @@
   ],
   "install": [
     {
-      "kind": "shell multiple",
-      "commands": [
-        "sudo apt-get install -y --no-install-recommends byobu gitk htop mc meld tree",
-        "sudo dpkg --install $PREFETCH_DIR/fd.deb"
-      ]
+      "kind": "shell",
+      "command": "sudo apt-get install -y --no-install-recommends byobu gitk htop mc meld tree"
     }
   ]
 }
