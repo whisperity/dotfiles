@@ -10,6 +10,7 @@ import subprocess
 import sys
 import tempfile
 
+
 if __name__ != "__main__":
     raise ImportError("Do not use this as a module.")
 
@@ -43,6 +44,7 @@ except json.decoder.JSONDecodeError:
 script_directory = os.getcwd()
 package_directory = os.path.join(script_directory, 'packages')
 
+
 def file_to_packagename(packagefile):
     return os.path.dirname(packagefile) \
         .replace(package_directory, '') \
@@ -62,8 +64,8 @@ def get_package_data(package):
 
 
 package_files = [os.path.join(dirpath, f)
-                for dirpath, dirnames, files in os.walk(package_directory)
-                for f in fnmatch.filter(files, 'package.json')]
+                 for dirpath, dirnames, files in os.walk(package_directory)
+                 for f in fnmatch.filter(files, 'package.json')]
 AVAILABLE_PACKAGES = [file_to_packagename(packagefile)
                       for packagefile in package_files]
 
@@ -106,7 +108,7 @@ for package in specified_packages:
 
     globbed_packages = [package for package in AVAILABLE_PACKAGES
                         if package.startswith(namespace) and
-                           not package.startswith('internal')]
+                        not package.startswith('internal')]
     for package in globbed_packages:
         print("Marked '%s' for installation." % package)
 
@@ -135,7 +137,7 @@ def add_parent_package_as_dependency(package, package_data):
     try:
         parent_name = '.'.join(package.split('.')[:-1])
         get_package_data(parent_name)
-    except:
+    except (IndexError, OSError):
         # The parent is not a package, don't do anything.
         return
 
@@ -233,6 +235,7 @@ def deduplicate_work_queue():
 WORK_QUEUE = deduplicate_work_queue()
 print("Will install the following packages:\n    %s" % ', '.join(WORK_QUEUE))
 
+
 def check_superuser():
     print("Testing access to the 'sudo' command, please enter your password "
           "as prompted.")
@@ -253,7 +256,7 @@ for package in WORK_QUEUE:
     package_data = get_package_data(package)
 
     if 'superuser' in package_data and not HAS_SUPERUSER_CHECKED:
-        if package_data['superuser'] == True:
+        if package_data['superuser'] is True:
             print("Package '%s' requires superuser rights to install."
                   % package)
             test = check_superuser()
@@ -319,7 +322,6 @@ def execute_install_actions(package_name, actions,
     uservar_re = re.compile(r'\$<(?P<key>[\w_-]+)>',
                             re.MULTILINE | re.UNICODE)
 
-
     def __replace_uservar(match):
         var_name = match.group('key')
         try:
@@ -347,7 +349,6 @@ def execute_install_actions(package_name, actions,
                            "not set." % (var_name, package_name))
         return value
 
-
     for command in actions:
         kind = command['kind']
         if kind == 'shell':
@@ -363,7 +364,7 @@ def execute_install_actions(package_name, actions,
         elif kind == 'make folders':
             for folder in command['folders']:
                 output = os.path.expandvars(folder)
-                print("    ---\ Creating output folder '%s'" % output)
+                print("    ---\\ Creating output folder '%s'" % output)
                 os.makedirs(output, exist_ok=True)
         elif kind == 'extract multiple':
             from_root_folder = command['root']
@@ -403,23 +404,23 @@ def execute_install_actions(package_name, actions,
                 to.write(command['text'])
                 to.write('\n')
         elif kind == 'replace user input':
-             to_file = os.path.expandvars(command['file'])
-             print("    ---> Saving user configuration to '%s'" % to_file)
-             with open(to_file, 'r+') as to:
-                 content = to.read()
-                 content = re.sub(uservar_re, __replace_uservar, content)
-                 to.seek(0)
-                 to.write(content)
-                 to.truncate(to.tell())
+            to_file = os.path.expandvars(command['file'])
+            print("    ---> Saving user configuration to '%s'" % to_file)
+            with open(to_file, 'r+') as to:
+                content = to.read()
+                content = re.sub(uservar_re, __replace_uservar, content)
+                to.seek(0)
+                to.write(content)
+                to.truncate(to.tell())
         elif kind == 'substitute environment variables':
-             to_file = arg_expansion(command['file'])
-             print("    ---> Substituting environment vars in '%s'" % to_file)
-             with open(to_file, 'r+') as to:
-                 content = to.read()
-                 content = re.sub(uservar_re, __replace_envvar, content)
-                 to.seek(0)
-                 to.write(content)
-                 to.truncate(to.tell())
+            to_file = arg_expansion(command['file'])
+            print("    ---> Substituting environment vars in '%s'" % to_file)
+            with open(to_file, 'r+') as to:
+                content = to.read()
+                content = re.sub(uservar_re, __replace_envvar, content)
+                to.seek(0)
+                to.write(content)
+                to.truncate(to.tell())
         else:
             raise KeyError("Invalid kind '%s' specified in INSTALL or ENABLE "
                            "of %s" % (kind, package_name))
@@ -436,7 +437,6 @@ def install_package(package):
 
     package_dir = os.path.dirname(packagename_to_file(package))
     prefetch_dir = None
-
 
     def __expand(path):
         """
@@ -456,7 +456,6 @@ def install_package(package):
 
         return path
 
-
     def __exec_shell(action):
         """
         Executes a "shell" action of a package. Returns whether the return
@@ -469,7 +468,6 @@ def install_package(package):
         cmdline = [__expand(c) for c in cmdline]
         retcode = subprocess.call(cmdline, shell=True)
         return retcode == 0
-
 
     if 'prefetch' in package_data:
         print("Obtaining extra content for install of '%s'..." % package)
@@ -491,7 +489,6 @@ def install_package(package):
             return False
         finally:
             os.chdir(script_directory)
-
 
     try:
         os.chdir(package_dir)
@@ -551,6 +548,7 @@ while any(WORK_QUEUE):
         json.dump(PACKAGE_STATUS, status,
                   indent=2, sort_keys=True)
 
+
 def cleanup_package(package):
     package_data = get_package_data(package)
     if 'cleanup' not in package_data:
@@ -578,7 +576,6 @@ def cleanup_package(package):
 
         return path
 
-
     def __exec_shell(action):
         """
         Executes a "shell" action of a package. Returns whether the return code
@@ -591,7 +588,6 @@ def cleanup_package(package):
         cmdline = [__expand(c) for c in cmdline]
         retcode = subprocess.call(cmdline, shell=True)
         return retcode == 0
-
 
     if 'cleanup' in package_data:
         print("Performing extra cleanup steps after usage of '%s'..." %
@@ -615,7 +611,6 @@ def cleanup_package(package):
                 # If it was not cleaned up earlier, delete the prefetch now.
                 shutil.rmtree(prefetch_dir, True)
                 del PACKAGE_TO_PREFETCH_DIR[package]
-
 
 
 for package in CLEANUP_PACKAGES:
