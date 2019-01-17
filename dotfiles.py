@@ -304,9 +304,13 @@ def execute_prepare_actions(package_name, actions,
                       'w') as varfile:
                 varfile.write(value)
             print("\n")
+        else:
+            raise KeyError("Invalid kind '%s' specified in PREFETCH or CLEANUP"
+                           " of %s" % (kind, package_name))
 
 
-def execute_install_actions(actions, arg_expansion, shell_executor):
+def execute_install_actions(package_name, actions,
+                            arg_expansion, shell_executor):
     """
     Executes the given actions (for 'install' and 'enable') with the
     given argument expansion and shell execution lambda.
@@ -331,6 +335,17 @@ def execute_install_actions(actions, arg_expansion, shell_executor):
                   % var_name,
                   file=sys.stderr)
             raise
+
+    def __replace_envvar(match):
+        var_name = match.group('key')
+        value = os.environ.get(var_name)
+        if not value:
+            value = os.environ.get(var_name.lower())
+        if not value:
+            raise KeyError("Installer attempted to substitute environment "
+                           "variable %s in script of %s but the variable is "
+                           "not set." % (var_name, package_name))
+        return value
 
 
     for command in actions:
@@ -396,6 +411,18 @@ def execute_install_actions(actions, arg_expansion, shell_executor):
                  to.seek(0)
                  to.write(content)
                  to.truncate(to.tell())
+        elif kind == 'substitute environment variables':
+             to_file = arg_expansion(command['file'])
+             print("    ---> Substituting environment vars in '%s'" % to_file)
+             with open(to_file, 'r+') as to:
+                 content = to.read()
+                 content = re.sub(uservar_re, __replace_envvar, content)
+                 to.seek(0)
+                 to.write(content)
+                 to.truncate(to.tell())
+        else:
+            raise KeyError("Invalid kind '%s' specified in INSTALL or ENABLE "
+                           "of %s" % (kind, package_name))
 
 
 PACKAGE_TO_PREFETCH_DIR = {}
@@ -475,7 +502,8 @@ def install_package(package):
             raise KeyError("Invalid state: package data for %s did not "
                            "contain any install-like directive?" % package)
 
-        execute_install_actions(package_data[install_like_directive],
+        execute_install_actions(package,
+                                package_data[install_like_directive],
                                 __expand,
                                 __exec_shell)
         return True

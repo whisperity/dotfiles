@@ -1,0 +1,36 @@
+{
+  "description": "Install the TeXLive (La)TeX typesetting environment's latest version.",
+  "dependencies": [
+    "bash"
+  ],
+  "prefetch": [
+    {
+      "kind": "shell multiple",
+      "commands": [
+        "wget http://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz",
+        "tar xvfz install-tl-unx.tar.gz",
+        "rm install-tl-unx.tar.gz",
+        "mv install-tl-* install-tl"
+     ]
+    },
+    {
+      "kind": "shell",
+      "command": "cp $PACKAGE_DIR/texlive.profile $PREFETCH_DIR/texlive.profile"
+    }
+  ],
+  "install": [
+    {
+      "kind": "substitute environment variables",
+      "file": "$PREFETCH_DIR/texlive.profile"
+    },
+    {
+      "kind": "shell",
+      "command": "$PREFETCH_DIR/install-tl/install-tl --profile=$PREFETCH_DIR/texlive.profile"
+    },
+    {
+      "kind": "copy",
+      "file": "texlive.sh",
+      "to": "$HOME/.bash.d/tex-live.sh"
+    }
+  ]
+}
