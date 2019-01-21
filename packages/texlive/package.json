@@ -1,5 +1,5 @@
 {
-  "description": "Install the TeXLive (La)TeX typesetting environment's latest version.",
+  "description": "Install the TeXLive (La)TeX typesetting environment's latest version from the internet.",
   "dependencies": [
     "bash"
   ],

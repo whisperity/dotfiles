@@ -1,5 +1,5 @@
 # Load binaries from the TeX-Live installation.
-TEX_BINDIR="${HOME}/.local/share/texlive/*/bin/*"
+TEX_BINDIR="${HOME}/.local/share/texlive/bin/*"
 
 if [[ ":${PATH}:" != *":${TEX_BINDIR}:"* ]]
 then
