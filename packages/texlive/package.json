@@ -24,6 +24,10 @@
       "file": "$PREFETCH_DIR/texlive.profile"
     },
     {
+      "kind": "make folders",
+      "folders": [ "$HOME/opt" ]
+    },
+    {
       "kind": "shell",
       "command": "$PREFETCH_DIR/install-tl/install-tl --profile=$PREFETCH_DIR/texlive.profile"
     },
