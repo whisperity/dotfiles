@@ -28,12 +28,12 @@
     },
     {
       "kind": "make folders",
-      "folders": [ "$HOME/.config/htop" ]
+      "folders": [ "$HOME/.ssh" ]
     },
     {
       "kind": "extract multiple",
       "root": "HOME",
-      "files": [ ".config/htop/htoprc" ]
+      "files": [ ".ssh/unlock-all" ]
     },
     {
       "kind": "replace user input",
