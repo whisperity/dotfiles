@@ -18,9 +18,18 @@
       "commands": [
         "sudo dpkg --install $PREFETCH_DIR/bat.deb",
         "sudo dpkg --install $PREFETCH_DIR/fd.deb",
-        "sudo mv $PREFETCH_DIR/exa /usr/local/bin/exa",
         "sudo dpkg --install $PREFETCH_DIR/hexyl.deb"
       ]
+    },
+    {
+      "kind": "copy",
+      "from": "$PREFETCH_DIR/exa",
+      "to": "$HOME/bin/exa"
+    },
+    {
+      "kind": "copy",
+      "from": "$PACKAGE_DIR/exa_aliases.sh",
+      "to": "$HOME/.bash.d/exa.sh"
     }
   ]
 }
