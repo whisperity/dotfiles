@@ -1,0 +1,48 @@
+#!/bin/bash
+# Open a remote connection to a server but set up audio forwarding first...
+# via https://superuser.com/questions/231920/forwarding-audio-like-x-in-ssh/311830#311830
+
+if [[ $1 == "-h" ]]
+then
+    echo "Usage: ssh-with-audio remote-host [remote-port]"
+    echo "remote-host: as in the argument for SSH command"
+    echo "remote-port: the port that will be used to connect the audio, this"
+    echo "             must be a free port number on the remote machine!"
+    exit 0
+fi
+
+if [[ $# -lt 1 ]]
+then
+  echo "Error: specify remote hostname to SSH." >&2
+  exit 1
+fi
+
+SERVER_ADDRESS=$(pax11publish | grep -oE "tcp:[[:alnum:]:]+\s")
+if [[ $? -ne 0 ]]
+then
+    echo "Error: No TCP cookie exists for PulseAudio!" >&2
+    echo "Please run 'paprefs' and allow network connection to audio devices." >&2
+    exit 1
+fi
+
+LOCAL_PORT=$(echo ${SERVER_ADDRESS} | cut -d':' -f3)
+
+echo "Copying PulseAudio cookie..."
+scp ~/.config/pulse/cookie "$1":".config/pulse/cookie"
+
+REMOTE_PORT="$2"
+if [[ -z "${REMOTE_PORT}" ]]
+then
+    REMOTE_PORT=24713
+fi
+
+echo "Establishing SSH connection..."
+ssh -R "${REMOTE_PORT}:localhost:${LOCAL_PORT}" -X -t "$1" \
+  "export PULSE_SERVER=tcp:localhost:${REMOTE_PORT}; pactl info; bash"
+RET=$?
+
+echo "Cleanup of PulseAudio cookie..."
+ssh "$1" 'rm -r $HOME/.config/pulse/cookie'
+
+exit ${RET}
+
