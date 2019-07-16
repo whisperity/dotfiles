@@ -5,8 +5,9 @@
     {
       "kind": "shell multiple",
       "commands": [
-        "$PACKAGE_DIR/fd.sh",
         "$PACKAGE_DIR/bat.sh",
+        "$PACKAGE_DIR/exa.sh",
+        "$PACKAGE_DIR/fd.sh",
         "$PACKAGE_DIR/hexyl.sh"
       ]
     }
@@ -15,8 +16,9 @@
     {
       "kind": "shell multiple",
       "commands": [
-        "sudo dpkg --install $PREFETCH_DIR/fd.deb",
         "sudo dpkg --install $PREFETCH_DIR/bat.deb",
+        "sudo dpkg --install $PREFETCH_DIR/fd.deb",
+        "sudo mv $PREFETCH_DIR/exa /usr/local/bin/exa",
         "sudo dpkg --install $PREFETCH_DIR/hexyl.deb"
       ]
     }
