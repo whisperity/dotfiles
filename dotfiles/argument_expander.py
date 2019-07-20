@@ -60,3 +60,13 @@ def package_glob(available_packages, globbing_expr):
         ret.update(globbed_packages)
 
     return ret
+
+
+def deduplicate_iterable(it):
+    """
+    Deduplicates the elements in the given iterable by creating a new iterable
+    in which the same element's first occurrence is kept.
+    """
+    seen = set()
+    seen_add = seen.add
+    return [x for x in it if not (x in seen or seen_add(x))]

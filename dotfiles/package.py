@@ -13,8 +13,7 @@ class Status(Enum):
     # The default state of a package.
     NOT_INSTALLED = 0,
 
-    # The package is marked for installation, but dependencies prevent
-    # installing just now.
+    # The package is marked for installation.
     MARKED = 1,
 
     # The package is prepared for install: external dependencies and
@@ -121,8 +120,11 @@ class Package:
     @classmethod
     def create(cls, logical_name):
         # TODO: Check if package is installed.
-        return Package(logical_name,
-                       cls.package_name_to_data_file(logical_name))
+        try:
+            return Package(logical_name,
+                           cls.package_name_to_data_file(logical_name))
+        except FileNotFoundError:
+            raise KeyError("Package data file for %s was not found.")
 
     @property
     def data(self):
@@ -136,7 +138,7 @@ class Package:
     @property
     def is_support(self):
         """
-        Returns whether or not a package is a "support package".
+        Whether or not a package is a "support package".
 
         Support packages are fully featured packages in terms of having prepare
         and install actions, but they are not meant to write anything permanent
@@ -148,6 +150,29 @@ class Package:
         return self._data.get('support', False) or 'internal' in self.name
 
     @property
+    def depends_on_parent(self):
+        """
+        Whether the package depends on its parent package in the logical
+        hierarchy.
+        """
+        return self._data.get('depend_on_parent', True)
+
+    @property
+    def parent(self):
+        """
+        Returns the logical name of the package that SHOULD BE the parent
+        package of the current one. There are no guarantees that the name
+        actually refers to an installable package.
+        """
+        return '.'.join(self.name.split('.')[:-1])
+
+    @property
+    def dependencies(self):
+        return self._data.get('dependencies', []) + \
+               ([self.parent] if self.depends_on_parent and self.parent
+                else [])
+
+    @property
     def should_do_prepare(self):
         """
         :return: If there are pre-install actions present for the current
@@ -155,13 +180,6 @@ class Package:
         """
         return self._status == Status.MARKED and \
             bool(self._data.get('prepare', {}))
-
-    def check_dependencies(self):
-        """
-        Check if the dependencies of the current package are satisfied.
-        """
-        # TODO: Implement this.
-        raise NotImplementedError("TODO: Implement this.")
 
     @_StatusRequirementDecorator(Status.MARKED)
     @restore_working_directory
@@ -207,6 +225,9 @@ class Package:
         success = [f() for f in self._teardown]
         return all(success)
 
+    def __str__(self):
+        return self.name
+
 
 def get_package_names(*roots):
     """
@@ -218,3 +239,40 @@ def get_package_names(*roots):
             for match in fnmatch.filter(files, 'package.json'):  # TODO: YAML
                 yield Package.data_file_to_package_name(
                     os.path.join(dirpath, match))
+
+
+def get_dependencies(package_store, package, ignore=None):
+    """
+    Calculate the logical names of the packages that are the dependencies of
+    the given package instance.
+    :param package_store: A dict of package instances that is the memory map of
+        known packages.
+    :param package: The package instance for whom the dependencies should be
+        calculated.
+    :param ignore: An optional list of package names that should be ignored -
+        if these packages are encountered, the dependency chain walk does not
+        continue.
+    """
+    if package in ignore:
+        return []
+    if ignore is None:
+        ignore = []
+
+    dependencies = []
+    for dependency in set(package.dependencies) - set(ignore):
+        try:
+            # Check if the dependency exists.
+            dependency_obj = package_store[dependency]
+        except KeyError:
+            # If the dependency name is not a real package, fail.
+            raise KeyError("Dependency %s for %s was not found as a package."
+                           % (dependency, package))
+
+        # If the dependency exists as a package, it is a dependency.
+        dependencies += [dependency]
+        # And walk the dependencies of the now found dependency.
+        dependencies.extend(get_dependencies(package_store,
+                                             dependency_obj,
+                                             ignore + [package.name]))
+
+    return dependencies
