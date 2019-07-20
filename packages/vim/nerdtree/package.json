@@ -3,7 +3,7 @@
   "dependencies": [
     "vim.pathogen"
   ],
-  "prefetch": [
+  "prepare": [
     {
       "kind": "git clone",
       "remote": "http://github.com/scrooloose/nerdtree"
@@ -12,7 +12,7 @@
   "install": [
     {
       "kind": "copy tree",
-      "folder": "$PREFETCH_DIR/nerdtree",
+      "folder": "$TEMPORARY_DIR/nerdtree",
       "to": "$HOME/.vim/bundle/nerdtree"
     },
     {

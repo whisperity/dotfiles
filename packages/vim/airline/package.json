@@ -3,7 +3,7 @@
   "dependencies": [
     "vim.pathogen"
   ],
-  "prefetch": [
+  "prepare": [
     {
       "kind": "git clone",
       "remote": "http://github.com/vim-airline/vim-airline"
@@ -12,7 +12,7 @@
   "install": [
     {
       "kind": "copy tree",
-      "folder": "$PREFETCH_DIR/vim-airline",
+      "folder": "$TEMPORARY_DIR/vim-airline",
       "to": "$HOME/.vim/bundle/vim-airline"
     },
     {

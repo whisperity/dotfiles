@@ -3,7 +3,7 @@
   "dependencies": [
     "bash"
   ],
-  "prefetch": [
+  "prepare": [
     {
       "kind": "shell multiple",
       "commands": [
@@ -15,13 +15,13 @@
     },
     {
       "kind": "shell",
-      "command": "cp $PACKAGE_DIR/texlive.profile $PREFETCH_DIR/texlive.profile"
+      "command": "cp $PACKAGE_DIR/texlive.profile $TEMPORARY_DIR/texlive.profile"
     }
   ],
   "install": [
     {
       "kind": "substitute environment variables",
-      "file": "$PREFETCH_DIR/texlive.profile"
+      "file": "$TEMPORARY_DIR/texlive.profile"
     },
     {
       "kind": "make folders",
@@ -29,7 +29,7 @@
     },
     {
       "kind": "shell",
-      "command": "$PREFETCH_DIR/install-tl/install-tl --profile=$PREFETCH_DIR/texlive.profile"
+      "command": "$TEMPORARY_DIR/install-tl/install-tl --profile=$TEMPORARY_DIR/texlive.profile"
     },
     {
       "kind": "copy",

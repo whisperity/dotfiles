@@ -3,7 +3,7 @@
   "dependencies": [
     "vim.pathogen"
   ],
-  "prefetch": [
+  "prepare": [
     {
       "kind": "git clone",
       "remote": "http://github.com/plasticboy/vim-markdown"
@@ -12,7 +12,7 @@
   "install": [
     {
       "kind": "copy tree",
-      "folder": "$PREFETCH_DIR/vim-markdown",
+      "folder": "$TEMPORARY_DIR/vim-markdown",
       "to": "$HOME/.vim/bundle/vim-markdown"
     }
   ]

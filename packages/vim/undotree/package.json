@@ -3,7 +3,7 @@
   "dependencies": [
     "vim.pathogen"
   ],
-  "prefetch": [
+  "prepare": [
     {
       "kind": "git clone",
       "remote": "http://github.com/mbbill/undotree"
@@ -12,7 +12,7 @@
   "install": [
     {
       "kind": "copy tree",
-      "folder": "$PREFETCH_DIR/undotree",
+      "folder": "$TEMPORARY_DIR/undotree",
       "to": "$HOME/.vim/bundle/undotree"
     },
     {

@@ -3,7 +3,7 @@
   "dependencies": [
     "vim.pathogen"
   ],
-  "prefetch": [
+  "prepare": [
     {
       "kind": "git clone",
       "remote": "http://github.com/scrooloose/syntastic"
@@ -12,7 +12,7 @@
   "install": [
     {
       "kind": "copy tree",
-      "folder": "$PREFETCH_DIR/syntastic",
+      "folder": "$TEMPORARY_DIR/syntastic",
       "to": "$HOME/.vim/bundle/syntastic"
     },
     {

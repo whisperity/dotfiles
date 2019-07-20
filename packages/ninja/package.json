@@ -1,6 +1,6 @@
 {
   "description": "A small build system with focus on speed. Commonly used with CMake to generate the build commands for a project.",
-  "prefetch": [
+  "prepare": [
     {
       "kind": "shell multiple",
       "commands": [
@@ -16,7 +16,7 @@
     },
     {
       "kind": "copy",
-      "file": "$PREFETCH_DIR/ninja",
+      "file": "$TEMPORARY_DIR/ninja",
       "to": "$HOME/bin/ninja"
     }
   ]

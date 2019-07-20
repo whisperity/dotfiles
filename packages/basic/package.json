@@ -1,6 +1,6 @@
 {
   "description": "Basic user environment files. (This package is initially tailored for use on a default Ubuntu 16.04 user account.)",
-  "prefetch": [
+  "prepare": [
     {
       "kind": "prompt user",
       "short_name": "git-user.name",

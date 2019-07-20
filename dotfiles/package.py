@@ -2,9 +2,10 @@ from enum import Enum
 import json
 import os
 
+from dotfiles import install_stages
 from dotfiles.argument_expander import ArgumentExpander
 from dotfiles.chdir import restore_working_directory
-from dotfiles import install_stages
+from dotfiles.temporary import temporary_dir
 
 
 class Status(Enum):
@@ -113,8 +114,8 @@ class Package:
             self._data = json.load(datafile)
 
         self._expander = ArgumentExpander()
-        self._expander.register_expansion('PACKAGE_DIR',
-                                          os.path.dirname(datafile_path))
+        self._expander.register_expansion('PACKAGE_DIR', self.resources)
+        self._expander.register_expansion('SESSION_DIR', temporary_dir())
 
     @classmethod
     def create(cls, logical_name):
@@ -136,16 +137,15 @@ class Package:
         package.
         """
         return self._status == Status.MARKED and \
-            bool(self._data.get('prefetch', {}))
+            bool(self._data.get('prepare', {}))
 
     @_StatusRequirementDecorator(Status.MARKED)
     @restore_working_directory
     def execute_prepare(self):
-        # TODO: Rename the key in the scripts to "PREPARE".
-        prefetch = self._data.get('prefetch', {})
-        if prefetch:
+        prepare = self._data.get('prepare', {})
+        if prepare:
             executor = install_stages.prepare.Prepare(self, self._expander)
-            self._expander.register_expansion('PREFETCH_DIR',
+            self._expander.register_expansion('TEMPORARY_DIR',
                                               executor.temp_path)
 
             self.prefetch_dir = executor.temp_path  # TODO: Remove.
@@ -153,7 +153,7 @@ class Package:
             # Start the execution from the temporary download/prepare folder.
             os.chdir(executor.temp_path)
 
-            for action in prefetch:
+            for action in prepare:
                 executor.execute_command(action)
 
             # Register that temporary files were created and should be

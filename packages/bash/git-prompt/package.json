@@ -3,7 +3,7 @@
   "dependencies": [
     "basic"
   ],
-  "prefetch": [
+  "prepare": [
     {
       "kind": "git clone",
       "remote": "http://github.com/magicmonty/bash-git-prompt"
@@ -12,7 +12,7 @@
   "install": [
     {
       "kind": "copy tree",
-      "folder": "$PREFETCH_DIR/bash-git-prompt",
+      "folder": "$TEMPORARY_DIR/bash-git-prompt",
       "to": "$HOME/.bash.d/git-prompt"
     },
     {

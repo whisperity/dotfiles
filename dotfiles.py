@@ -11,6 +11,7 @@ import sys
 import tempfile
 
 from dotfiles import install_stages
+from dotfiles import temporary
 from dotfiles.package import Package
 
 
@@ -328,7 +329,6 @@ def install_package(package):
         return False
 
 
-CLEANUP_PACKAGES = []
 while any(WORK_QUEUE):
     package = WORK_QUEUE[0]
 
@@ -351,80 +351,15 @@ while any(WORK_QUEUE):
     if not configure:
         PACKAGE_STATUS[package] = 'installed'
 
-    CLEANUP_PACKAGES.append(package)
-
-    with open(os.path.join(os.path.expanduser('~'),
-                           '.dotfiles'), 'w') as status:
-        json.dump(PACKAGE_STATUS, status,
-                  indent=2, sort_keys=True)
-
-
-def cleanup_package(package):
-    package_data = get_package_data(package)
-    if 'cleanup' not in package_data:
-        print("'%s' is an install package - no actions done." % package)
-        return True
-
-    package_dir = os.path.dirname(packagename_to_file(package))
-    prefetch_dir = PACKAGE_TO_PREFETCH_DIR.get(package, None)
-
-    def __expand(path):
-        """
-        Helper method for expanding not only the environment variables in an
-        install action, but script-specific variables.
-        """
-
-        if '$PREFETCH_DIR' in path:
-            if not prefetch_dir:
-                raise ValueError("Invalid directive: '$PREFETCH_DIR' used "
-                                 "without any prefetch command executed.")
-            path = path.replace('$PREFETCH_DIR', prefetch_dir)
-
-        path = path.replace('$SCRIPT_DIR', script_directory)
-        path = path.replace('$PACKAGE_DIR', package_dir)
-        path = os.path.expandvars(path)
-
-        return path
-
-    def __exec_shell(cmdline):
-        """
-        Executes a "shell" action of a package. Returns whether the return code
-        of the command was 0 (success).
-        """
-        if isinstance(cmdline, str):
-            cmdline = [cmdline]
-
-        cmdline = [__expand(c) for c in cmdline]
-        retcode = subprocess.call(cmdline, shell=True)
-        return retcode == 0
-
-    if 'cleanup' in package_data:
-        print("Performing extra cleanup steps after usage of '%s'..." %
-              package)
-
-        try:
-            # TODO: This part of the toolchain should be reconsidered.
-
-            # execute_prepare_actions(package,
-            #                         package_data['cleanup'],
-            #                         __expand,
-            #                         __exec_shell)
-            return True
-        except Exception as e:
-            print("Couldn't clean up '%s': '%s'!" % (package, e),
-                  file=sys.stderr)
-            print(e)
-            return False
-        finally:
-            os.chdir(script_directory)
-
-
-for package in CLEANUP_PACKAGES:
-    print("Cleaning up package '%s'..." % package)
-    success = cleanup_package(package)
-
-    package_instance = _load_package(package)
-    package_instance.clean_temporaries()
-
+    success = _load_package(package).clean_temporaries()
     if not success:
         print(" !! Failed to clean up '%s'" % package)
+
+if temporary.has_temporary_dir():
+    print("Cleaning up installation temporaries...")
+    shutil.rmtree(temporary.temporary_dir(), ignore_errors=True)
+
+with open(os.path.join(os.path.expanduser('~'),
+                       '.dotfiles'), 'w') as status:
+    json.dump(PACKAGE_STATUS, status,
+              indent=2, sort_keys=True)

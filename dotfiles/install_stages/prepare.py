@@ -3,6 +3,7 @@ import shutil
 import subprocess
 import tempfile
 
+from dotfiles.temporary import package_temporary_dir
 from .common_shell import ShellCommandsMixin
 
 
@@ -13,8 +14,7 @@ class Prepare(ShellCommandsMixin):
     """
     def __init__(self, package, arg_expand):
         self.package_name = package.name
-        self._prefetch_dir = tempfile.mkdtemp('_' + package.name,
-                                              "dotfiles-")
+        self._prefetch_dir = package_temporary_dir(package.name)
         self.expand_args = arg_expand
 
     @property

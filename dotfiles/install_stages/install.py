@@ -79,7 +79,7 @@ class Install(ShellCommandsMixin):
     def __replace_uservar(self, match):
         var_name = match.group('key')
         try:
-            with open(os.path.join(self.expand_args('$PREFETCH_DIR'),
+            with open(os.path.join(self.expand_args('$TEMPORARY_DIR'),
                                    'var-' + var_name),
                       'r') as varfile:
                 value = varfile.read()

@@ -3,7 +3,7 @@
   "dependencies": [
     "vim.pathogen"
   ],
-  "prefetch": [
+  "prepare": [
     {
       "kind": "git clone",
       "remote": "http://github.com/tpope/vim-fugitive"
@@ -16,12 +16,12 @@
   "install": [
     {
       "kind": "copy tree",
-      "folder": "$PREFETCH_DIR/vim-fugitive",
+      "folder": "$TEMPORARY_DIR/vim-fugitive",
       "to": "$HOME/.vim/bundle/vim-fugitive"
     },
     {
       "kind": "copy tree",
-      "folder": "$PREFETCH_DIR/vim-gitgutter",
+      "folder": "$TEMPORARY_DIR/vim-gitgutter",
       "to": "$HOME/.vim/bundle/vim-gitgutter"
     }
   ]
