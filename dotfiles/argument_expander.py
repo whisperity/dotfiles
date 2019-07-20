@@ -12,8 +12,8 @@ class ArgumentExpander:
 
     def register_expansion(self, key, value):
         """
-        Register that 'key' appearing as an environment variable ($KEY) should
-        be expanded to 'value'.
+        Register that `key` appearing as an environment variable ($KEY) should
+        be expanded to `value`.
         """
         self._envs[key] = value
 

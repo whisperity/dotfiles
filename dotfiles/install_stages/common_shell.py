@@ -1,7 +1,7 @@
 import subprocess
 
 
-class ShellCommands:
+class ShellCommandsMixin:
     """
     Provides a set of commonly usable "execute shell command" actions for the
     installer.
@@ -14,8 +14,6 @@ class ShellCommands:
         return command
 
     def shell(self, command):
-        print(command)
-
         command = self._expand(command)
 
         print("Executing command-line: ", command)

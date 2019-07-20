@@ -103,6 +103,7 @@ class Package:
     def __init__(self, logical_name, datafile_path):
         self.name = logical_name
         self.datafile = datafile_path
+        self.resources = os.path.dirname(datafile_path)
         self._status = Status.MARKED  # TODO: Implement dependency checking.
         self._teardown = []
 
@@ -140,15 +141,16 @@ class Package:
     @_StatusRequirementDecorator(Status.MARKED)
     @restore_working_directory
     def execute_prepare(self):
+        # TODO: Rename the key in the scripts to "PREPARE".
         prefetch = self._data.get('prefetch', {})
         if prefetch:
-            executor = install_stages.prefetch.Prefetch(self)
+            executor = install_stages.prepare.Prepare(self, self._expander)
             self._expander.register_expansion('PREFETCH_DIR',
                                               executor.temp_path)
-            setattr(executor, 'expand_args', self._expander)
+
             self.prefetch_dir = executor.temp_path  # TODO: Remove.
 
-            # Start the execution
+            # Start the execution from the temporary download/prepare folder.
             os.chdir(executor.temp_path)
 
             for action in prefetch:
@@ -160,10 +162,23 @@ class Package:
 
         self._status = Status.PREPARED
 
+    @_StatusRequirementDecorator(Status.PREPARED)
+    @restore_working_directory
+    def execute_install(self):
+        executor = install_stages.install.Install(self, self._expander)
+
+        # Start the execution in the package resource folder.
+        os.chdir(self.resources)
+
+        for action in self._data.get('install'):
+            executor.execute_command(action)
+
+        self._status = Status.INSTALLED
+
     def clean_temporaries(self):
         """
         Remove potential TEMPORARY files that were created during install
         from the system.
         """
-        for cleanup_func in self._teardown:
-            cleanup_func()
+        success = [f() for f in self._teardown]
+        return all(success)

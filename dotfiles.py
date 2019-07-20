@@ -160,7 +160,7 @@ def is_installed(package):
 def is_configuration_package(package):
     # TODO: "configuration" packages are broken in the current state.
     # QUESTION: Do we need this notion of configuration packages, even?
-    return 'enable' in get_package_data(package)
+    return get_package_data(package).get('configuration', False)
 
 
 def check_dependencies(dependencies):
@@ -207,11 +207,6 @@ for package in args.PACKAGE:
     if is_installed(package):
         print("%s is already installed -- skipping." % package)
         continue
-
-    if 'install' in package_data and 'enable' in package_data:
-        print("%s package's descriptor is corrupt, it contains both an "
-              "INSTALL and ENABLE statement." % package, file=sys.stderr)
-        sys.exit(1)
 
     if package in WORK_QUEUE:
         # Don't check a package again if it was found as a dependency and the
@@ -272,120 +267,6 @@ for package in WORK_QUEUE:
                 HAS_SUPERUSER_CHECKED = True
 
 
-def execute_install_actions(package_name, actions,
-                            arg_expansion, shell_executor):
-    """
-    Executes the given actions (for 'install' and 'enable') with the
-    given argument expansion and shell execution lambda.
-    """
-
-    uservar_re = re.compile(r'\$<(?P<key>[\w_-]+)>',
-                            re.MULTILINE | re.UNICODE)
-
-    def __replace_uservar(match):
-        var_name = match.group('key')
-        try:
-            with open(os.path.join(arg_expansion('$PREFETCH_DIR'),
-                                   'var-' + var_name),
-                      'r') as varfile:
-                value = varfile.read()
-
-            return value
-        except OSError:
-            print("Error! Package requested to write user input to file "
-                  "but no user input for variable '%s' was provide!"
-                  % var_name,
-                  file=sys.stderr)
-            raise
-
-    def __replace_envvar(match):
-        var_name = match.group('key')
-        value = os.environ.get(var_name)
-        if not value:
-            value = os.environ.get(var_name.lower())
-        if not value:
-            raise KeyError("Installer attempted to substitute environment "
-                           "variable %s in script of %s but the variable is "
-                           "not set." % (var_name, package_name))
-        return value
-
-    for command in actions:
-        kind = command['kind']
-        if kind == 'shell':
-            shell_executor(command)
-        elif kind == 'shell tryinorder':
-            for shell_cmd in command['commands']:
-                success = shell_executor({'command': shell_cmd})
-                if success:
-                    break
-        elif kind == 'shell multiple':
-            for shell_cmd in command['commands']:
-                shell_executor({'command': shell_cmd})
-        elif kind == 'make folders':
-            for folder in command['folders']:
-                output = os.path.expandvars(folder)
-                print("    ---\\ Creating output folder '%s'" % output)
-                os.makedirs(output, exist_ok=True)
-        elif kind == 'extract multiple':
-            from_root_folder = command['root']
-            to_root_folder = os.path.expandvars('$' + command['root'])
-            print("    ---: Copying files from '%s' to '%s'"
-                  % (from_root_folder, to_root_folder))
-
-            for f in command['files']:
-                print("       :- %s" % f)
-                shutil.copy(os.path.join(from_root_folder, f),
-                            os.path.join(to_root_folder, f))
-        elif kind == 'copy':
-            from_file = arg_expansion(command['file'])
-            to_file = os.path.expandvars(command['to'])
-            print("    ---> Copying file '%s' to '%s'"
-                  % (from_file, to_file))
-            shutil.copy(from_file, to_file)
-        elif kind == 'copy tree':
-            from_folder = arg_expansion(command['folder'])
-            to_folder = os.path.expandvars(command['to'])
-            print("    ---> Copying folder '%s' to '%s'"
-                  % (from_folder, to_folder))
-            shutil.copytree(from_folder, to_folder)
-        elif kind == 'append':
-            from_file = arg_expansion(command['file'])
-            to_file = os.path.expandvars(command['to'])
-            print("    ---> Appending package file '%s' to '%s'"
-                  % (from_file, to_file))
-            with open(to_file, 'a') as to:
-                with open(from_file, 'r') as in_file:
-                    to.write(in_file.read())
-        elif kind == 'append text':
-            to_file = os.path.expandvars(command['to'])
-            print("    ---> Appending text to '%s'"
-                  % (to_file))
-            with open(to_file, 'a') as to:
-                to.write(command['text'])
-                to.write('\n')
-        elif kind == 'replace user input':
-            to_file = os.path.expandvars(command['file'])
-            print("    ---> Saving user configuration to '%s'" % to_file)
-            with open(to_file, 'r+') as to:
-                content = to.read()
-                content = re.sub(uservar_re, __replace_uservar, content)
-                to.seek(0)
-                to.write(content)
-                to.truncate(to.tell())
-        elif kind == 'substitute environment variables':
-            to_file = arg_expansion(command['file'])
-            print("    ---> Substituting environment vars in '%s'" % to_file)
-            with open(to_file, 'r+') as to:
-                content = to.read()
-                content = re.sub(uservar_re, __replace_envvar, content)
-                to.seek(0)
-                to.write(content)
-                to.truncate(to.tell())
-        else:
-            raise KeyError("Invalid kind '%s' specified in INSTALL or ENABLE "
-                           "of %s" % (kind, package_name))
-
-
 PACKAGE_TO_PREFETCH_DIR = {}
 PACKAGES = {}
 
@@ -401,44 +282,11 @@ def _load_package(package_name):
 
 def install_package(package):
     package_data = get_package_data(package)
-    if 'install' not in package_data and 'enable' not in package_data:
+    if 'install' not in package_data:
         print("'%s' is a virtual package - no actions done." % package)
         return True
 
     package_instance = _load_package(package)
-
-    package_dir = os.path.dirname(packagename_to_file(package))
-
-    def __expand(path):
-        """
-        Helper method for expanding not only the environment variables in an
-        install action, but script-specific variables.
-        """
-
-        if '$PREFETCH_DIR' in path:
-            prefetch_dir = PACKAGE_TO_PREFETCH_DIR.get(package, None)
-            if not prefetch_dir:
-                raise ValueError("Invalid directive: '$PREFETCH_DIR' used "
-                                 "without any prefetch command executed.")
-            path = path.replace('$PREFETCH_DIR', prefetch_dir)
-
-        path = path.replace('$SCRIPT_DIR', script_directory)
-        path = path.replace('$PACKAGE_DIR', package_dir)
-        path = os.path.expandvars(path)
-
-        return path
-
-    def __exec_shell(cmdline):
-        """
-        Executes a "shell" action of a package. Returns whether the return
-        code of the command was 0 (success).
-        """
-        if isinstance(cmdline, str):
-            cmdline = [cmdline]
-
-        cmdline = [__expand(c) for c in cmdline]
-        retcode = subprocess.call(cmdline, shell=True)
-        return retcode == 0
 
     if package_instance.should_do_prepare:
         print("Performing pre-installation steps for '%s'..."
@@ -462,32 +310,22 @@ def install_package(package):
             return False
 
     try:
-        os.chdir(package_dir)
         install_like_directive = 'install' if 'install' in package_data \
-                                 else 'enable' if 'enable' in package_data \
                                  else None
         if not install_like_directive:
             raise KeyError("Invalid state: package data for %s did not "
                            "contain any install-like directive?" % package)
 
-        execute_install_actions(package,
-                                package_data[install_like_directive],
-                                __expand,
-                                __exec_shell)
+        package_instance.execute_install()
         return True
     except Exception as e:
         print("Couldn't install '%s': '%s'!" % (package, e), file=sys.stderr)
         print(e)
-        return False
-    finally:
-        os.chdir(script_directory)
 
-        if package in PACKAGE_TO_PREFETCH_DIR and \
-                'cleanup' not in package_data:
-            # Cleanup the prefetch automatically if there is no cleanup
-            # actions in the configuration.
-            shutil.rmtree(PACKAGE_TO_PREFETCH_DIR[package])
-            del PACKAGE_TO_PREFETCH_DIR[package]
+        import traceback
+        traceback.print_exc()
+
+        return False
 
 
 CLEANUP_PACKAGES = []
