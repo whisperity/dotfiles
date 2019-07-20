@@ -10,6 +10,9 @@ import subprocess
 import sys
 import tempfile
 
+from dotfiles import install_stages
+from dotfiles.package import Package
+
 
 if __name__ != "__main__":
     raise ImportError("Do not use this as a module.")
@@ -41,21 +44,20 @@ except json.decoder.JSONDecodeError:
           "installed.", file=sys.stderr)
 
 # Load the list of available packages.
+# FIXME: This doesn't work when the current directory isn't the checkout
+#        directory of the project.
 script_directory = os.getcwd()
-package_directory = os.path.join(script_directory, 'packages')
+package_directory = Package.package_directory  # TODO: Delete this.
 
 
 def file_to_packagename(packagefile):
-    return os.path.dirname(packagefile) \
-        .replace(package_directory, '') \
-        .replace(os.sep, '.')           \
-        .lstrip('.')
+    # TODO: Remove this.
+    return Package.data_file_to_package_name(packagefile)
 
 
 def packagename_to_file(packagename):
-    return os.path.join(package_directory,
-                        packagename.replace('.', os.sep),
-                        'package.json')
+    # TODO: Remove this.
+    return Package.package_name_to_data_file(packagename)
 
 
 def get_package_data(package):
@@ -156,6 +158,8 @@ def is_installed(package):
 
 
 def is_configuration_package(package):
+    # TODO: "configuration" packages are broken in the current state.
+    # QUESTION: Do we need this notion of configuration packages, even?
     return 'enable' in get_package_data(package)
 
 
@@ -266,50 +270,6 @@ for package in WORK_QUEUE:
                 sys.exit(1)
             else:
                 HAS_SUPERUSER_CHECKED = True
-
-
-def execute_prepare_actions(package_name, actions,
-                            arg_expansion, shell_executor):
-    """
-    Executes the given actions (for 'prefetch' and 'cleanup' commands) with
-    the given argument expansion and shell execution lambda.
-    """
-    for command in actions:
-        kind = command['kind']
-        if kind == 'git clone':
-            print("Cloning remote content from '%s'..."
-                  % command['remote'])
-            subprocess.call(['git', 'clone', command['remote'],
-                             '--origin', 'upstream',
-                             '--depth', str(1)])
-        elif kind == 'shell':
-            shell_executor(command)
-        elif kind == 'shell tryinorder':
-            for shell_cmd in command['commands']:
-                success = shell_executor({'command': shell_cmd})
-                if success:
-                    break
-        elif kind == 'shell multiple':
-            for shell_cmd in command['commands']:
-                shell_executor({'command': shell_cmd})
-        elif kind == 'prompt user':
-            var_name = command['short-name']
-
-            print("\n-------- REQUESTING USER INPUT -------")
-            print("Package '%s' requires you to provide '%s'"
-                  % (package_name, var_name))
-            if 'description' in command:
-                print("    %s " % command['description'])
-            value = input(">> %s: " % var_name)
-
-            with open(os.path.join(arg_expansion('$PREFETCH_DIR'),
-                                   'var-' + command['variable']),
-                      'w') as varfile:
-                varfile.write(value)
-            print("\n")
-        else:
-            raise KeyError("Invalid kind '%s' specified in PREFETCH or CLEANUP"
-                           " of %s" % (kind, package_name))
 
 
 def execute_install_actions(package_name, actions,
@@ -427,6 +387,16 @@ def execute_install_actions(package_name, actions,
 
 
 PACKAGE_TO_PREFETCH_DIR = {}
+PACKAGES = {}
+
+
+def _load_package(package_name):
+    # TODO: Refactor this to be on the top and loaded in advance.
+    package = PACKAGES.get(package_name, None)
+    if not package:
+        package = Package.create(package_name)
+        PACKAGES[package_name] = package
+    return package
 
 
 def install_package(package):
@@ -435,8 +405,9 @@ def install_package(package):
         print("'%s' is a virtual package - no actions done." % package)
         return True
 
+    package_instance = _load_package(package)
+
     package_dir = os.path.dirname(packagename_to_file(package))
-    prefetch_dir = None
 
     def __expand(path):
         """
@@ -445,6 +416,7 @@ def install_package(package):
         """
 
         if '$PREFETCH_DIR' in path:
+            prefetch_dir = PACKAGE_TO_PREFETCH_DIR.get(package, None)
             if not prefetch_dir:
                 raise ValueError("Invalid directive: '$PREFETCH_DIR' used "
                                  "without any prefetch command executed.")
@@ -456,12 +428,11 @@ def install_package(package):
 
         return path
 
-    def __exec_shell(action):
+    def __exec_shell(cmdline):
         """
         Executes a "shell" action of a package. Returns whether the return
         code of the command was 0 (success).
         """
-        cmdline = action['command']
         if isinstance(cmdline, str):
             cmdline = [cmdline]
 
@@ -469,26 +440,26 @@ def install_package(package):
         retcode = subprocess.call(cmdline, shell=True)
         return retcode == 0
 
-    if 'prefetch' in package_data:
-        print("Obtaining extra content for install of '%s'..." % package)
-
-        # Create a temporary directory for this operation
-        prefetch_dir = tempfile.mkdtemp(None, "dotfiles-")
-        PACKAGE_TO_PREFETCH_DIR[package] = prefetch_dir
+    if package_instance.should_do_prepare:
+        print("Performing pre-installation steps for '%s'..."
+              % package_instance.name)
 
         try:
-            os.chdir(prefetch_dir)
-            execute_prepare_actions(package,
-                                    package_data['prefetch'],
-                                    __expand,
-                                    __exec_shell)
+            package_instance.execute_prepare()
+
+            # TODO: This needs to be factored out.
+            PACKAGE_TO_PREFETCH_DIR[package] = getattr(package_instance,
+                                                       'prefetch_dir',
+                                                       None)
         except Exception as e:
-            print("Couldn't fetch '%s': '%s'!" % (package, e),
+            print("Couldn't prepare '%s': '%s'!" % (package, e),
                   file=sys.stderr)
             print(e)
+
+            import traceback
+            traceback.print_exc()
+
             return False
-        finally:
-            os.chdir(script_directory)
 
     try:
         os.chdir(package_dir)
@@ -511,10 +482,11 @@ def install_package(package):
     finally:
         os.chdir(script_directory)
 
-        if prefetch_dir and 'cleanup' not in package_data:
+        if package in PACKAGE_TO_PREFETCH_DIR and \
+                'cleanup' not in package_data:
             # Cleanup the prefetch automatically if there is no cleanup
             # actions in the configuration.
-            shutil.rmtree(prefetch_dir, True)
+            shutil.rmtree(PACKAGE_TO_PREFETCH_DIR[package])
             del PACKAGE_TO_PREFETCH_DIR[package]
 
 
@@ -540,8 +512,8 @@ while any(WORK_QUEUE):
                                 package))
     if not configure:
         PACKAGE_STATUS[package] = 'installed'
-    else:
-        CLEANUP_PACKAGES.append(package)
+
+    CLEANUP_PACKAGES.append(package)
 
     with open(os.path.join(os.path.expanduser('~'),
                            '.dotfiles'), 'w') as status:
@@ -576,12 +548,11 @@ def cleanup_package(package):
 
         return path
 
-    def __exec_shell(action):
+    def __exec_shell(cmdline):
         """
         Executes a "shell" action of a package. Returns whether the return code
         of the command was 0 (success).
         """
-        cmdline = action['command']
         if isinstance(cmdline, str):
             cmdline = [cmdline]
 
@@ -594,10 +565,12 @@ def cleanup_package(package):
               package)
 
         try:
-            execute_prepare_actions(package,
-                                    package_data['cleanup'],
-                                    __expand,
-                                    __exec_shell)
+            # TODO: This part of the toolchain should be reconsidered.
+
+            # execute_prepare_actions(package,
+            #                         package_data['cleanup'],
+            #                         __expand,
+            #                         __exec_shell)
             return True
         except Exception as e:
             print("Couldn't clean up '%s': '%s'!" % (package, e),
@@ -607,15 +580,13 @@ def cleanup_package(package):
         finally:
             os.chdir(script_directory)
 
-            if prefetch_dir:
-                # If it was not cleaned up earlier, delete the prefetch now.
-                shutil.rmtree(prefetch_dir, True)
-                del PACKAGE_TO_PREFETCH_DIR[package]
-
 
 for package in CLEANUP_PACKAGES:
     print("Cleaning up package '%s'..." % package)
     success = cleanup_package(package)
+
+    package_instance = _load_package(package)
+    package_instance.clean_temporaries()
 
     if not success:
         print(" !! Failed to clean up '%s'" % package)
