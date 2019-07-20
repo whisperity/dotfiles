@@ -1,4 +1,5 @@
 from enum import Enum
+import fnmatch
 import json
 import os
 
@@ -123,12 +124,28 @@ class Package:
         return Package(logical_name,
                        cls.package_name_to_data_file(logical_name))
 
-    def check_dependencies(self):
+    @property
+    def data(self):
+        # TODO: DON'T EXPOSE THIS.
+        return self._data
+
+    @property
+    def description(self):
+        return self._data.get('description', None)
+
+    @property
+    def is_support(self):
         """
-        Check if the dependencies of the current package are satisfied.
+        Returns whether or not a package is a "support package".
+
+        Support packages are fully featured packages in terms of having prepare
+        and install actions, but they are not meant to write anything permanent
+        to the disk.
+
+        Note that the Python code does NOT sanitise whether or not a package
+        marked as a support package actually conforms to the rule above.
         """
-        # TODO: Implement this.
-        raise NotImplementedError("TODO: Implement this.")
+        return self._data.get('support', False) or 'internal' in self.name
 
     @property
     def should_do_prepare(self):
@@ -138,6 +155,13 @@ class Package:
         """
         return self._status == Status.MARKED and \
             bool(self._data.get('prepare', {}))
+
+    def check_dependencies(self):
+        """
+        Check if the dependencies of the current package are satisfied.
+        """
+        # TODO: Implement this.
+        raise NotImplementedError("TODO: Implement this.")
 
     @_StatusRequirementDecorator(Status.MARKED)
     @restore_working_directory
@@ -182,3 +206,15 @@ class Package:
         """
         success = [f() for f in self._teardown]
         return all(success)
+
+
+def get_package_names(*roots):
+    """
+    Returns the logical name of packages that are available under the specified
+    roots.
+    """
+    for root in roots:
+        for dirpath, _, files in os.walk(root):
+            for match in fnmatch.filter(files, 'package.json'):  # TODO: YAML
+                yield Package.data_file_to_package_name(
+                    os.path.join(dirpath, match))

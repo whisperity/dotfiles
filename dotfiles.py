@@ -1,22 +1,19 @@
 #!/usr/bin/env python3
 
 import argparse
-import fnmatch
 import json
 import os
 import re
 import shutil
 import subprocess
 import sys
-import tempfile
 
-from dotfiles import install_stages
 from dotfiles import temporary
-from dotfiles.package import Package
+from dotfiles import package
 
 
 if __name__ != "__main__":
-    raise ImportError("Do not use this as a module.")
+    raise ImportError("Do not use this as a module!")
 
 parser = argparse.ArgumentParser(
     prog='dotfiles',
@@ -44,51 +41,48 @@ except json.decoder.JSONDecodeError:
     print("Package status file is corrupt? Considering every package not "
           "installed.", file=sys.stderr)
 
+
 # Load the list of available packages.
-# FIXME: This doesn't work when the current directory isn't the checkout
-#        directory of the project.
-script_directory = os.getcwd()
-package_directory = Package.package_directory  # TODO: Delete this.
+PACKAGES = {lname: False
+            for lname in package.get_package_names(
+                package.Package.package_directory)}
 
 
-def file_to_packagename(packagefile):
-    # TODO: Remove this.
-    return Package.data_file_to_package_name(packagefile)
+def get_package(logical_name):
+    """
+    Lazy loads the object instance for the given logical package name.
+    """
+    instance = PACKAGES.get(logical_name, None)
+    if instance is None:
+        # The package is not known at all.
+        raise KeyError("Package %s was not found in the package roots."
+                       % logical_name)
+    elif instance is False:
+        # The package is known, but not loaded yet.
+        instance = package.Package.create(logical_name)
+        PACKAGES[logical_name] = instance
+
+    return instance
 
 
-def packagename_to_file(packagename):
-    # TODO: Remove this.
-    return Package.package_name_to_data_file(packagename)
-
-
-def get_package_data(package):
-    with open(packagename_to_file(package), 'r') as package_file:
-        return json.load(package_file)
-
-
-package_files = [os.path.join(dirpath, f)
-                 for dirpath, dirnames, files in os.walk(package_directory)
-                 for f in fnmatch.filter(files, 'package.json')]
-AVAILABLE_PACKAGES = [file_to_packagename(packagefile)
-                      for packagefile in package_files]
-
+# Handle printing the list of packages if the user didn't specify anything to
+# install.
 if len(args.PACKAGE) == 0:
     print("Listing available packages...")
 
-    for package in AVAILABLE_PACKAGES:
-        if package.startswith('internal'):
+    for logical_name in PACKAGES:
+        if 'internal' in logical_name:
             continue
 
-        package_data = get_package_data(package)
+        instance = get_package(logical_name)
+        print("    - %s" % instance.name, end='')
 
-        print("    - %s" % package, end='')
+        if instance.name in PACKAGE_STATUS:
+            print("       (%s)" % PACKAGE_STATUS[instance.name], end='')
 
-        if package in PACKAGE_STATUS:
-            print("       (%s)" % PACKAGE_STATUS[package], end='')
-
-        if 'description' in package_data:
+        if instance.description:
             print()  # Put a linebreak here too.
-            print("          %s" % package_data['description'], end='')
+            print("          %s" % instance.description, end='')
 
         print()  # Linebreak.
 
@@ -97,23 +91,23 @@ if len(args.PACKAGE) == 0:
 # Translate globber expressions such as "foo.bar.*" into actual package list.
 specified_packages = args.PACKAGE[:]
 args.PACKAGE = []
-for package in specified_packages:
-    if not package.endswith(('*', '__ALL__')):
-        args.PACKAGE.append(package)
+for package_name in specified_packages:
+    if not package_name.endswith(('*', '__ALL__')):
+        args.PACKAGE.append(package_name)
         continue
 
-    namespace = package.replace('*', '').replace('__ALL__', '')
+    namespace = package_name.replace('*', '').replace('__ALL__', '')
     if namespace.startswith('internal'):
         print("%s a configuration package group that is not to be installed, "
               "it's life is restricted to helping another package's "
-              "installation process!" % package, file=sys.stderr)
+              "installation process!" % package_name, file=sys.stderr)
         sys.exit(1)
 
-    globbed_packages = [package for package in AVAILABLE_PACKAGES
+    globbed_packages = [package for package in PACKAGES
                         if package.startswith(namespace) and
                         not package.startswith('internal')]
-    for package in globbed_packages:
-        print("Marked '%s' for installation." % package)
+    for package_name in globbed_packages:
+        print("Marked '%s' for installation." % package_name)
 
     # Update the remaining package list to include all the marked packages.
     args.PACKAGE = args.PACKAGE + globbed_packages
@@ -122,7 +116,7 @@ del specified_packages
 
 # Run the package installs in topological order.
 invalid_packages = [package for package in args.PACKAGE
-                    if package not in AVAILABLE_PACKAGES]
+                    if package not in PACKAGES]
 if any(invalid_packages):
     print("ERROR: Specified to install packages that are not available!",
           file=sys.stderr)
@@ -139,8 +133,8 @@ def add_parent_package_as_dependency(package, package_data):
 
     try:
         parent_name = '.'.join(package.split('.')[:-1])
-        get_package_data(parent_name)
-    except (IndexError, OSError):
+        get_package(parent_name)
+    except (IndexError, KeyError, OSError):
         # The parent is not a package, don't do anything.
         return
 
@@ -158,12 +152,6 @@ def is_installed(package):
     return package in PACKAGE_STATUS and PACKAGE_STATUS[package] == 'installed'
 
 
-def is_configuration_package(package):
-    # TODO: "configuration" packages are broken in the current state.
-    # QUESTION: Do we need this notion of configuration packages, even?
-    return get_package_data(package).get('configuration', False)
-
-
 def check_dependencies(dependencies):
     unmet_dependencies = []
 
@@ -179,7 +167,7 @@ def check_dependencies(dependencies):
             continue
 
         print("  -> Checking dependency '%s'..." % dependency)
-        dependency_data = get_package_data(dependency)
+        dependency_data = get_package(dependency).data
         add_parent_package_as_dependency(dependency, dependency_data)
         if 'dependencies' in dependency_data and \
                 any(dependency_data['dependencies']):
@@ -194,35 +182,36 @@ def check_dependencies(dependencies):
 # Check the depencies for the packages that the user wants to install.
 WORK_QUEUE = []
 
-for package in args.PACKAGE:
-    print("Checking package '%s'..." % package)
-    package_data = get_package_data(package)
+for package_name in args.PACKAGE:
+    print("Checking package '%s'..." % package_name)
+    instance = get_package(package_name)
+    package_data = instance.data
 
-    if is_configuration_package(package):
+    if instance.is_support:
         print("%s a configuration package that is not to be installed, "
               "it's life is restricted to helping another package's "
-              "installation process!" % package, file=sys.stderr)
+              "installation process!" % package_name, file=sys.stderr)
         sys.exit(1)
 
     # Check if the package is already installed. In this case, do nothing.
-    if is_installed(package):
-        print("%s is already installed -- skipping." % package)
+    if is_installed(package_name):
+        print("%s is already installed -- skipping." % package_name)
         continue
 
-    if package in WORK_QUEUE:
+    if package_name in WORK_QUEUE:
         # Don't check a package again if it was found as a dependency and the
         # user also specified it.
         continue
 
-    add_parent_package_as_dependency(package, package_data)
+    add_parent_package_as_dependency(package_name, package_data)
     unmet_dependencies = []
     if 'dependencies' in package_data and any(package_data['dependencies']):
         unmet_dependencies = check_dependencies(package_data['dependencies'])
         if any(unmet_dependencies):
             print("Unmet dependencies for '%s': %s"
-                  % (package, ', '.join(unmet_dependencies)))
+                  % (package_name, ', '.join(unmet_dependencies)))
 
-    WORK_QUEUE = WORK_QUEUE + unmet_dependencies + [package]
+    WORK_QUEUE = WORK_QUEUE + unmet_dependencies + [package_name]
 
 
 # Preparation and cleanup steps before actual install.
@@ -252,42 +241,32 @@ def check_superuser():
 
 
 HAS_SUPERUSER_CHECKED = None
-for package in WORK_QUEUE:
-    package_data = get_package_data(package)
+for package_name in WORK_QUEUE:
+    package_data = get_package(package_name).data
 
     if 'superuser' in package_data and not HAS_SUPERUSER_CHECKED:
         if package_data['superuser'] is True:
             print("Package '%s' requires superuser rights to install."
-                  % package)
+                  % package_name)
             test = check_superuser()
             if not test:
                 print("ERROR: Can't install '%s' as user presented no "
-                      "superuser access!" % package, file=sys.stderr)
+                      "superuser access!" % package_name, file=sys.stderr)
                 sys.exit(1)
             else:
                 HAS_SUPERUSER_CHECKED = True
 
 
 PACKAGE_TO_PREFETCH_DIR = {}
-PACKAGES = {}
-
-
-def _load_package(package_name):
-    # TODO: Refactor this to be on the top and loaded in advance.
-    package = PACKAGES.get(package_name, None)
-    if not package:
-        package = Package.create(package_name)
-        PACKAGES[package_name] = package
-    return package
 
 
 def install_package(package):
-    package_data = get_package_data(package)
+    package_data = get_package(package).data
     if 'install' not in package_data:
         print("'%s' is a virtual package - no actions done." % package)
         return True
 
-    package_instance = _load_package(package)
+    package_instance = get_package(package)
 
     if package_instance.should_do_prepare:
         print("Performing pre-installation steps for '%s'..."
@@ -330,30 +309,30 @@ def install_package(package):
 
 
 while any(WORK_QUEUE):
-    package = WORK_QUEUE[0]
-
-    configure = is_configuration_package(package)
+    package_name = WORK_QUEUE[0]
+    instance = get_package(package_name)
+    configure = instance.is_support
     print("Preparing to %s package '%s'..." %
           ('configure' if configure else 'install',
-           package))
+           package_name))
 
-    WORK_QUEUE = [p for p in WORK_QUEUE if p != package]
+    WORK_QUEUE = [p for p in WORK_QUEUE if p != package_name]
 
-    success = install_package(package)
+    success = install_package(package_name)
     if not success:
         print(" !! Failed to %s '%s'" %
-              ('configure' if configure else 'install', package))
-        PACKAGE_STATUS[package] = 'failed'
+              ('configure' if configure else 'install', package_name))
+        PACKAGE_STATUS[package_name] = 'failed'
         break  # Explicitly break the loop and write the statuses.
 
     print("%s package '%s'." % ('Configured' if configure else 'Installed',
-                                package))
+                                package_name))
     if not configure:
-        PACKAGE_STATUS[package] = 'installed'
+        PACKAGE_STATUS[package_name] = 'installed'
 
-    success = _load_package(package).clean_temporaries()
+    success = get_package(package_name).clean_temporaries()
     if not success:
-        print(" !! Failed to clean up '%s'" % package)
+        print(" !! Failed to clean up '%s'" % package_name)
 
 if temporary.has_temporary_dir():
     print("Cleaning up installation temporaries...")

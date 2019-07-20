@@ -1,7 +1,7 @@
 {
   "description": "This package sets up a Python virtual environment to be used by other installers who need some custom tools *for the installation* to be available.",
   "dependencies": [ "python.virtualenv" ],
-  "configuration": true,
+  "support": true,
   "install": [
     {
       "kind": "shell",
