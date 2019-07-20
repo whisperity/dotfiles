@@ -29,3 +29,34 @@ class ArgumentExpander:
             ret.append(arg)
 
         return ret[0] if len(ret) == 1 else ret
+
+
+def package_glob(available_packages, globbing_expr):
+    """
+    Performs a globbing of the given expression over the list of available
+    names.
+
+    Valid globbers are '*' and '__ALL__' as in "foo.*" which means "every
+    package under foo".
+
+    :return: The list of all packages globbed and expanded.
+    """
+    # Start out with everything that isn't a globbing expression:
+    ret = set([normal for normal in globbing_expr
+               if not normal.endswith(('*', '__ALL__'))])
+
+    for name in set(globbing_expr) - ret:
+        if not any(globstar in name
+                   for globstar in ['.*', '.__ALL__']):
+            raise ValueError("Please specify a tree with a closing . before "
+                             "the * or __ALL__.")
+        namespace = name.replace('.*', '', 1).replace('.__ALL__', '', 1)
+        if '*' in namespace or '__ALL__' in namespace:
+            raise ValueError("Do not specify multiple *s or __ALL__s in the "
+                             "same tree name.")
+
+        globbed_packages = [logical_name for logical_name in available_packages
+                            if logical_name.startswith(namespace)]
+        ret.update(globbed_packages)
+
+    return ret

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+from collections import deque
 import json
 import os
 import re
@@ -10,6 +11,7 @@ import sys
 
 from dotfiles import temporary
 from dotfiles import package
+from dotfiles.argument_expander import package_glob
 
 
 if __name__ != "__main__":
@@ -27,6 +29,8 @@ parser.add_argument(
          "by specifying no package names.")
 
 args = parser.parse_args()
+
+# -----------------------------------------------------------------------------
 
 # Fetch what packages were marked installed for the user.
 PACKAGE_STATUS = {}
@@ -65,6 +69,8 @@ def get_package(logical_name):
     return instance
 
 
+# -----------------------------------------------------------------------------
+
 # Handle printing the list of packages if the user didn't specify anything to
 # install.
 if len(args.PACKAGE) == 0:
@@ -88,40 +94,32 @@ if len(args.PACKAGE) == 0:
 
     sys.exit(0)
 
-# Translate globber expressions such as "foo.bar.*" into actual package list.
-specified_packages = args.PACKAGE[:]
-args.PACKAGE = []
-for package_name in specified_packages:
-    if not package_name.endswith(('*', '__ALL__')):
-        args.PACKAGE.append(package_name)
-        continue
+# -----------------------------------------------------------------------------
 
-    namespace = package_name.replace('*', '').replace('__ALL__', '')
-    if namespace.startswith('internal'):
-        print("%s a configuration package group that is not to be installed, "
-              "it's life is restricted to helping another package's "
-              "installation process!" % package_name, file=sys.stderr)
+if any(['internal' in name for name in args.PACKAGE]):
+    print("'internal' a support package group that is not to be directly "
+          "installed, its life is restricted to helping other packages' "
+          "installation process!", file=sys.stderr)
+    sys.exit(1)
+
+PACKAGES_TO_INSTALL = package_glob(PACKAGES.keys(), args.PACKAGE)
+
+
+def _die_for_invalid_packages():
+    invalid_packages = [package for package in PACKAGES_TO_INSTALL
+                        if package not in PACKAGES]
+    if invalid_packages:
+        print("ERROR: Specified to install packages that are not available!",
+              file=sys.stderr)
+        print("  Not found:  %s" % ', '.join(invalid_packages),
+              file=sys.stderr)
         sys.exit(1)
 
-    globbed_packages = [package for package in PACKAGES
-                        if package.startswith(namespace) and
-                        not package.startswith('internal')]
-    for package_name in globbed_packages:
-        print("Marked '%s' for installation." % package_name)
 
-    # Update the remaining package list to include all the marked packages.
-    args.PACKAGE = args.PACKAGE + globbed_packages
+_die_for_invalid_packages()
 
-del specified_packages
 
-# Run the package installs in topological order.
-invalid_packages = [package for package in args.PACKAGE
-                    if package not in PACKAGES]
-if any(invalid_packages):
-    print("ERROR: Specified to install packages that are not available!",
-          file=sys.stderr)
-    print("  Not found:  %s" % ', '.join(invalid_packages), file=sys.stderr)
-    sys.exit(1)
+# -----------------------------------------------------------------------------
 
 
 def add_parent_package_as_dependency(package, package_data):
@@ -179,50 +177,52 @@ def check_dependencies(dependencies):
     return unmet_dependencies
 
 
-# Check the depencies for the packages that the user wants to install.
-WORK_QUEUE = []
+# Check the dependencies of the packages the user wanted to install and create
+# a sensible order of package installations.
+QUEUE = deque()
 
-for package_name in args.PACKAGE:
-    print("Checking package '%s'..." % package_name)
-    instance = get_package(package_name)
+for name in PACKAGES_TO_INSTALL:
+    print("Checking package '%s'..." % name)
+    instance = get_package(name)
     package_data = instance.data
 
     if instance.is_support:
-        print("%s a configuration package that is not to be installed, "
-              "it's life is restricted to helping another package's "
-              "installation process!" % package_name, file=sys.stderr)
+        print("%s a support package that is not to be directly installed, "
+              "its life is restricted to helping other packages "
+              "installation process!" % name, file=sys.stderr)
         sys.exit(1)
 
     # Check if the package is already installed. In this case, do nothing.
-    if is_installed(package_name):
-        print("%s is already installed -- skipping." % package_name)
+    if is_installed(name):
+        print("%s is already installed -- skipping." % name)
         continue
 
-    if package_name in WORK_QUEUE:
+    if name in QUEUE:
         # Don't check a package again if it was found as a dependency and the
         # user also specified it.
         continue
 
-    add_parent_package_as_dependency(package_name, package_data)
+    add_parent_package_as_dependency(name, package_data)
     unmet_dependencies = []
     if 'dependencies' in package_data and any(package_data['dependencies']):
         unmet_dependencies = check_dependencies(package_data['dependencies'])
         if any(unmet_dependencies):
             print("Unmet dependencies for '%s': %s"
-                  % (package_name, ', '.join(unmet_dependencies)))
+                  % (name, ', '.join(unmet_dependencies)))
 
-    WORK_QUEUE = WORK_QUEUE + unmet_dependencies + [package_name]
+    QUEUE.extend(unmet_dependencies)
+    QUEUE.append(name)
 
 
 # Preparation and cleanup steps before actual install.
 def deduplicate_work_queue():
     seen = set()
     seen_add = seen.add
-    return [x for x in WORK_QUEUE if not (x in seen or seen_add(x))]
+    return [x for x in QUEUE if not (x in seen or seen_add(x))]
 
 
-WORK_QUEUE = deduplicate_work_queue()
-print("Will install the following packages:\n    %s" % ', '.join(WORK_QUEUE))
+QUEUE = deque(deduplicate_work_queue())
+print("Will install the following packages:\n    %s" % ', '.join(QUEUE))
 
 
 def check_superuser():
@@ -241,17 +241,17 @@ def check_superuser():
 
 
 HAS_SUPERUSER_CHECKED = None
-for package_name in WORK_QUEUE:
-    package_data = get_package(package_name).data
+for name in QUEUE:
+    package_data = get_package(name).data
 
     if 'superuser' in package_data and not HAS_SUPERUSER_CHECKED:
         if package_data['superuser'] is True:
             print("Package '%s' requires superuser rights to install."
-                  % package_name)
+                  % name)
             test = check_superuser()
             if not test:
                 print("ERROR: Can't install '%s' as user presented no "
-                      "superuser access!" % package_name, file=sys.stderr)
+                      "superuser access!" % name, file=sys.stderr)
                 sys.exit(1)
             else:
                 HAS_SUPERUSER_CHECKED = True
@@ -308,15 +308,13 @@ def install_package(package):
         return False
 
 
-while any(WORK_QUEUE):
-    package_name = WORK_QUEUE[0]
+while QUEUE:
+    package_name = QUEUE.popleft()
     instance = get_package(package_name)
     configure = instance.is_support
     print("Preparing to %s package '%s'..." %
           ('configure' if configure else 'install',
            package_name))
-
-    WORK_QUEUE = [p for p in WORK_QUEUE if p != package_name]
 
     success = install_package(package_name)
     if not success:
