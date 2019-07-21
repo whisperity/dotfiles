@@ -109,6 +109,9 @@ class Package:
                            cls.package_name_to_data_file(logical_name))
         except FileNotFoundError:
             raise KeyError("Package data file for %s was not found.")
+        except json.JSONDecodeError:
+            raise ValueError("Package data file for '%s' is corrupt."
+                             % logical_name)
 
     @property
     def status(self):

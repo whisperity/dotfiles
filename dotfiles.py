@@ -78,12 +78,11 @@ if len(args.PACKAGE) == 0:
     print("Listing available packages...")
 
     for logical_name in PACKAGES:
-        if 'internal' in logical_name:
+        instance = PACKAGES[logical_name]
+        if instance.is_support:
             continue
 
-        instance = PACKAGES[logical_name]
         print("    - %s" % instance.name, end='')
-
         if get_user_save().is_installed(instance.name):
             print("       (installed)", end='')
 
