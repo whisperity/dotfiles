@@ -127,12 +127,23 @@ class Package:
             raise KeyError("Package data file for %s was not found.")
 
     @property
+    def status(self):
+        """
+        Returns the `Status` value associated with the package.
+        """
+        return self._status
+
+    @property
     def data(self):
         # TODO: DON'T EXPOSE THIS.
         return self._data
 
     @property
     def description(self):
+        """
+        An arbitrary description from the package metadata file that can be
+        presented to the user.
+        """
         return self._data.get('description', None)
 
     @property

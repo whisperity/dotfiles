@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
 import argparse
+import atexit
 from collections import deque
 import json
-import os
 import shutil
 import subprocess
 import sys
@@ -12,6 +12,7 @@ from dotfiles import argument_expander
 from dotfiles import package
 from dotfiles import temporary
 from dotfiles.lazy_dict import LazyDict
+from dotfiles.saved_data import UserSave
 
 
 if __name__ != "__main__":
@@ -32,19 +33,33 @@ args = parser.parse_args()
 
 # -----------------------------------------------------------------------------
 
-# Fetch what packages were marked installed for the user.
-PACKAGE_STATUS = {}
 try:
-    with open(os.path.join(os.path.expanduser('~'),
-                           '.dotfiles'), 'r') as status:
-        PACKAGE_STATUS = json.load(status)
-except OSError:
-    print("Couldn't find local package status descriptor! Either missing, or "
-          "first run?", file=sys.stderr)
-except json.decoder.JSONDecodeError:
-    print("Package status file is corrupt? Considering every package not "
-          "installed.", file=sys.stderr)
+    USER_STORE = UserSave()
+except PermissionError:
+    print("ERROR! Couldn't get lock on install information!", file=sys.stderr)
+    print("Another Dotfiles install running somewhere?", file=sys.stderr)
+    print("If not please execute: `rm -f %s` and try again."
+          % UserSave.lock_file, file=sys.stderr)
+    sys.exit(1)
+except json.JSONDecodeError:
+    print("ERROR: User configuration file corrupted.", file=sys.stderr)
+    print("It is now impossible to recover what packages were installed.",
+          file=sys.stderr)
+    print("Please remove configuration file with `rm %s` and try again."
+          % UserSave.state_file, file=sys.stderr)
+    print("Every package will be considered never installed.", file=sys.stderr)
+    sys.exit(1)
 
+
+@atexit.register
+def _clear_temporary_dir():
+    if temporary.has_temporary_dir():
+        shutil.rmtree(temporary.temporary_dir(), ignore_errors=True)
+
+
+atexit.register(USER_STORE.close)
+
+# -----------------------------------------------------------------------------
 
 # Load the names of available packages.
 PACKAGES = LazyDict(package.Package.create)
@@ -52,7 +67,6 @@ for lname in package.get_package_names(package.Package.package_directory):
     # Indicate that for the name a package could be known, but hasn't been
     # instantiated yet.
     PACKAGES[lname] = None
-
 
 # -----------------------------------------------------------------------------
 
@@ -68,8 +82,8 @@ if len(args.PACKAGE) == 0:
         instance = PACKAGES[logical_name]
         print("    - %s" % instance.name, end='')
 
-        if instance.name in PACKAGE_STATUS:
-            print("       (%s)" % PACKAGE_STATUS[instance.name], end='')
+        if USER_STORE.is_installed(instance.name):
+            print("       (installed)", end='')
 
         if instance.description:
             print()  # Put a linebreak here too.
@@ -107,11 +121,6 @@ _die_for_invalid_packages()
 
 # -----------------------------------------------------------------------------
 
-
-def is_installed(package):
-    return package in PACKAGE_STATUS and PACKAGE_STATUS[package] == 'installed'
-
-
 # Check the dependencies of the packages the user wanted to install and create
 # a sensible order of package installations.
 for name in list(PACKAGES_TO_INSTALL):
@@ -124,15 +133,13 @@ for name in list(PACKAGES_TO_INSTALL):
         sys.exit(1)
 
     # Check if the package is already installed. In this case, do nothing.
-    if is_installed(name):  # TODO: This should be refactored too.
+    if USER_STORE.is_installed(name):
         print("%s is already installed -- skipping." % name)
         continue
 
-    unmet_dependencies = package.get_dependencies(PACKAGES,
-                                                  instance,
-                                                  # TODO: Ignore already
-                                                  #       installed.
-                                                  list(PACKAGES_TO_INSTALL))
+    unmet_dependencies = package.get_dependencies(
+        PACKAGES, instance,
+        list(PACKAGES_TO_INSTALL) + list(USER_STORE.installed_packages))
 
     if unmet_dependencies:
         print("Unmet dependencies for '%s': %s"
@@ -178,9 +185,6 @@ for name in PACKAGES_TO_INSTALL:
                 HAS_SUPERUSER_CHECKED = True
 
 
-PACKAGE_TO_PREFETCH_DIR = {}
-
-
 def install_package(package):
     package_data = PACKAGES[package].data
     if 'install' not in package_data:
@@ -197,10 +201,6 @@ def install_package(package):
             print("Executing prepare for", package_instance.name, "...")
             package_instance.execute_prepare()
 
-            # TODO: This needs to be factored out.
-            PACKAGE_TO_PREFETCH_DIR[package] = getattr(package_instance,
-                                                       'prefetch_dir',
-                                                       None)
         except Exception as e:
             print("Couldn't prepare '%s': '%s'!" % (package, e),
                   file=sys.stderr)
@@ -243,23 +243,15 @@ while PACKAGES_TO_INSTALL:
     if not success:
         print(" !! Failed to %s '%s'" %
               ('configure' if configure else 'install', package_name))
-        PACKAGE_STATUS[package_name] = 'failed'
         break  # Explicitly break the loop and write the statuses.
 
     print("%s package '%s'." % ('Configured' if configure else 'Installed',
                                 package_name))
-    if not configure:
-        PACKAGE_STATUS[package_name] = 'installed'
+
+    if success:
+        # Save that the package was installed.
+        USER_STORE.save_status(instance)
 
     success = PACKAGES[package_name].clean_temporaries()
     if not success:
         print(" !! Failed to clean up '%s'" % package_name)
-
-if temporary.has_temporary_dir():
-    print("Cleaning up installation temporaries...")
-    shutil.rmtree(temporary.temporary_dir(), ignore_errors=True)
-
-with open(os.path.join(os.path.expanduser('~'),
-                       '.dotfiles'), 'w') as status:
-    json.dump(PACKAGE_STATUS, status,
-              indent=2, sort_keys=True)
