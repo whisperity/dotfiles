@@ -258,8 +258,9 @@ while PACKAGES_TO_INSTALL:
     if instance.is_installed:
         print("Successfully installed '%s'." % instance.name)
 
-        # Save that the package was installed.
-        get_user_save().save_status(instance)
+        if not instance.is_support:
+            # Save that the package was installed.
+            get_user_save().save_status(instance)
 
     if not instance.clean_temporaries():
         print("Failed to clean installation temporaries for '%s'"
