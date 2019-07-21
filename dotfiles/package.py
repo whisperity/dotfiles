@@ -39,12 +39,6 @@ class _StatusRequirementDecorator:
             current_status = instance.__dict__['_status']
 
             if current_status not in self.required:
-                print("Status failed, %s !€ %s"
-                      % (current_status, self.required))
-                import traceback
-                traceback.print_exc()
-
-                # TODO: Actually do the throw here.
                 raise WrongStatusError(self.required, current_status)
 
             func(*args)
@@ -132,17 +126,20 @@ class Package:
         return self._status == Status.FAILED
 
     @property
-    def data(self):
-        # TODO: DON'T EXPOSE THIS.
-        return self._data
-
-    @property
     def description(self):
         """
         An arbitrary description from the package metadata file that can be
         presented to the user.
         """
         return self._data.get('description', None)
+
+    @property
+    def requires_superuser(self):
+        """
+        Returns whether or not installing the package requires superuser
+        access.
+        """
+        return self._data.get('superuser', False)
 
     @property
     def is_support(self):
@@ -225,8 +222,6 @@ class Package:
             executor = install_stages.prepare.Prepare(self, self._expander)
             self._expander.register_expansion('TEMPORARY_DIR',
                                               executor.temp_path)
-
-            self.prefetch_dir = executor.temp_path  # TODO: Remove.
 
             # Start the execution from the temporary download/prepare folder.
             os.chdir(executor.temp_path)

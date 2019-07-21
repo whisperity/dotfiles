@@ -96,6 +96,7 @@ if len(args.PACKAGE) == 0:
     sys.exit(0)
 
 # -----------------------------------------------------------------------------
+# Sanitise user input.
 
 if any(['internal' in name for name in args.PACKAGE]):
     print("'internal' a support package group that is not to be directly "
@@ -157,38 +158,42 @@ print("Will install the following packages:\n        %s"
       % ' '.join(sorted(PACKAGES_TO_INSTALL)))
 
 
+# -----------------------------------------------------------------------------
+
+
 def check_superuser():
     print("Testing access to the 'sudo' command, please enter your password "
-          "as prompted.")
-    print("If you don't have superuser, please press Ctrl-D.")
+          "as prompted.",
+          file=sys.stderr)
+    print("If you don't have superuser access, please press Ctrl-D.",
+          file=sys.stderr)
 
     try:
         res = subprocess.check_call(
-            ['sudo', 'echo', "Hello, dotfiles found 'sudo' rights. :-)"])
+            ['sudo', '-p', "[sudo] password for user '%p' for Dotfiles: ",
+             'echo', "sudo check successful."])
         return not res
     except Exception as e:
-        print("Checking 'sudo' access failed.", file=sys.stderr)
+        print("Checking 'sudo' access failed!", file=sys.stderr)
         print(str(e), file=sys.stderr)
         return False
 
 
 HAS_SUPERUSER_CHECKED = None
-for name in PACKAGES_TO_INSTALL:
-    package_data = PACKAGES[name].data
+for name in list(PACKAGES_TO_INSTALL):  # Work on copy as iteration modifies.
+    instance = PACKAGES[name]
+    if instance.requires_superuser:
+        if HAS_SUPERUSER_CHECKED is None:
+            print("Package '%s' requires superuser rights to install!" % name)
+            HAS_SUPERUSER_CHECKED = check_superuser()  # Either True or False.
 
-    if 'superuser' in package_data and not HAS_SUPERUSER_CHECKED:
-        if package_data['superuser'] is True:
-            print("Package '%s' requires superuser rights to install."
-                  % name)
-            test = check_superuser()
-            if not test:
-                print("ERROR: Can't install '%s' as user presented no "
-                      "superuser access!" % name, file=sys.stderr)
-                sys.exit(1)
-            else:
-                HAS_SUPERUSER_CHECKED = True
+        if not HAS_SUPERUSER_CHECKED:  # Literal False.
+            print("WARNING: Won't install '%s' as user presented no "
+                  "superuser access!" % name, file=sys.stderr)
+            instance.set_failed()
 
 
+# -----------------------------------------------------------------------------
 # Handle executing the actual install steps.
 while PACKAGES_TO_INSTALL:
     print("--------------------========================---------------------")
@@ -199,7 +204,8 @@ while PACKAGES_TO_INSTALL:
         try:
             d_instance = PACKAGES[dependency]
             if d_instance.is_failed:
-                print("Skipping '%s' as dependency '%s' failed to install!"
+                print("WARNING: Won't install '%s' as dependency '%s' "
+                      "failed to install!"
                       % (instance.name, d_instance.name),
                       file=sys.stderr)
                 # Cascade the failure information to all dependents.
@@ -212,6 +218,7 @@ while PACKAGES_TO_INSTALL:
             pass
 
     if instance.is_failed:
+        print("Skipping '%s'..." % instance.name)
         continue
 
     print("Selecting package '%s'" % instance.name)
