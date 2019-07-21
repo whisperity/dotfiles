@@ -303,11 +303,10 @@ def get_dependencies(package_store, package, ignore=None):
             # Check if the dependency exists.
             dependency_obj = package_store[dependency]
         except KeyError:
-            print(package.name, "dep", dependency, "par", package.parent)
             if dependency == package.parent:
                 # Don't consider dependency on the parent an error if the
                 # parent does not exist as a real package.
-                pass
+                continue
 
             raise KeyError("Dependency %s for %s was not found as a package."
                            % (dependency, package.name))

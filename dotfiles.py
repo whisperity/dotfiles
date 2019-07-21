@@ -141,11 +141,11 @@ for name in list(PACKAGES_TO_INSTALL):  # Work on copy of original input.
 
     unmet_dependencies = package.get_dependencies(
         PACKAGES, instance,
-        list(PACKAGES_TO_INSTALL) + list(get_user_save().installed_packages))
+        list(get_user_save().installed_packages))
     if unmet_dependencies:
         print("%s needs dependencies to be installed: %s"
               % (name, ', '.join(unmet_dependencies)))
-        PACKAGES_TO_INSTALL.extendleft(reversed(unmet_dependencies))
+        PACKAGES_TO_INSTALL.extendleft(unmet_dependencies)
 
 PACKAGES_TO_INSTALL = deque(
     argument_expander.deduplicate_iterable(PACKAGES_TO_INSTALL))
@@ -153,8 +153,8 @@ if not PACKAGES_TO_INSTALL:
     print("No packages need to be installed.")
     sys.exit(0)
 
-print("Will install the following packages:\n    %s"
-      % ', '.join(PACKAGES_TO_INSTALL))
+print("Will install the following packages:\n        %s"
+      % ' '.join(sorted(PACKAGES_TO_INSTALL)))
 
 
 def check_superuser():
