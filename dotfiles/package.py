@@ -2,6 +2,17 @@ import fnmatch
 import json
 import os
 
+try:
+    import yaml
+except ImportError:
+    import sys
+    print("The YAML package for the current Python interpreter cannot be "
+          "loaded.\n"
+          "Please run 'bootstrap.sh' from the directory of Dotfiles project "
+          "to try and fix this error.",
+          file=sys.stderr)
+    sys.exit(-1)
+
 from dotfiles import install_stages
 from dotfiles.argument_expander import ArgumentExpander
 from dotfiles.chdir import restore_working_directory
