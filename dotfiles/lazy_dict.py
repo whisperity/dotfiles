@@ -11,7 +11,6 @@ class LazyDict(dict):
     def __getitem__(self, key):
         it = super().__getitem__(key)
         if it is None:
-            print(">>>>>> Factory for", key)
             it = self.factory(key)
             self[key] = it
         return it

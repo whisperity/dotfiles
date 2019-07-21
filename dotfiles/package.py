@@ -1,4 +1,3 @@
-from enum import Enum
 import fnmatch
 import json
 import os
@@ -6,24 +5,9 @@ import os
 from dotfiles import install_stages
 from dotfiles.argument_expander import ArgumentExpander
 from dotfiles.chdir import restore_working_directory
+from dotfiles.status import Status
 from dotfiles.temporary import temporary_dir
-
-
-class Status(Enum):
-    # The default state of a package.
-    NOT_INSTALLED = 0,
-
-    # The package is marked for installation.
-    MARKED = 1,
-
-    # The package is prepared for install: external dependencies and
-    # configuration had been obtained.
-    PREPARED = 2,
-
-    # The package is installed.
-    INSTALLED = 3,
-
-    # TODO: Support uninstalling.
+from dotfiles.saved_data import get_user_save
 
 
 class WrongStatusError(Exception):
@@ -45,8 +29,8 @@ class _StatusRequirementDecorator:
     """
     A custom decorator that can mark the requirement of a package state.
     """
-    def __init__(self, required_status):
-        self.required = required_status
+    def __init__(self, *required_statuses):
+        self.required = required_statuses
 
     def __call__(self, func):
         def _wrapper(*args):
@@ -54,10 +38,14 @@ class _StatusRequirementDecorator:
             instance = args[0]
             current_status = instance.__dict__['_status']
 
-            if current_status != self.required:
-                pass
+            if current_status not in self.required:
+                print("Status failed, %s !€ %s"
+                      % (current_status, self.required))
+                import traceback
+                traceback.print_exc()
+
                 # TODO: Actually do the throw here.
-                # raise WrongStatusError(self.required, current_status)
+                raise WrongStatusError(self.required, current_status)
 
             func(*args)
         return _wrapper
@@ -105,7 +93,10 @@ class Package:
         self.name = logical_name
         self.datafile = datafile_path
         self.resources = os.path.dirname(datafile_path)
-        self._status = Status.MARKED  # TODO: Implement dependency checking.
+        self._status = Status.NOT_INSTALLED
+        if get_user_save().is_installed(self.name):
+            self._status = Status.INSTALLED
+
         self._teardown = []
 
         with open(datafile_path, 'r') as datafile:
@@ -119,7 +110,6 @@ class Package:
 
     @classmethod
     def create(cls, logical_name):
-        # TODO: Check if package is installed.
         try:
             return Package(logical_name,
                            cls.package_name_to_data_file(logical_name))
@@ -132,6 +122,14 @@ class Package:
         Returns the `Status` value associated with the package.
         """
         return self._status
+
+    @property
+    def is_installed(self):
+        return self._status == Status.INSTALLED
+
+    @property
+    def is_failed(self):
+        return self._status == Status.FAILED
 
     @property
     def data(self):
@@ -172,16 +170,44 @@ class Package:
     def parent(self):
         """
         Returns the logical name of the package that SHOULD BE the parent
-        package of the current one. There are no guarantees that the name
-        actually refers to an installable package.
+        package of the current one.
+
+        There are no guarantees that the name actually refers to an
+        installable package.
         """
         return '.'.join(self.name.split('.')[:-1])
 
     @property
     def dependencies(self):
+        """
+        Get the list of all dependencies the package metadata file describes.
+
+        There are no guarantees that the packages named actually refer to
+        installable packages.
+        """
         return self._data.get('dependencies', []) + \
-               ([self.parent] if self.depends_on_parent and self.parent
-                else [])
+            ([self.parent] if self.depends_on_parent and self.parent
+             else [])
+
+    @_StatusRequirementDecorator(Status.NOT_INSTALLED)
+    def select(self):
+        """
+        Mark the package selected for installation.
+        """
+        self._status = Status.MARKED
+
+    def set_failed(self):
+        """
+        Mark that the package failed to install.
+        """
+        self._status = Status.FAILED
+
+    @_StatusRequirementDecorator(Status.FAILED)
+    def unselect(self):
+        """
+        Unmark the package from failure.
+        """
+        self._status = Status.NOT_INSTALLED
 
     @property
     def should_do_prepare(self):
@@ -190,13 +216,12 @@ class Package:
         package.
         """
         return self._status == Status.MARKED and \
-            bool(self._data.get('prepare', {}))
+            'prepare' in self._data
 
     @_StatusRequirementDecorator(Status.MARKED)
     @restore_working_directory
     def execute_prepare(self):
-        prepare = self._data.get('prepare', {})
-        if prepare:
+        if self.should_do_prepare:
             executor = install_stages.prepare.Prepare(self, self._expander)
             self._expander.register_expansion('TEMPORARY_DIR',
                                               executor.temp_path)
@@ -206,7 +231,7 @@ class Package:
             # Start the execution from the temporary download/prepare folder.
             os.chdir(executor.temp_path)
 
-            for action in prepare:
+            for action in self._data.get('prepare'):
                 executor.execute_command(action)
 
             # Register that temporary files were created and should be
@@ -260,11 +285,14 @@ def get_dependencies(package_store, package, ignore=None):
         known packages.
     :param package: The package instance for whom the dependencies should be
         calculated.
-    :param ignore: An optional list of package names that should be ignored -
+    :param ignore: An optional list of package *NAMES* that should be ignored -
         if these packages are encountered, the dependency chain walk does not
         continue.
     """
-    if package in ignore:
+    # This recursion isn't the fastest algorithm for creating dependencies,
+    # but due to the relatively small size and scope of the project, this
+    # will do.
+    if package.name in ignore:
         return []
     if ignore is None:
         ignore = []
@@ -275,9 +303,14 @@ def get_dependencies(package_store, package, ignore=None):
             # Check if the dependency exists.
             dependency_obj = package_store[dependency]
         except KeyError:
-            # If the dependency name is not a real package, fail.
+            print(package.name, "dep", dependency, "par", package.parent)
+            if dependency == package.parent:
+                # Don't consider dependency on the parent an error if the
+                # parent does not exist as a real package.
+                pass
+
             raise KeyError("Dependency %s for %s was not found as a package."
-                           % (dependency, package))
+                           % (dependency, package.name))
 
         # If the dependency exists as a package, it is a dependency.
         dependencies += [dependency]

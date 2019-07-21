@@ -12,7 +12,7 @@ from dotfiles import argument_expander
 from dotfiles import package
 from dotfiles import temporary
 from dotfiles.lazy_dict import LazyDict
-from dotfiles.saved_data import UserSave
+from dotfiles.saved_data import get_user_save
 
 
 if __name__ != "__main__":
@@ -34,19 +34,20 @@ args = parser.parse_args()
 # -----------------------------------------------------------------------------
 
 try:
-    USER_STORE = UserSave()
+    # Load the persistent configuration.
+    get_user_save()
 except PermissionError:
     print("ERROR! Couldn't get lock on install information!", file=sys.stderr)
     print("Another Dotfiles install running somewhere?", file=sys.stderr)
     print("If not please execute: `rm -f %s` and try again."
-          % UserSave.lock_file, file=sys.stderr)
+          % get_user_save().lock_file, file=sys.stderr)
     sys.exit(1)
 except json.JSONDecodeError:
     print("ERROR: User configuration file corrupted.", file=sys.stderr)
     print("It is now impossible to recover what packages were installed.",
           file=sys.stderr)
     print("Please remove configuration file with `rm %s` and try again."
-          % UserSave.state_file, file=sys.stderr)
+          % get_user_save().state_file, file=sys.stderr)
     print("Every package will be considered never installed.", file=sys.stderr)
     sys.exit(1)
 
@@ -57,7 +58,7 @@ def _clear_temporary_dir():
         shutil.rmtree(temporary.temporary_dir(), ignore_errors=True)
 
 
-atexit.register(USER_STORE.close)
+atexit.register(get_user_save().close)
 
 # -----------------------------------------------------------------------------
 
@@ -72,6 +73,7 @@ for lname in package.get_package_names(package.Package.package_directory):
 
 # Handle printing the list of packages if the user didn't specify anything to
 # install.
+# TODO: Make a better format for this.
 if len(args.PACKAGE) == 0:
     print("Listing available packages...")
 
@@ -82,7 +84,7 @@ if len(args.PACKAGE) == 0:
         instance = PACKAGES[logical_name]
         print("    - %s" % instance.name, end='')
 
-        if USER_STORE.is_installed(instance.name):
+        if get_user_save().is_installed(instance.name):
             print("       (installed)", end='')
 
         if instance.description:
@@ -123,8 +125,7 @@ _die_for_invalid_packages()
 
 # Check the dependencies of the packages the user wanted to install and create
 # a sensible order of package installations.
-for name in list(PACKAGES_TO_INSTALL):
-    print("Checking package '%s'..." % name)
+for name in list(PACKAGES_TO_INSTALL):  # Work on copy of original input.
     instance = PACKAGES[name]
     if instance.is_support:
         print("%s a support package that is not to be directly installed, "
@@ -133,22 +134,25 @@ for name in list(PACKAGES_TO_INSTALL):
         sys.exit(1)
 
     # Check if the package is already installed. In this case, do nothing.
-    if USER_STORE.is_installed(name):
+    if get_user_save().is_installed(name):
         print("%s is already installed -- skipping." % name)
+        PACKAGES_TO_INSTALL.remove(name)
         continue
 
     unmet_dependencies = package.get_dependencies(
         PACKAGES, instance,
-        list(PACKAGES_TO_INSTALL) + list(USER_STORE.installed_packages))
-
+        list(PACKAGES_TO_INSTALL) + list(get_user_save().installed_packages))
     if unmet_dependencies:
-        print("Unmet dependencies for '%s': %s"
+        print("%s needs dependencies to be installed: %s"
               % (name, ', '.join(unmet_dependencies)))
-
-    PACKAGES_TO_INSTALL.extendleft(reversed(unmet_dependencies))
+        PACKAGES_TO_INSTALL.extendleft(reversed(unmet_dependencies))
 
 PACKAGES_TO_INSTALL = deque(
     argument_expander.deduplicate_iterable(PACKAGES_TO_INSTALL))
+if not PACKAGES_TO_INSTALL:
+    print("No packages need to be installed.")
+    sys.exit(0)
+
 print("Will install the following packages:\n    %s"
       % ', '.join(PACKAGES_TO_INSTALL))
 
@@ -185,73 +189,72 @@ for name in PACKAGES_TO_INSTALL:
                 HAS_SUPERUSER_CHECKED = True
 
 
-def install_package(package):
-    package_data = PACKAGES[package].data
-    if 'install' not in package_data:
-        print("'%s' is a virtual package - no actions done." % package)
-        return True
+# Handle executing the actual install steps.
+while PACKAGES_TO_INSTALL:
+    print("--------------------========================---------------------")
+    instance = PACKAGES[PACKAGES_TO_INSTALL.popleft()]
 
-    package_instance = PACKAGES[package]
-
-    if package_instance.should_do_prepare:
-        print("Performing pre-installation steps for '%s'..."
-              % package_instance.name)
-
+    # Check if any dependency of the package has failed to install.
+    for dependency in instance.dependencies:
         try:
-            print("Executing prepare for", package_instance.name, "...")
-            package_instance.execute_prepare()
+            d_instance = PACKAGES[dependency]
+            if d_instance.is_failed:
+                print("Skipping '%s' as dependency '%s' failed to install!"
+                      % (instance.name, d_instance.name),
+                      file=sys.stderr)
+                # Cascade the failure information to all dependents.
+                instance.set_failed()
 
-        except Exception as e:
-            print("Couldn't prepare '%s': '%s'!" % (package, e),
-                  file=sys.stderr)
-            print(e)
+                break  # Failure of one dependency is enough.
+        except KeyError:
+            # The dependency found by the name isn't a real package.
+            # This can safely be ignored.
+            pass
 
-            import traceback
-            traceback.print_exc()
+    if instance.is_failed:
+        continue
 
-            return False
+    print("Selecting package '%s'" % instance.name)
+    instance.select()
+
+    if instance.should_do_prepare:
+        print("Performing pre-installation steps for '%s'..."
+              % instance.name)
 
     try:
-        install_like_directive = 'install' if 'install' in package_data \
-                                 else None
-        if not install_like_directive:
-            raise KeyError("Invalid state: package data for %s did not "
-                           "contain any install-like directive?" % package)
-
-        print("Executing installer for", package_instance.name, "...")
-        package_instance.execute_install()
-        return True
+        # (Prepare should always be called to advance the status of the
+        # package even if it does not actions.)
+        instance.execute_prepare()
     except Exception as e:
-        print("Couldn't install '%s': '%s'!" % (package, e), file=sys.stderr)
+        print("Failed to prepare '%s' for installation!"
+              % instance.name, file=sys.stderr)
         print(e)
-
         import traceback
         traceback.print_exc()
 
-        return False
+        instance.set_failed()
+        continue
 
+    try:
+        print("Installing '%s'..." % instance.name)
+        instance.execute_install()
+    except Exception as e:
+        print("Failed to prepare '%s' for installation!"
+              % instance.name, file=sys.stderr)
+        print(e)
+        import traceback
 
-while PACKAGES_TO_INSTALL:
-    package_name = PACKAGES_TO_INSTALL.popleft()
-    instance = PACKAGES[package_name]
-    configure = instance.is_support
-    print("Preparing to %s package '%s'..." %
-          ('configure' if configure else 'install',
-           package_name))
+        traceback.print_exc()
 
-    success = install_package(package_name)
-    if not success:
-        print(" !! Failed to %s '%s'" %
-              ('configure' if configure else 'install', package_name))
-        break  # Explicitly break the loop and write the statuses.
+        instance.set_failed()
+        continue
 
-    print("%s package '%s'." % ('Configured' if configure else 'Installed',
-                                package_name))
+    if instance.is_installed:
+        print("Successfully installed '%s'." % instance.name)
 
-    if success:
         # Save that the package was installed.
-        USER_STORE.save_status(instance)
+        get_user_save().save_status(instance)
 
-    success = PACKAGES[package_name].clean_temporaries()
-    if not success:
-        print(" !! Failed to clean up '%s'" % package_name)
+    if not instance.clean_temporaries():
+        print("Failed to clean installation temporaries for '%s'"
+              % instance.name, file=sys.stderr)

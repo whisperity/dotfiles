@@ -1,9 +1,21 @@
 from datetime import datetime
 import json
 import os
-import time
 
-from .package import Status
+from .status import Status
+
+_INSTANCE = None
+
+
+def get_user_save():
+    """
+    Returns the current execution's instance for the user's configuration save
+    file(s).
+    """
+    global _INSTANCE
+    if not _INSTANCE:
+        _INSTANCE = UserSave()
+    return _INSTANCE
 
 
 class UserSave:
