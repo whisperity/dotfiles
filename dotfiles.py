@@ -77,7 +77,7 @@ for lname in package.get_package_names(package.Package.package_directory):
 if len(args.PACKAGE) == 0:
     print("Listing available packages...")
 
-    for logical_name in PACKAGES:
+    for logical_name in sorted(PACKAGES):
         instance = PACKAGES[logical_name]
         if instance.is_support:
             continue

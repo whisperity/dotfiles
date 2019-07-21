@@ -1,0 +1,14 @@
+description: A small build system with focus on speed. Commonly used with
+  CMake to generate the build commands for a project.
+prepare:
+  - kind: shell multiple
+    commands:
+      - "$PACKAGE_DIR/get-ninja.sh"
+      - "unzip ninja-linux.zip"
+install:
+  - kind: make folders
+    folders:
+      - "$HOME/bin"
+  - kind: copy
+    file: "$TEMPORARY_DIR/ninja"
+    to: "$HOME/bin/ninja"

@@ -1,0 +1,10 @@
+description: Installs some common and most wanted system administration and maintenance
+  tools.
+superuser: true
+install:
+  - kind: shell
+    command: "sudo apt-get install -y --no-install-recommends aptitude finger iotop lynx smartmontools traceroute"
+  - kind: shell tryinorder
+    commands:
+      - "sudo apt-get install -y --no-install-recommends cpufreq-utils"  # 16.04
+      - "sudo apt-get install -y --no-install-recommends cpufrequtils"   # 18.04

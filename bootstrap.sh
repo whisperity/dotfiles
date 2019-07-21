@@ -67,8 +67,16 @@ if [[ $HAVE_YAML -eq 1 ]]
 then
     echo
     echo "Every dependency is satisfied in the current environment."
-    echo "You may run the script normally!"
-    exit 0
+
+
+    if [[ "$1" =~ (-f|--force) ]]
+    then
+        echo "'-f/--force' was given: considering as if dependencies weren't" \
+             "satisfied."
+    else
+        echo "You may run the script normally!"
+        exit 0
+    fi
 fi
 
 

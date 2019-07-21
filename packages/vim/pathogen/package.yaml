@@ -1,0 +1,16 @@
+description: "pathogen.vim: Manage Vim plugins with ease!"
+prepare:
+  - kind: git clone
+    remote: "http://github.com/tpope/vim-pathogen"
+install:
+  - kind: make folders
+    folders:
+      - "$HOME/.vim/autoload"
+      - "$HOME/.vim/bundle"
+      - "$HOME/.vim/config"
+  - kind: copy
+    file: "$TEMPORARY_DIR/vim-pathogen/autoload/pathogen.vim"
+    to: "$HOME/.vim/autoload/pathogen.vim"
+  - kind: copy
+    file: config.vim
+    to: "$HOME/.vim/config/pathogen.vim"

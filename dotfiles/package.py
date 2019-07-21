@@ -1,9 +1,18 @@
 import fnmatch
-import json
 import os
 
 try:
-    import yaml
+    from yaml import YAMLError
+    from yaml import load as load_yaml
+
+    try:
+        # Get the faster version of the loader, if possible.
+        from yaml import CSafeLoader as Loader
+    except ImportError:
+        # NOTE: Installing "LibYAML" requires compiling from source, so in
+        # case the current environment does not have it, just fall back to
+        # the pure Python (thus slower) implementation.
+        from yaml import SafeLoader as Loader
 except ImportError:
     import sys
     print("The YAML package for the current Python interpreter cannot be "
@@ -81,7 +90,7 @@ class Package:
         """
         return os.path.join(cls.package_directory,
                             name.replace('.', os.sep),
-                            'package.json')
+                            'package.yaml')
 
     @classmethod
     def data_file_to_package_name(cls, path):
@@ -105,9 +114,8 @@ class Package:
         self._teardown = []
 
         with open(datafile_path, 'r') as datafile:
-            # TODO: Use YAML format instead of JSON.
             # TODO: Validate contents for action kinds and such.
-            self._data = json.load(datafile)
+            self._data = load_yaml(datafile, Loader=Loader)
 
         self._expander = ArgumentExpander()
         self._expander.register_expansion('PACKAGE_DIR', self.resources)
@@ -120,7 +128,7 @@ class Package:
                            cls.package_name_to_data_file(logical_name))
         except FileNotFoundError:
             raise KeyError("Package data file for %s was not found.")
-        except json.JSONDecodeError:
+        except YAMLError:
             raise ValueError("Package data file for '%s' is corrupt."
                              % logical_name)
 
@@ -281,7 +289,7 @@ def get_package_names(*roots):
     """
     for root in roots:
         for dirpath, _, files in os.walk(root):
-            for match in fnmatch.filter(files, 'package.json'):  # TODO: YAML
+            for match in fnmatch.filter(files, 'package.yaml'):
                 yield Package.data_file_to_package_name(
                     os.path.join(dirpath, match))
 
