@@ -3,7 +3,7 @@
   "dependencies": [
     "vim.pathogen"
   ],
-  "prefetch": [
+  "prepare": [
     {
       "kind": "git clone",
       "remote": "http://github.com/lervag/vimtex"
@@ -12,7 +12,7 @@
   "install": [
     {
       "kind": "copy tree",
-      "folder": "$PREFETCH_DIR/vimtex",
+      "folder": "$TEMPORARY_DIR/vimtex",
       "to": "$HOME/.vim/bundle/vimtex"
     }
   ]

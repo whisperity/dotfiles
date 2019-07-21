@@ -1,15 +1,15 @@
 {
   "description": "Basic user environment files. (This package is initially tailored for use on a default Ubuntu 16.04 user account.)",
-  "prefetch": [
+  "prepare": [
     {
       "kind": "prompt user",
-      "short-name": "git-user.name",
+      "short_name": "git-user.name",
       "description": "The name with which your Git commits will be authored.",
       "variable": "GIT_USERNAME"
     },
     {
       "kind": "prompt user",
-      "short-name": "git-user.email",
+      "short_name": "git-user.email",
       "description": "The e-mail address with which your Git commits will be authored.",
       "variable": "GIT_USEREMAIL"
     }

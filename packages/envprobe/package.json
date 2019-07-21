@@ -3,7 +3,7 @@
   "dependencies": [
     "basic"
   ],
-  "prefetch": [
+  "prepare": [
     {
       "kind": "shell multiple",
       "commands": [
@@ -23,7 +23,7 @@
     },
     {
       "kind": "copy tree",
-      "folder": "$PREFETCH_DIR/envprobe",
+      "folder": "$TEMPORARY_DIR/envprobe",
       "to": "$HOME/opt/envprobe"
     },
     {

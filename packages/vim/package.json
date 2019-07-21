@@ -1,7 +1,7 @@
 {
   "description": "Installs Vim, a pluginable command-line text editor",
   "superuser": true,
-  "prefetch": [
+  "prepare": [
     {
       "kind": "git clone",
       "remote": "http://github.com/tomasr/molokai.git"
@@ -29,7 +29,7 @@
     },
     {
       "kind": "copy",
-      "file": "$PREFETCH_DIR/molokai/colors/molokai.vim",
+      "file": "$TEMPORARY_DIR/molokai/colors/molokai.vim",
       "to": "$HOME/.vim/colors/molokai.vim"
     }
   ]

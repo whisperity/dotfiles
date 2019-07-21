@@ -1,6 +1,6 @@
 {
   "description": "pathogen.vim: Manage Vim plugins with ease!",
-  "prefetch": [
+  "prepare": [
     {
       "kind": "git clone",
       "remote": "http://github.com/tpope/vim-pathogen"
@@ -17,7 +17,7 @@
     },
     {
       "kind": "copy",
-      "file": "$PREFETCH_DIR/vim-pathogen/autoload/pathogen.vim",
+      "file": "$TEMPORARY_DIR/vim-pathogen/autoload/pathogen.vim",
       "to": "$HOME/.vim/autoload/pathogen.vim"
     },
     {

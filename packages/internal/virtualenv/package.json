@@ -1,16 +1,11 @@
 {
   "description": "This package sets up a Python virtual environment to be used by other installers who need some custom tools *for the installation* to be available.",
   "dependencies": [ "python.virtualenv" ],
-  "enable": [
+  "support": true,
+  "install": [
     {
       "kind": "shell",
-      "command": "$HOME/opt/virtualenv/virtualenv_s.py --python $(which python3) $HOME/dotfiles-venv"
-    }
-  ],
-  "cleanup": [
-    {
-      "kind": "shell",
-      "command": "rm -rf $HOME/dotfiles-venv"
+      "command": "$HOME/opt/virtualenv/virtualenv_s.py --python $(which python3) $SESSION_DIR/dotfiles-venv"
     }
   ]
 }

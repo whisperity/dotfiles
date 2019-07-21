@@ -3,7 +3,7 @@
   "dependencies": [
     "vim.pathogen"
   ],
-  "prefetch": [
+  "prepare": [
     {
       "kind": "git clone",
       "remote": "http://github.com/rhysd/vim-clang-format"
@@ -12,7 +12,7 @@
   "install": [
     {
       "kind": "copy tree",
-      "folder": "$PREFETCH_DIR/vim-clang-format",
+      "folder": "$TEMPORARY_DIR/vim-clang-format",
       "to": "$HOME/.vim/bundle/vim-clang-format"
     },
     {
