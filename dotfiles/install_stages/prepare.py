@@ -4,16 +4,17 @@ import subprocess
 import tempfile
 
 from dotfiles.temporary import package_temporary_dir
-from .common_shell import ShellCommandsMixin
+from .base import _StageBase
+from .shell_mixin import ShellCommandsMixin
 
 
-class Prepare(ShellCommandsMixin):
+class Prepare(_StageBase, ShellCommandsMixin):
     """
     The prefetch stage is responsible for preparing the package for use, most
     often downloading external content or dependencies.
     """
     def __init__(self, package, arg_expand):
-        self.package_name = package.name
+        super().__init__(package)
         self._prefetch_dir = package_temporary_dir(package.name)
         self.expand_args = arg_expand
 
@@ -34,14 +35,6 @@ class Prepare(ShellCommandsMixin):
                       onerror=_onerror)
 
         return True
-
-    def execute_command(self, action):
-        name = action['kind'].replace(' ', '_')
-        args = {k.replace(' ', '_'): action[k]
-                for k in action
-                if k != 'kind'}
-        func = getattr(self, name)
-        func(**args)
 
     def git_clone(self, remote):
         print("Cloning remote content from '%s'..."

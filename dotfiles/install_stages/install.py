@@ -3,25 +3,18 @@ import re
 import shutil
 import sys
 
-from .common_shell import ShellCommandsMixin
+from .base import _StageBase
+from .shell_mixin import ShellCommandsMixin
 
 
-class Install(ShellCommandsMixin):
+class Install(_StageBase, ShellCommandsMixin):
     """
     The prefetch stage is responsible for preparing the package for use, most
     often downloading external content or dependencies.
     """
     def __init__(self, package, arg_expand):
-        self.package_name = package.name
+        super().__init__(package)
         self.expand_args = arg_expand
-
-    def execute_command(self, action):
-        name = action['kind'].replace(' ', '_')
-        args = {k.replace(' ', '_'): action[k]
-                for k in action
-                if k != 'kind'}
-        func = getattr(self, name)
-        func(**args)
 
     def make_folders(self, folders):
         for folder in folders:

@@ -29,6 +29,12 @@ parser.add_argument(
     help="The package name(s) to install. See the list of available packages "
          "by specifying no package names.")
 
+# TODO: Support multiple roots.
+
+# TODO: Support not clearing temporaries for debug purposes.
+
+# TODO: Verbosity switch?
+
 args = parser.parse_args()
 
 # -----------------------------------------------------------------------------

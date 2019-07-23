@@ -248,8 +248,8 @@ class Package:
             # Start the execution from the temporary download/prepare folder.
             os.chdir(executor.temp_path)
 
-            for action in self._data.get('prepare'):
-                executor.execute_command(action)
+            for step in self._data.get('prepare'):
+                executor(**step)
 
             # Register that temporary files were created and should be
             # cleaned up later.
@@ -265,8 +265,8 @@ class Package:
         # Start the execution in the package resource folder.
         os.chdir(self.resources)
 
-        for action in self._data.get('install'):
-            executor.execute_command(action)
+        for step in self._data.get('install'):
+            executor(**step)
 
         self._status = Status.INSTALLED
 
