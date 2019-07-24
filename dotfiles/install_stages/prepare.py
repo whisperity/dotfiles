@@ -72,8 +72,6 @@ class Prepare(_StageBase, ShellCommandsMixin):
                                     "relative to '%s'"
                                     % (path, self.package.resources))
 
-        return True
-
     def git_clone(self, repository):
         """
         Obtain a shallow Git clone of a remote repository.
@@ -104,4 +102,3 @@ class Prepare(_StageBase, ShellCommandsMixin):
                   'w') as varfile:
             varfile.write(value)
         print("\n")
-        return True

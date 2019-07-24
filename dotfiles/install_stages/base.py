@@ -23,4 +23,9 @@ class _StageBase:
                                  "'%s'!" % (action, type(self).__name__))
 
         args = {k.replace(' ', '_'): v for k, v in kwargs.items()}
-        return func(**args)
+
+        ret = func(**args)
+        if ret is None:
+            # Assume true if the function didn't return anything.
+            ret = True
+        return ret

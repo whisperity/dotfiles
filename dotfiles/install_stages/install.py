@@ -37,8 +37,6 @@ class Install(_StageBase, ShellCommandsMixin):
 
             os.makedirs(self.expand_args(dir), exist_ok=True)
 
-        return True
-
     def extract_multiple(self, root, files):
         from_root_folder = root
         to_root_folder = os.path.expandvars('$' + root)
