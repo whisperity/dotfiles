@@ -35,6 +35,10 @@ class Prepare(_StageBase, ShellCommandsMixin):
 
         return True
 
+    # The prepare stage has no "uninstall equivalents" as prepare actions are
+    # supposed to write to the disk only in the temporary directory, which is
+    # cleaned up automatically.
+
     def copy_resource(self, path):
         """
         Copies a resource (a file or directory that is shipped together with

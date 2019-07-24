@@ -123,7 +123,7 @@ First, the package's configuration and external dependencies are obtained.
 This is called the _preparation phase_.
 
 At the beginning of this phase, the executing environment switches into a
-temporary folder.
+temporary directory.
 In most directives, `$TEMPORARY_DIR` can be used to refer to this directory.
 
 
@@ -149,9 +149,11 @@ phase's directory.
 `$PACKAGE_DIR` refers to the persistent package directory.
 
 
-|   Action           | Arguments                    | Semantics                                                                                                    | Failure condition                                     |
-|:------------------:|------------------------------|:-------------------------------------------------------------------------------------------------------------|:------------------------------------------------------|
-| `make dirs`        | `dirs` (list of strings)     | Creates the directories specified, and their parents if they don't exist                                     | OS-level error happens at creating a directory        |
-| `shell`            | `command` (string)           | Execute `command` in a shell                                                                                 | Non-zero return                                       |
-| `shell all`        | `commands` (list of strings) | Execute every command in order                                                                               | At least one command returns non-zero                 |
-| `shell any`        | `commands` (list of strings) | Execute the commands in order until one succeeds                                                             | None of the commands returns zero                     |
+|   Action           | Arguments                                                                  | Semantics                                                                                                                                             | Failure condition                                     |
+|:------------------:|----------------------------------------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------|:------------------------------------------------------|
+| `copy`             | `file` (string), `to` (string)                                             | Copies `file` to the `to` path                                                                                                                        | OS-level error,                                       |
+| `copy`             | `files` (list of string), `to` (string), `prefix` (string, default: empty) | As if `copy` was done for all element of `files`, `to` must be the destination directory, optionally prepending `prefix` to each destination filename | OS-level error, `to` isn't an existing directory      |
+| `make dirs`        | `dirs` (list of strings)                                                   | Creates the directories specified, and their parents if they don't exist                                                                              | OS-level error happens at creating a directory        |
+| `shell`            | `command` (string)                                                         | Execute `command` in a shell                                                                                                                          | Non-zero return                                       |
+| `shell all`        | `commands` (list of strings)                                               | Execute every command in order                                                                                                                        | At least one command returns non-zero                 |
+| `shell any`        | `commands` (list of strings)                                               | Execute the commands in order until one succeeds                                                                                                      | None of the commands returns zero                     |

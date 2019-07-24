@@ -10,19 +10,19 @@ prepare:
     short name: git-user.email
     variable: GIT_USEREMAIL
 install:
-  - action: extract multiple
+  - action: copy
     files:
-      - .bashrc
-      - .bash_aliases
-      - .gitconfig
-      - .profile
-    root: HOME
+      - bashrc
+      - bash_aliases
+      - gitconfig
+      - profile
+    to: $HOME
+    prefix: '.'
   - action: make dirs
     dirs:
       - "$HOME/.ssh"
-  - action: extract multiple
-    files:
-      - ".ssh/unlock-all"
-    root: HOME
+  - action: copy
+    file: ssh/unlock-all
+    to: "$HOME/.ssh/unlock-all"
   - action: replace user input
     file: $HOME/.gitconfig

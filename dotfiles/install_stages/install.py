@@ -37,47 +37,66 @@ class Install(_StageBase, ShellCommandsMixin):
 
             os.makedirs(self.expand_args(dir), exist_ok=True)
 
-    def extract_multiple(self, root, files):
-        from_root_folder = root
-        to_root_folder = os.path.expandvars('$' + root)
-        print("    ---: Copying files from '%s' to '%s'"
-              % (from_root_folder, to_root_folder))
+    def copy(self, to, file=None, files=None, prefix=''):
+        """
+        Copies one or multiple files from one place to another.
 
-        for f in files:
-            print("       :- %s" % f)
-            shutil.copy(os.path.join(from_root_folder, f),
-                        os.path.join(to_root_folder, f))
+        This method is considered the unconditional copy, which inverse
+        operation is the removal of a file.
+        (For the version which can restore the version before the copy, see
+        `overwrite` action.)
 
-    def copy(self, file, to):
-        from_file = self.expand_args(file)
-        to_file = self.expand_args(to)
-        print("    ---> Copying file '%s' to '%s'"
-              % (from_file, to_file))
-        shutil.copy(from_file, to_file)
+        If `file` is specified, it is an existing file, assumed to be relative
+        to the current directory, if necessary.
+        In this case, `to` is either the destination file path (cannot be
+        relative), or the destination directory (cannot be relative) in which
+        case the file's name will be retained.
+
+        If `files` is specified, it is a list of files.
+        In this case, `to` must be a destination directory, which must already
+        exist.
+        In this case, `prefix` may be specified, and it will be prepended to
+        every destination file's name.
+        """
+        if file and files:
+            raise NameError("Copy must specify either (file, to) or "
+                            "(files, to).")
+        if file and prefix:
+            raise NameError("If only a single file is specified, use the 'to' "
+                            "argument to specify the whole destination name!")
+
+        to = self.expand_args(to)
+        if os.path.abspath(to) != to:
+            raise ValueError("'to' must be given as an absolute PATH")
+
+        if files and not os.path.isdir(to):
+            raise NotADirectoryError("'to' must be an existing directory when "
+                                     "copying multiple files.")
+
+        for file in (files if files else [file]):
+            source = self.expand_args(file)
+            target = to
+
+            if prefix:
+                target = os.path.join(to, os.path.basename(source))
+                dirn, filen = os.path.split(target)
+                target = os.path.join(dirn, prefix + filen)
+
+            print("[DEBUG] Unconditionally copied '%s' to '%s'"
+                  % (os.path.abspath(file), target))
+            shutil.copy(file, target)
 
     def copy_tree(self, folder, to):
+        # TODO: Revise this.
         from_folder = self.expand_args(folder)
         to_folder = self.expand_args(to)
         print("    ---> Copying folder '%s' to '%s'"
               % (from_folder, to_folder))
         shutil.copytree(from_folder, to_folder)
 
-    def append(self, file, to):
-        from_file = self.expand_args(file)
-        to_file = self.expand_args(to)
-        print("    ---> Appending package file '%s' to '%s'"
-              % (from_file, to_file))
-        with open(to_file, 'a') as to:
-            with open(from_file, 'r') as in_file:
-                to.write(in_file.read())
-
-    def append_text(self, text, to):
-        to_file = self.expand_args(to)
-        print("    ---> Appending text to '%s'"
-              % (to_file))
-        with open(to_file, 'a') as to:
-            to.write(text)
-            to.write('\n')
+    def overwrite_(self, *l, **d):
+        # TODO: Write this
+        pass
 
     # TODO: Refactor user-given variables to be loaded from memory, not from
     #       a file.
