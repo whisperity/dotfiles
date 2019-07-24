@@ -3,7 +3,7 @@ dependencies:
   - basic
 prepare:
   - action: git clone
-    remote: "http://github.com/magicmonty/bash-git-prompt"
+    repository: "http://github.com/magicmonty/bash-git-prompt"
 install:
   - action: copy tree
     folder: "$TEMPORARY_DIR/bash-git-prompt"

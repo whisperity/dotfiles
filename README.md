@@ -127,11 +127,14 @@ temporary folder.
 In most directives, `$TEMPORARY_DIR` can be used to refer to this directory.
 
 
-|   Action    | Arguments                    | Semantics                                         | Failure condition                     |
-|:-----------:|------------------------------|:--------------------------------------------------|:--------------------------------------|
-| `shell`     | `command` (string)           | Execute `command` in a shell.                     | Non-zero return                       |
-| `shell all` | `commands` (list of strings) | Execute every command in order.                   | At least one command returns non-zero |
-| `shell any` | `commands` (list of strings) | Execute the commands in order until one succeeds. | None of the commands returns zero     |
+|   Action        | Arguments                    | Semantics                                                                                                    | Failure condition                                     |
+|:---------------:|------------------------------|:-------------------------------------------------------------------------------------------------------------|:------------------------------------------------------|
+| `copy resource` | `path` (string)              | Copy the file or directory from the package's resources (where `package.yaml` is) to the temporary directory | `path` is invalid or OS-level permission error occurs |
+| `git clone`     | `repository` (URL string)    | Obtain a clone of the repository by calling `git`                                                            | `git clone` process fails                             |
+| `shell`         | `command` (string)           | Execute `command` in a shell                                                                                 | Non-zero return                                       |
+| `shell all`     | `commands` (list of strings) | Execute every command in order                                                                               | At least one command returns non-zero                 |
+| `shell any`     | `commands` (list of strings) | Execute the commands in order until one succeeds                                                             | None of the commands returns zero                     |
+
 
 
 #### `install`

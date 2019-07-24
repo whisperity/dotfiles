@@ -9,8 +9,8 @@ prepare:
       - "tar xvfz install-tl-unx.tar.gz"
       - "rm install-tl-unx.tar.gz"
       - "mv install-tl-* install-tl"
-  - action: shell
-    command: "cp $PACKAGE_DIR/texlive.profile $TEMPORARY_DIR/texlive.profile"
+  - action: copy resource
+    path: texlive.profile
 install:
   - action: substitute environment variables
     file: $TEMPORARY_DIR/texlive.profile

@@ -2,7 +2,7 @@ description: Installs Vim, a pluginable command-line text editor
 superuser: true
 prepare:
   - action: git clone
-    remote: "http://github.com/tomasr/molokai.git"
+    repository: "http://github.com/tomasr/molokai.git"
 install:
   - action: shell
     command: "sudo apt-get install -y vim"

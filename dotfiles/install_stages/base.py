@@ -3,8 +3,8 @@ class _StageBase:
     """
     The base class from which all stage executors inherit from.
     """
-    def __init__(self, for_package):
-        self.package_name = for_package
+    def __init__(self, package):
+        self.package = package
 
     def __call__(self, action, **kwargs):
         """

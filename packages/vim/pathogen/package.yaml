@@ -1,7 +1,7 @@
 description: "pathogen.vim: Manage Vim plugins with ease!"
 prepare:
   - action: git clone
-    remote: "http://github.com/tpope/vim-pathogen"
+    repository: "http://github.com/tpope/vim-pathogen"
 install:
   - action: make folders
     folders:

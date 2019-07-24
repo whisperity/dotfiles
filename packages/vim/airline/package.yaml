@@ -3,7 +3,7 @@ dependencies:
   - vim.pathogen
 prepare:
   - action: git clone
-    remote: "http://github.com/vim-airline/vim-airline"
+    repository: "http://github.com/vim-airline/vim-airline"
 install:
   - action: copy tree
     folder: "$TEMPORARY_DIR/vim-airline"

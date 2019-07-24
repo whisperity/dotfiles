@@ -3,7 +3,7 @@ dependencies:
   - vim.pathogen
 prepare:
   - action: git clone
-    remote: "http://github.com/plasticboy/vim-markdown"
+    repository: "http://github.com/plasticboy/vim-markdown"
 install:
   - action: copy tree
     folder: "$TEMPORARY_DIR/vim-markdown"

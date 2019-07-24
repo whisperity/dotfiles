@@ -3,7 +3,7 @@ dependencies:
   - vim.pathogen
 prepare:
   - action: git clone
-    remote: "http://github.com/scrooloose/syntastic"
+    repository: "http://github.com/scrooloose/syntastic"
 install:
   - action: copy tree
     folder: "$TEMPORARY_DIR/syntastic"

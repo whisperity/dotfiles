@@ -3,9 +3,9 @@ dependencies:
   - vim.pathogen
 prepare:
   - action: git clone
-    remote: "http://github.com/tpope/vim-fugitive"
+    repository: "http://github.com/tpope/vim-fugitive"
   - action: git clone
-    remote: "http://github.com/airblade/vim-gitgutter"
+    repository: "http://github.com/airblade/vim-gitgutter"
 install:
   - action: copy tree
     folder: "$TEMPORARY_DIR/vim-fugitive"
