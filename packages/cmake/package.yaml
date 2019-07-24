@@ -5,7 +5,7 @@ description: CMake is a cross-platform open-source build system designed to
 dependencies:
   - internal.virtualenv
 prepare:
-  - kind: shell multiple
+  - kind: shell all
     commands:
       - "bash -c 'source $SESSION_DIR/dotfiles-venv/bin/activate; pip install bs4 lxml'"
       - "bash -c 'source $SESSION_DIR/dotfiles-venv/bin/activate; $PACKAGE_DIR/select-latest-version.py > $TEMPORARY_DIR/url.txt'"

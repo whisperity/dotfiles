@@ -1,5 +1,6 @@
 import fnmatch
 import os
+import pprint
 
 try:
     from yaml import YAMLError
@@ -37,12 +38,29 @@ class WrongStatusError(Exception):
     """
     def __init__(self, required_status, current_status):
         super().__init__()
-        self._required = required_status
-        self._current = current_status
+        self.required = required_status
+        self.current = current_status
 
     def __str__(self):
         return "Executing package action is invalid in status %s, as " \
-               "%s is required." % (self._current, self._required)
+               "%s is required." % (self.current, self.required)
+
+
+class ExecutorError(Exception):
+    """
+    Indicates that an error happened during execution of a command from the
+    package descriptor.
+    """
+    def __init__(self, package, stage, action):
+        super().__init__()
+        self.package = package
+        self.stage = stage
+        self.action = action
+
+    def __str__(self):
+        return "Execution of %s action for %s failed.\n" \
+               "Details of action:\n%s" \
+               % (self.stage, str(self.package), pprint.pformat(self.action))
 
 
 class _StatusRequirementDecorator:
@@ -244,16 +262,17 @@ class Package:
             executor = install_stages.prepare.Prepare(self, self._expander)
             self._expander.register_expansion('TEMPORARY_DIR',
                                               executor.temp_path)
+            # Register that temporary files were created and should be
+            # cleaned up later.
+            self._teardown.append(executor.cleanup)
 
             # Start the execution from the temporary download/prepare folder.
             os.chdir(executor.temp_path)
 
             for step in self._data.get('prepare'):
-                executor(**step)
-
-            # Register that temporary files were created and should be
-            # cleaned up later.
-            self._teardown.append(executor.cleanup)
+                if not executor(**step):
+                    self.set_failed()
+                    raise ExecutorError(self, 'prepare', step)
 
         self._status = Status.PREPARED
 
@@ -266,7 +285,9 @@ class Package:
         os.chdir(self.resources)
 
         for step in self._data.get('install'):
-            executor(**step)
+            if not executor(**step):
+                self.set_failed()
+                raise ExecutorError(self, 'install', step)
 
         self._status = Status.INSTALLED
 

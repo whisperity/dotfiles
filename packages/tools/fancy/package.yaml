@@ -4,14 +4,14 @@ dependencies:
   - basic
 superuser: true
 prepare:
-  - kind: shell multiple
+  - kind: shell all
     commands:
       - "$PACKAGE_DIR/bat.sh"
       - "$PACKAGE_DIR/exa.sh"
       - "$PACKAGE_DIR/fd.sh"
       - "$PACKAGE_DIR/hexyl.sh"
 install:
-  - kind: shell multiple
+  - kind: shell all
     commands:
       - "sudo dpkg --install $TEMPORARY_DIR/fd.deb"
       - "sudo dpkg --install $TEMPORARY_DIR/bat.deb"

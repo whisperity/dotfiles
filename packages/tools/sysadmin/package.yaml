@@ -4,7 +4,7 @@ superuser: true
 install:
   - kind: shell
     command: "sudo apt-get install -y --no-install-recommends aptitude finger iotop lynx smartmontools traceroute"
-  - kind: shell tryinorder
+  - kind: shell any
     commands:
       - "sudo apt-get install -y --no-install-recommends cpufreq-utils"  # 16.04
       - "sudo apt-get install -y --no-install-recommends cpufrequtils"   # 18.04

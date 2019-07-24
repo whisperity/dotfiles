@@ -3,7 +3,7 @@ dependencies:
   - basic
 superuser: true
 prepare:
-  - kind: shell multiple
+  - kind: shell all
     commands:
       - 'wget http://raw.githubusercontent.com/so-fancy/diff-so-fancy/master/third_party/build_fatpack/diff-so-fancy'
       - chmod +x diff-so-fancy

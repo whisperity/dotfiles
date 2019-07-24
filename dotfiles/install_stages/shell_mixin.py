@@ -8,27 +8,35 @@ class ShellCommandsMixin:
     """
 
     def _expand(self, command):
+        # The Shell mixin does not have variable expansion capability as a
+        # hard requirement.
         expander = getattr(self, 'expand_args', None)
         if expander:
             command = expander(command)
         return command
 
     def shell(self, command):
+        """
+        Directly executes the command in the shell.
+        """
         command = self._expand(command)
-
-        print("Executing command-line: ", command)
-
-        returncode = subprocess.call(command,
-                                     shell=True)
-
+        returncode = subprocess.call(command, shell=True)
         return returncode == 0
 
-    def shell_tryinorder(self, commands):
-        for command in commands:
-            success = self.shell(command)
-            if success:
-                break
+    def shell_all(self, commands):
+        """
+        Directly execute all the given commands in the order they were given.
+        """
+        result = [self.shell(command) for command in commands]
+        return all(result)
 
-    def shell_multiple(self, commands):
+    def shell_any(self, commands):
+        """
+        Directly executes the given commands in the order they were given,
+        until one of them succeeds.
+        """
         for command in commands:
-            self.shell(command)
+            if self.shell(command):
+                return True
+
+        return False

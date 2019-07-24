@@ -2,7 +2,7 @@ description: Download and install the latest version of Python virtualenv.
 depend_on_parent: false
 superuser: true
 prepare:
-  - kind: shell multiple
+  - kind: shell all
     commands:
       - "$PACKAGE_DIR/get-release.sh"
       - "tar -xf virtualenv.tar.gz"
@@ -13,7 +13,7 @@ install:
   - kind: make folders
     folders:
       - "$HOME/opt"
-  - kind: shell multiple
+  - kind: shell all
     commands:
       - "mv $TEMPORARY_DIR/virtualenv $HOME/opt/virtualenv"
       - "bash -c 'cd $HOME/opt/virtualenv; ln -s $(find . -name virtualenv.py -type f) virtualenv_s.py'"

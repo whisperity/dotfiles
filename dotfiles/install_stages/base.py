@@ -19,4 +19,4 @@ class _StageBase:
                                  "'%s'!" % (kind, type(self).__name__))
 
         args = {k.replace(' ', '_'): v for k, v in kwargs.items()}
-        func(**args)
+        return func(**args)

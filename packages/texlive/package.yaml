@@ -3,7 +3,7 @@ description: Install the TeXLive (La)TeX typesetting environment's latest
 dependencies:
   - bash
 prepare:
-  - kind: shell multiple
+  - kind: shell all
     commands:
       - "wget http://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz"
       - "tar xvfz install-tl-unx.tar.gz"
