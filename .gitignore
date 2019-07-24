@@ -1,2 +1,6 @@
 __pycache__/
+
+# bootstrap.sh artifacts
 venv/
+get-pip.py
+tmp.*/
