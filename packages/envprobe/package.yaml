@@ -9,8 +9,8 @@ prepare:
       - "tar -xf envprobe.tar.gz"
       - "mv whisperity-envprobe-* envprobe"
 install:
-  - action: make folders
-    folders:
+  - action: make dirs
+    dirs:
       - "$HOME/.bash.d"
       - "$HOME/opt"
   - action: copy tree

@@ -16,8 +16,8 @@ install:
       - "sudo dpkg --install $TEMPORARY_DIR/fd.deb"
       - "sudo dpkg --install $TEMPORARY_DIR/bat.deb"
       - "sudo dpkg --install $TEMPORARY_DIR/hexyl.deb"
-  - action: make folders
-    folders:
+  - action: make dirs
+    dirs:
       - "$HOME/bin"
   - action: copy
     file: "$TEMPORARY_DIR/exa"

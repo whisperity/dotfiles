@@ -6,8 +6,8 @@ prepare:
 install:
   - action: shell
     command: "sudo apt-get install -y vim"
-  - action: make folders
-    folders:
+  - action: make dirs
+    dirs:
       - "$HOME/.vim"
       - "$HOME/.vim/colors"
   - action: extract multiple

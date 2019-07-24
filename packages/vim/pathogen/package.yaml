@@ -3,8 +3,8 @@ prepare:
   - action: git clone
     repository: "http://github.com/tpope/vim-pathogen"
 install:
-  - action: make folders
-    folders:
+  - action: make dirs
+    dirs:
       - "$HOME/.vim/autoload"
       - "$HOME/.vim/bundle"
       - "$HOME/.vim/config"

@@ -17,8 +17,8 @@ install:
       - .gitconfig
       - .profile
     root: HOME
-  - action: make folders
-    folders:
+  - action: make dirs
+    dirs:
       - "$HOME/.ssh"
   - action: extract multiple
     files:

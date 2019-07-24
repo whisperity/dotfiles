@@ -13,8 +13,8 @@ prepare:
       - "tar -xf cmake.tar.gz"
       - "mv cmake-* cmake"
 install:
-  - action: make folders
-    folders:
+  - action: make dirs
+    dirs:
       - "$HOME/bin"
       - "$HOME/opt"
   - action: copy tree

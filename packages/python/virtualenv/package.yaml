@@ -10,8 +10,8 @@ prepare:
 install:
   - action: shell
     command: "sudo apt-get install -y --no-install-recommends python3-distutils"
-  - action: make folders
-    folders:
+  - action: make dirs
+    dirs:
       - "$HOME/opt"
   - action: shell all
     commands:

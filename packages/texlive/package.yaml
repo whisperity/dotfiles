@@ -14,8 +14,8 @@ prepare:
 install:
   - action: substitute environment variables
     file: $TEMPORARY_DIR/texlive.profile
-  - action: make folders
-    folders:
+  - action: make dirs
+    dirs:
       - $HOME/opt
   - action: shell
     command: "$TEMPORARY_DIR/install-tl/install-tl --profile=$TEMPORARY_DIR/texlive.profile"

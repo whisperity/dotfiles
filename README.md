@@ -148,4 +148,10 @@ In most directives, `$TEMPORARY_DIR` can be used to refer to the _`prepare`_
 phase's directory.
 `$PACKAGE_DIR` refers to the persistent package directory.
 
-> **TODO:** Directives that can be used in `install` phase.
+
+|   Action           | Arguments                    | Semantics                                                                                                    | Failure condition                                     |
+|:------------------:|------------------------------|:-------------------------------------------------------------------------------------------------------------|:------------------------------------------------------|
+| `make dirs`        | `dirs` (list of strings)     | Creates the directories specified, and their parents if they don't exist                                     | OS-level error happens at creating a directory        |
+| `shell`            | `command` (string)           | Execute `command` in a shell                                                                                 | Non-zero return                                       |
+| `shell all`        | `commands` (list of strings) | Execute every command in order                                                                               | At least one command returns non-zero                 |
+| `shell any`        | `commands` (list of strings) | Execute the commands in order until one succeeds                                                             | None of the commands returns zero                     |

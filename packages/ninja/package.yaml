@@ -6,8 +6,8 @@ prepare:
       - "$PACKAGE_DIR/get-ninja.sh"
       - "unzip ninja-linux.zip"
 install:
-  - action: make folders
-    folders:
+  - action: make dirs
+    dirs:
       - "$HOME/bin"
   - action: copy
     file: "$TEMPORARY_DIR/ninja"

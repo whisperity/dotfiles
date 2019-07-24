@@ -16,11 +16,28 @@ class Install(_StageBase, ShellCommandsMixin):
         super().__init__(package)
         self.expand_args = arg_expand
 
-    def make_folders(self, folders):
-        for folder in folders:
-            folder = os.path.expandvars(folder)
-            print("    ---\\ Creating output folder '%s'" % folder)
-            os.makedirs(folder, exist_ok=True)
+    def make_dirs(self, dirs):
+        """
+        Creates the specified directories (and their parents if they don't
+        exist).
+        """
+        # TODO: Uninstall equivalent: remove every directory if they are not
+        #       empty, incl. all the parents created at this point.
+        for dir in dirs:
+            # Calculate which dirs would be created if they don't exist yet.
+            path_parts = []
+            head, tail = dir, ''
+            while head:
+                # Expand the environment variables only at expansion and not
+                # for the iteration so we don't walk back up until /.
+                path_parts.append(self.expand_args(head))
+                head, tail = os.path.split(head)
+
+            print("[DEBUG] Action tries creating dirs:", path_parts)
+
+            os.makedirs(self.expand_args(dir), exist_ok=True)
+
+        return True
 
     def extract_multiple(self, root, files):
         from_root_folder = root
