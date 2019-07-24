@@ -2,12 +2,12 @@ description: Vim status line
 dependencies:
   - vim.pathogen
 prepare:
-  - kind: git clone
+  - action: git clone
     remote: "http://github.com/vim-airline/vim-airline"
 install:
-  - kind: copy tree
+  - action: copy tree
     folder: "$TEMPORARY_DIR/vim-airline"
     to: "$HOME/.vim/bundle/vim-airline"
-  - kind: copy
+  - action: copy
     file: config.vim
     to: "$HOME/.vim/config/vim-airline.vim"

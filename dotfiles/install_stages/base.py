@@ -6,17 +6,21 @@ class _StageBase:
     def __init__(self, for_package):
         self.package_name = for_package
 
-    def __call__(self, kind, **kwargs):
-        # TODO: Rename 'kind' to something more sensible.
+    def __call__(self, action, **kwargs):
         """
         Dispatch the actual execution of the action
         """
-        kind = kind.replace(' ', '_')
+        if action.startswith('_'):
+            raise AttributeError("Invalid action '%s' requested: do not try "
+                                 "accessing execution engine internals!"
+                                 % action)
+
+        action = action.replace(' ', '_')
         try:
-            func = getattr(self, kind)
+            func = getattr(self, action)
         except AttributeError:
-            raise AttributeError("Invalid directive '%s' for package stage "
-                                 "'%s'!" % (kind, type(self).__name__))
+            raise AttributeError("Invalid action '%s' for package stage "
+                                 "'%s'!" % (action, type(self).__name__))
 
         args = {k.replace(' ', '_'): v for k, v in kwargs.items()}
         return func(**args)

@@ -1,20 +1,20 @@
 description: Installs Vim, a pluginable command-line text editor
 superuser: true
 prepare:
-  - kind: git clone
+  - action: git clone
     remote: "http://github.com/tomasr/molokai.git"
 install:
-  - kind: shell
+  - action: shell
     command: "sudo apt-get install -y vim"
-  - kind: make folders
+  - action: make folders
     folders:
       - "$HOME/.vim"
       - "$HOME/.vim/colors"
-  - kind: extract multiple
+  - action: extract multiple
     files:
       - .vimrc
       - .vim/init.vim
     root: HOME
-  - kind: copy
+  - action: copy
     file: "$TEMPORARY_DIR/molokai/colors/molokai.vim"
     to: "$HOME/.vim/colors/molokai.vim"

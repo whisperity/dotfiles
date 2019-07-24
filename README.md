@@ -105,17 +105,17 @@ Action directives are laid out in the package descriptor YAML file as
 shown below.
 Each phase has a **list** of key-value tuples, which will be executed _in the
 order_ they are added.
-Each tuple must have a **`kind`** arguments which defines what sort of action
-to run.
-The rest of the arguments are specific to the _`kind`_ specified.
+Each tuple must have an **`action`** argument which defines the type/kind of
+the action to run.
+The rest of the arguments are specific to the _`action`_ specified.
 
-> **TODO:** Rename `kind` to `action` or something!
 
 ```yaml
 prepare:
-    - kind: shell
+    - action: shell
       command: echo "True"
 ```
+
 
 #### `prepare` (optional)
 

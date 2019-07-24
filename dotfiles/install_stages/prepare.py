@@ -22,7 +22,7 @@ class Prepare(_StageBase, ShellCommandsMixin):
     def temp_path(self):
         return self._prefetch_dir
 
-    def cleanup(self):
+    def _cleanup(self):
         """
         Executes the cleanup action for the instance.
         """

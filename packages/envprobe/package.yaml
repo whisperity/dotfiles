@@ -3,19 +3,19 @@ description: Envprobe is a Shell environment variable management tool written
 dependencies:
   - basic
 prepare:
-  - kind: shell all
+  - action: shell all
     commands:
       - "wget https://api.github.com/repos/whisperity/envprobe/tarball/master -O envprobe.tar.gz"
       - "tar -xf envprobe.tar.gz"
       - "mv whisperity-envprobe-* envprobe"
 install:
-  - kind: make folders
+  - action: make folders
     folders:
       - "$HOME/.bash.d"
       - "$HOME/opt"
-  - kind: copy tree
+  - action: copy tree
     folder: "$TEMPORARY_DIR/envprobe"
     to: "$HOME/opt/envprobe"
-  - kind: copy
+  - action: copy
     file: envprobe.sh
     to: "$HOME/.bash.d/zzzzzz_loadlast_envprobe.sh"

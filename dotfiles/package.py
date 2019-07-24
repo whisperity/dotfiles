@@ -132,7 +132,7 @@ class Package:
         self._teardown = []
 
         with open(datafile_path, 'r') as datafile:
-            # TODO: Validate contents for action kinds and such.
+            # TODO: At least basically try validating contents of the file.
             self._data = load_yaml(datafile, Loader=Loader)
 
         self._expander = ArgumentExpander()
@@ -264,7 +264,7 @@ class Package:
                                               executor.temp_path)
             # Register that temporary files were created and should be
             # cleaned up later.
-            self._teardown.append(executor.cleanup)
+            self._teardown.append(getattr(executor, '_cleanup'))
 
             # Start the execution from the temporary download/prepare folder.
             os.chdir(executor.temp_path)

@@ -4,24 +4,24 @@ dependencies:
   - basic
 superuser: true
 prepare:
-  - kind: shell all
+  - action: shell all
     commands:
       - "$PACKAGE_DIR/bat.sh"
       - "$PACKAGE_DIR/exa.sh"
       - "$PACKAGE_DIR/fd.sh"
       - "$PACKAGE_DIR/hexyl.sh"
 install:
-  - kind: shell all
+  - action: shell all
     commands:
       - "sudo dpkg --install $TEMPORARY_DIR/fd.deb"
       - "sudo dpkg --install $TEMPORARY_DIR/bat.deb"
       - "sudo dpkg --install $TEMPORARY_DIR/hexyl.deb"
-  - kind: make folders
+  - action: make folders
     folders:
       - "$HOME/bin"
-  - kind: copy
+  - action: copy
     file: "$TEMPORARY_DIR/exa"
     to: "$HOME/bin/exa"
-  - kind: copy
+  - action: copy
     file: exa_aliases.sh
     to: "$HOME/.bash.d/exa.sh"

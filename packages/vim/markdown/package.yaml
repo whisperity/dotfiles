@@ -2,9 +2,9 @@ description: Vim Markdown support
 dependencies:
   - vim.pathogen
 prepare:
-  - kind: git clone
+  - action: git clone
     remote: "http://github.com/plasticboy/vim-markdown"
 install:
-  - kind: copy tree
+  - action: copy tree
     folder: "$TEMPORARY_DIR/vim-markdown"
     to: "$HOME/.vim/bundle/vim-markdown"
