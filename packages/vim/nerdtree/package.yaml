@@ -6,7 +6,7 @@ prepare:
     repository: "http://github.com/scrooloose/nerdtree"
 install:
   - action: copy tree
-    folder: "$TEMPORARY_DIR/nerdtree"
+    dir: "$TEMPORARY_DIR/nerdtree"
     to: "$HOME/.vim/bundle/nerdtree"
   - action: copy
     file: config.vim

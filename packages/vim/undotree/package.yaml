@@ -6,7 +6,7 @@ prepare:
     repository: "http://github.com/mbbill/undotree"
 install:
   - action: copy tree
-    folder: "$TEMPORARY_DIR/undotree"
+    dir: "$TEMPORARY_DIR/undotree"
     to: "$HOME/.vim/bundle/undotree"
   - action: copy
     file: config.vim

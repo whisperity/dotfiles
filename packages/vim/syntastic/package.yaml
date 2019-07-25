@@ -6,7 +6,7 @@ prepare:
     repository: "http://github.com/scrooloose/syntastic"
 install:
   - action: copy tree
-    folder: "$TEMPORARY_DIR/syntastic"
+    dir: "$TEMPORARY_DIR/syntastic"
     to: "$HOME/.vim/bundle/syntastic"
   - action: copy
     file: config.vim

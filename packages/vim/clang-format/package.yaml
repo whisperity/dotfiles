@@ -6,7 +6,7 @@ prepare:
     repository: "http://github.com/rhysd/vim-clang-format"
 install:
   - action: copy tree
-    folder: "$TEMPORARY_DIR/vim-clang-format"
+    dir: "$TEMPORARY_DIR/vim-clang-format"
     to: "$HOME/.vim/bundle/vim-clang-format"
   - action: copy
     file: config.vim

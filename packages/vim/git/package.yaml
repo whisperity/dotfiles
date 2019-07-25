@@ -8,8 +8,8 @@ prepare:
     repository: "http://github.com/airblade/vim-gitgutter"
 install:
   - action: copy tree
-    folder: "$TEMPORARY_DIR/vim-fugitive"
+    dir: "$TEMPORARY_DIR/vim-fugitive"
     to: "$HOME/.vim/bundle/vim-fugitive"
   - action: copy tree
-    folder: "$TEMPORARY_DIR/vim-gitgutter"
+    dir: "$TEMPORARY_DIR/vim-gitgutter"
     to: "$HOME/.vim/bundle/vim-clafugitive"

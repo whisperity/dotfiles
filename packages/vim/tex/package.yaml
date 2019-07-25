@@ -6,5 +6,5 @@ prepare:
     repository: "http://github.com/lervag/vimtex"
 install:
   - action: copy tree
-    folder: "$TEMPORARY_DIR/vimtex"
+    dir: "$TEMPORARY_DIR/vimtex"
     to: "$HOME/.vim/bundle/vimtex"

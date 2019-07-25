@@ -6,7 +6,7 @@ prepare:
     repository: "http://github.com/vim-airline/vim-airline"
 install:
   - action: copy tree
-    folder: "$TEMPORARY_DIR/vim-airline"
+    dir: "$TEMPORARY_DIR/vim-airline"
     to: "$HOME/.vim/bundle/vim-airline"
   - action: copy
     file: config.vim

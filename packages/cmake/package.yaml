@@ -18,7 +18,7 @@ install:
       - "$HOME/bin"
       - "$HOME/opt"
   - action: copy tree
-    folder: "$TEMPORARY_DIR/cmake"
+    dir: "$TEMPORARY_DIR/cmake"
     to: "$HOME/opt/cmake"
   - action: shell
     command: "cd $HOME/bin; ln -s ../opt/cmake/bin/* ."

@@ -6,5 +6,5 @@ prepare:
     repository: "http://github.com/plasticboy/vim-markdown"
 install:
   - action: copy tree
-    folder: "$TEMPORARY_DIR/vim-markdown"
+    dir: "$TEMPORARY_DIR/vim-markdown"
     to: "$HOME/.vim/bundle/vim-markdown"

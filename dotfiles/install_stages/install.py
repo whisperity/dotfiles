@@ -83,16 +83,19 @@ class Install(_StageBase, ShellCommandsMixin):
                 target = os.path.join(dirn, prefix + filen)
 
             print("[DEBUG] Unconditionally copied '%s' to '%s'"
-                  % (os.path.abspath(file), target))
-            shutil.copy(file, target)
+                  % (os.path.abspath(source), target))
+            shutil.copy(source, target)
 
-    def copy_tree(self, folder, to):
-        # TODO: Revise this.
-        from_folder = self.expand_args(folder)
-        to_folder = self.expand_args(to)
-        print("    ---> Copying folder '%s' to '%s'"
-              % (from_folder, to_folder))
-        shutil.copytree(from_folder, to_folder)
+    def copy_tree(self, dir, to):
+        """
+        Copies the entire contents of the source 'dir' to the 'to' directory.
+        The destination directory must not exist.
+        """
+        # TODO: Inverse operation is the unconditional removal of the tree.
+        dir = self.expand_args(dir)
+        to = self.expand_args(to)
+        print("[DEBUG] Copy tree '%s' to '%s" % (dir, to))
+        shutil.copytree(dir, to)
 
     def overwrite_(self, *l, **d):
         # TODO: Write this

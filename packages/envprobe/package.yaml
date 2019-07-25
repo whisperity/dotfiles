@@ -14,7 +14,7 @@ install:
       - "$HOME/.bash.d"
       - "$HOME/opt"
   - action: copy tree
-    folder: "$TEMPORARY_DIR/envprobe"
+    dir: "$TEMPORARY_DIR/envprobe"
     to: "$HOME/opt/envprobe"
   - action: copy
     file: envprobe.sh

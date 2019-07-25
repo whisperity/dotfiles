@@ -6,7 +6,7 @@ prepare:
     repository: "http://github.com/magicmonty/bash-git-prompt"
 install:
   - action: copy tree
-    folder: "$TEMPORARY_DIR/bash-git-prompt"
+    dir: "$TEMPORARY_DIR/bash-git-prompt"
     to: "$HOME/.bash.d/git-prompt"
   - action: copy
     file: git-prompt.sh
