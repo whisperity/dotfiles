@@ -37,14 +37,28 @@ class Install(_StageBase, ShellCommandsMixin):
 
             os.makedirs(self.expand_args(dir), exist_ok=True)
 
+    def _calculate_copy_target(self, source, to, prefix=''):
+        """
+        Helper method that calculates what a copy/replace operation with the
+        parameters will actually refer as target.
+        """
+        target = to
+
+        if prefix:
+            target = os.path.join(to, os.path.basename(source))
+            dirn, filen = os.path.split(target)
+            target = os.path.join(dirn, prefix + filen)
+
+        return target
+
     def copy(self, to, file=None, files=None, prefix=''):
         """
         Copies one or multiple files from one place to another.
 
         This method is considered the unconditional copy, which inverse
         operation is the removal of a file.
-        (For the version which can restore the version before the copy, see
-        `overwrite` action.)
+        (For the version which can restore the version before the copy, see the
+        `replace` action.)
 
         If `file` is specified, it is an existing file, assumed to be relative
         to the current directory, if necessary.
@@ -75,15 +89,11 @@ class Install(_StageBase, ShellCommandsMixin):
 
         for file in (files if files else [file]):
             source = self.expand_args(file)
-            target = to
+            target = self.expand_args(
+                self._calculate_copy_target(source, to, prefix))
 
-            if prefix:
-                target = os.path.join(to, os.path.basename(source))
-                dirn, filen = os.path.split(target)
-                target = os.path.join(dirn, prefix + filen)
-
-            print("[DEBUG] Unconditionally copied '%s' to '%s'"
-                  % (os.path.abspath(source), target))
+            print("[DEBUG] Unconditionally copied '%s (%s)' to '%s'"
+                  % (source, os.path.abspath(source), target))
             shutil.copy(source, target)
 
     def copy_tree(self, dir, to):
@@ -97,9 +107,30 @@ class Install(_StageBase, ShellCommandsMixin):
         print("[DEBUG] Copy tree '%s' to '%s" % (dir, to))
         shutil.copytree(dir, to)
 
-    def overwrite_(self, *l, **d):
-        # TODO: Write this
-        pass
+    def replace(self, at, with_file=None, with_files=None, prefix=''):
+        """
+        Replaces a file with another file specified, or in a directory a list
+        of files with the files specified.
+
+        This method is considered a reversible copy, which inverse
+        operation is restoring the version of the file that existed before..
+        (For the version which does not restore, see the `copy` action.)
+
+        Copying the file is done by executing `copy` with the following
+        argument mapping:
+            * at -> to
+            * with_file[s] -> file[s]
+            * prefix -> prefix
+        """
+        for file in (with_files if with_files else [with_file]):
+            target = self.expand_args(self._calculate_copy_target(
+                self.expand_args(file), at, prefix))
+
+            print("[DEBUG] Replacing happens for file '%s'..." % target)
+
+            # TODO: Save backup.
+
+            self.copy(to=target, file=file, prefix=prefix)
 
     # TODO: Refactor user-given variables to be loaded from memory, not from
     #       a file.
