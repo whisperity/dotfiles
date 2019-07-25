@@ -1,28 +1,28 @@
 description: Basic user environment files. (This package is initially tailored
   for use on a default Ubuntu 16.04 or 18.04 user account.)
 prepare:
-  - kind: prompt user
+  - action: prompt user
     description: The name with which your Git commits will be authored.
     short name: git-user.name
     variable: GIT_USERNAME
-  - kind: prompt user
+  - action: prompt user
     description: The e-mail address with which your Git commits will be authored.
     short name: git-user.email
     variable: GIT_USEREMAIL
 install:
-  - kind: extract multiple
+  - action: copy
     files:
-      - .bashrc
-      - .bash_aliases
-      - .gitconfig
-      - .profile
-    root: HOME
-  - kind: make folders
-    folders:
+      - bashrc
+      - bash_aliases
+      - gitconfig
+      - profile
+    to: $HOME
+    prefix: '.'
+  - action: make dirs
+    dirs:
       - "$HOME/.ssh"
-  - kind: extract multiple
-    files:
-      - ".ssh/unlock-all"
-    root: HOME
-  - kind: replace user input
+  - action: copy
+    file: ssh/unlock-all
+    to: "$HOME/.ssh/unlock-all"
+  - action: replace user input
     file: $HOME/.gitconfig

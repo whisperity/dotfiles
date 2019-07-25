@@ -2,12 +2,12 @@ description: File system directory tree plugin for Vim
 dependencies:
   - vim.pathogen
 prepare:
-  - kind: git clone
-    remote: "http://github.com/scrooloose/nerdtree"
+  - action: git clone
+    repository: "http://github.com/scrooloose/nerdtree"
 install:
-  - kind: copy tree
-    folder: "$TEMPORARY_DIR/nerdtree"
+  - action: copy tree
+    dir: "$TEMPORARY_DIR/nerdtree"
     to: "$HOME/.vim/bundle/nerdtree"
-  - kind: copy
+  - action: copy
     file: config.vim
     to: "$HOME/.vim/config/nerdtree.vim"

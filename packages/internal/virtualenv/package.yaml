@@ -5,5 +5,5 @@ dependencies:
   - python.virtualenv
 support: true
 install:
-  - kind: shell
+  - action: shell
     command: "$HOME/opt/virtualenv/virtualenv_s.py --python $(which python3) $SESSION_DIR/dotfiles-venv"

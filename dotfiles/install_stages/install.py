@@ -3,73 +3,134 @@ import re
 import shutil
 import sys
 
-from .common_shell import ShellCommandsMixin
+from .base import _StageBase
+from .shell_mixin import ShellCommandsMixin
 
 
-class Install(ShellCommandsMixin):
+class Install(_StageBase, ShellCommandsMixin):
     """
     The prefetch stage is responsible for preparing the package for use, most
     often downloading external content or dependencies.
     """
     def __init__(self, package, arg_expand):
-        self.package_name = package.name
+        super().__init__(package)
         self.expand_args = arg_expand
 
-    def execute_command(self, action):
-        name = action['kind'].replace(' ', '_')
-        args = {k.replace(' ', '_'): action[k]
-                for k in action
-                if k != 'kind'}
-        func = getattr(self, name)
-        func(**args)
+    def make_dirs(self, dirs):
+        """
+        Creates the specified directories (and their parents if they don't
+        exist).
+        """
+        # TODO: Uninstall equivalent: remove every directory if they are not
+        #       empty, incl. all the parents created at this point.
+        for dir in dirs:
+            # Calculate which dirs would be created if they don't exist yet.
+            path_parts = []
+            head, tail = dir, ''
+            while head:
+                # Expand the environment variables only at expansion and not
+                # for the iteration so we don't walk back up until /.
+                path_parts.append(self.expand_args(head))
+                head, tail = os.path.split(head)
 
-    def make_folders(self, folders):
-        for folder in folders:
-            folder = os.path.expandvars(folder)
-            print("    ---\\ Creating output folder '%s'" % folder)
-            os.makedirs(folder, exist_ok=True)
+            print("[DEBUG] Action tries creating dirs:", path_parts)
 
-    def extract_multiple(self, root, files):
-        from_root_folder = root
-        to_root_folder = os.path.expandvars('$' + root)
-        print("    ---: Copying files from '%s' to '%s'"
-              % (from_root_folder, to_root_folder))
+            os.makedirs(self.expand_args(dir), exist_ok=True)
 
-        for f in files:
-            print("       :- %s" % f)
-            shutil.copy(os.path.join(from_root_folder, f),
-                        os.path.join(to_root_folder, f))
+    def _calculate_copy_target(self, source, to, prefix=''):
+        """
+        Helper method that calculates what a copy/replace operation with the
+        parameters will actually refer as target.
+        """
+        target = to
 
-    def copy(self, file, to):
-        from_file = self.expand_args(file)
-        to_file = self.expand_args(to)
-        print("    ---> Copying file '%s' to '%s'"
-              % (from_file, to_file))
-        shutil.copy(from_file, to_file)
+        if prefix:
+            target = os.path.join(to, os.path.basename(source))
+            dirn, filen = os.path.split(target)
+            target = os.path.join(dirn, prefix + filen)
 
-    def copy_tree(self, folder, to):
-        from_folder = self.expand_args(folder)
-        to_folder = self.expand_args(to)
-        print("    ---> Copying folder '%s' to '%s'"
-              % (from_folder, to_folder))
-        shutil.copytree(from_folder, to_folder)
+        return target
 
-    def append(self, file, to):
-        from_file = self.expand_args(file)
-        to_file = self.expand_args(to)
-        print("    ---> Appending package file '%s' to '%s'"
-              % (from_file, to_file))
-        with open(to_file, 'a') as to:
-            with open(from_file, 'r') as in_file:
-                to.write(in_file.read())
+    def copy(self, to, file=None, files=None, prefix=''):
+        """
+        Copies one or multiple files from one place to another.
 
-    def append_text(self, text, to):
-        to_file = self.expand_args(to)
-        print("    ---> Appending text to '%s'"
-              % (to_file))
-        with open(to_file, 'a') as to:
-            to.write(text)
-            to.write('\n')
+        This method is considered the unconditional copy, which inverse
+        operation is the removal of a file.
+        (For the version which can restore the version before the copy, see the
+        `replace` action.)
+
+        If `file` is specified, it is an existing file, assumed to be relative
+        to the current directory, if necessary.
+        In this case, `to` is either the destination file path (cannot be
+        relative), or the destination directory (cannot be relative) in which
+        case the file's name will be retained.
+
+        If `files` is specified, it is a list of files.
+        In this case, `to` must be a destination directory, which must already
+        exist.
+        In this case, `prefix` may be specified, and it will be prepended to
+        every destination file's name.
+        """
+        if file and files:
+            raise NameError("Copy must specify either (file, to) or "
+                            "(files, to).")
+        if file and prefix:
+            raise NameError("If only a single file is specified, use the 'to' "
+                            "argument to specify the whole destination name!")
+
+        to = self.expand_args(to)
+        if os.path.abspath(to) != to:
+            raise ValueError("'to' must be given as an absolute PATH")
+
+        if files and not os.path.isdir(to):
+            raise NotADirectoryError("'to' must be an existing directory when "
+                                     "copying multiple files.")
+
+        for file in (files if files else [file]):
+            source = self.expand_args(file)
+            target = self.expand_args(
+                self._calculate_copy_target(source, to, prefix))
+
+            print("[DEBUG] Unconditionally copied '%s (%s)' to '%s'"
+                  % (source, os.path.abspath(source), target))
+            shutil.copy(source, target)
+
+    def copy_tree(self, dir, to):
+        """
+        Copies the entire contents of the source 'dir' to the 'to' directory.
+        The destination directory must not exist.
+        """
+        # TODO: Inverse operation is the unconditional removal of the tree.
+        dir = self.expand_args(dir)
+        to = self.expand_args(to)
+        print("[DEBUG] Copy tree '%s' to '%s" % (dir, to))
+        shutil.copytree(dir, to)
+
+    def replace(self, at, with_file=None, with_files=None, prefix=''):
+        """
+        Replaces a file with another file specified, or in a directory a list
+        of files with the files specified.
+
+        This method is considered a reversible copy, which inverse
+        operation is restoring the version of the file that existed before..
+        (For the version which does not restore, see the `copy` action.)
+
+        Copying the file is done by executing `copy` with the following
+        argument mapping:
+            * at -> to
+            * with_file[s] -> file[s]
+            * prefix -> prefix
+        """
+        for file in (with_files if with_files else [with_file]):
+            target = self.expand_args(self._calculate_copy_target(
+                self.expand_args(file), at, prefix))
+
+            print("[DEBUG] Replacing happens for file '%s'..." % target)
+
+            # TODO: Save backup.
+
+            self.copy(to=target, file=file, prefix=prefix)
 
     # TODO: Refactor user-given variables to be loaded from memory, not from
     #       a file.

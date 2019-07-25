@@ -3,9 +3,9 @@ dependencies:
   - bash
 superuser: true
 install:
-  - kind: shell
+  - action: shell
     command: "sudo apt-get install -y --no-install-recommends ccache"
-  - kind: copy
+  - action: copy
     file: enable-ccache.sh
     to: "$HOME/.bash.d/enable-ccache.sh"
 

@@ -5,7 +5,7 @@ description: CMake is a cross-platform open-source build system designed to
 dependencies:
   - internal.virtualenv
 prepare:
-  - kind: shell multiple
+  - action: shell all
     commands:
       - "bash -c 'source $SESSION_DIR/dotfiles-venv/bin/activate; pip install bs4 lxml'"
       - "bash -c 'source $SESSION_DIR/dotfiles-venv/bin/activate; $PACKAGE_DIR/select-latest-version.py > $TEMPORARY_DIR/url.txt'"
@@ -13,12 +13,12 @@ prepare:
       - "tar -xf cmake.tar.gz"
       - "mv cmake-* cmake"
 install:
-  - kind: make folders
-    folders:
+  - action: make dirs
+    dirs:
       - "$HOME/bin"
       - "$HOME/opt"
-  - kind: copy tree
-    folder: "$TEMPORARY_DIR/cmake"
+  - action: copy tree
+    dir: "$TEMPORARY_DIR/cmake"
     to: "$HOME/opt/cmake"
-  - kind: shell
+  - action: shell
     command: "cd $HOME/bin; ln -s ../opt/cmake/bin/* ."

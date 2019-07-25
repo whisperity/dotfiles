@@ -2,12 +2,12 @@ description: Vim syntax checking extension
 dependencies:
   - vim.pathogen
 prepare:
-  - kind: git clone
-    remote: "http://github.com/scrooloose/syntastic"
+  - action: git clone
+    repository: "http://github.com/scrooloose/syntastic"
 install:
-  - kind: copy tree
-    folder: "$TEMPORARY_DIR/syntastic"
+  - action: copy tree
+    dir: "$TEMPORARY_DIR/syntastic"
     to: "$HOME/.vim/bundle/syntastic"
-  - kind: copy
+  - action: copy
     file: config.vim
     to: "$HOME/.vim/config/syntastic.vim"

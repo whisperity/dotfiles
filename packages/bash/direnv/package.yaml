@@ -4,8 +4,8 @@ dependencies:
   - basic
 superuser: true
 install:
-  - kind: shell
+  - action: shell
     command: "sudo apt-get install -y --no-install-recommends direnv"
-  - kind: copy
+  - action: copy
     file: direnv.sh
     to: "$HOME/.bash.d/direnv.sh"

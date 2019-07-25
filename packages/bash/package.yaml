@@ -2,6 +2,6 @@ description: Sets up the necessary environment for Bash subpackages.
 dependencies:
   - basic
 install:
-  - kind: make folders
-    folders:
+  - action: make dirs
+    dirs:
       - "$HOME/.bash.d"

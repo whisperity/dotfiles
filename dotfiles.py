@@ -29,6 +29,12 @@ parser.add_argument(
     help="The package name(s) to install. See the list of available packages "
          "by specifying no package names.")
 
+# TODO: Support multiple roots.
+
+# TODO: Support not clearing temporaries for debug purposes.
+
+# TODO: Verbosity switch?
+
 args = parser.parse_args()
 
 # -----------------------------------------------------------------------------
@@ -245,7 +251,7 @@ while PACKAGES_TO_INSTALL:
         print("Installing '%s'..." % instance.name)
         instance.execute_install()
     except Exception as e:
-        print("Failed to prepare '%s' for installation!"
+        print("Failed to install '%s'!"
               % instance.name, file=sys.stderr)
         print(e)
         import traceback
@@ -261,7 +267,3 @@ while PACKAGES_TO_INSTALL:
         if not instance.is_support:
             # Save that the package was installed.
             get_user_save().save_status(instance)
-
-    if not instance.clean_temporaries():
-        print("Failed to clean installation temporaries for '%s'"
-              % instance.name, file=sys.stderr)
