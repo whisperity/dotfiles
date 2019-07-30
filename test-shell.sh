@@ -2,18 +2,15 @@
 # Create a temporary HOME directory and run a shell there to test Dotfiles
 # without having to mess up the user's real home.
 
-clear
-
 TEMPHOME=$(mktemp -d)
-CUR_DIR=$(pwd)
 
-cd ${TEMPHOME}
+pushd ${TEMPHOME}
 touch .is_dotfiles_temporary_home \
-    .sudo_as_admin_successful
+    .sudo_as_admin_successful       # Don't show the Ubuntu default message...
+popd
 
-cd ${CUR_DIR}
+clear
+HOME="${TEMPHOME}" bash
 
-HOME="${TEMPHOME}" bash -l
-
+# Cleanup.
 rm -rf "${TEMPHOME}"
-

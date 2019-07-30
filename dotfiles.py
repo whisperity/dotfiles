@@ -7,6 +7,31 @@ import json
 import shutil
 import subprocess
 import sys
+import textwrap
+
+try:
+    from tabulate import tabulate
+except ImportError:
+    import sys
+    print("The tabulate package for the current Python interpreter cannot be "
+          "loaded.\n"
+          "Please run 'bootstrap.sh' from the directory of Dotfiles project "
+          "to try and fix this.",
+          file=sys.stderr)
+    print("Will use a more ugly version of output tables as fallback...",
+          file=sys.stderr)
+
+    def tabulate(table, *args, **kwargs):
+        """
+        An ugly fallback for the table pretty-printer if 'tabulate' module is
+        not available.
+        """
+        if 'headers' in kwargs:
+            print('|', '        | '.join(kwargs['headers']), '       |')
+        for row in table:
+            for i, col in enumerate(row):
+                row[i] = col.replace('\n', ' ')
+            print('|', '        | '.join(row), '       |')
 
 from dotfiles import argument_expander
 from dotfiles import package
@@ -16,18 +41,52 @@ from dotfiles.saved_data import get_user_save
 
 
 if __name__ != "__main__":
+    # This script is a user-facing entry point.
     raise ImportError("Do not use this as a module!")
 
-parser = argparse.ArgumentParser(
+PARSER = argparse.ArgumentParser(
     prog='dotfiles',
-    description="Install work environment packages from this repository.")
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    description="""Installer program that handles installing user environment
+                   configuration files and associated tools.""")
 
-parser.add_argument(
-    'PACKAGE',
-    nargs='*',
-    type=str,
-    help="The package name(s) to install. See the list of available packages "
-         "by specifying no package names.")
+ACTION = PARSER.add_argument_group("action arguments")
+ACTION = ACTION.add_mutually_exclusive_group()
+
+ACTION.add_argument('-l', '--list',
+                    dest='action',
+                    action='store_const',
+                    const='LIST',
+                    default=False,
+                    help="""Lists packages that could be installed from the
+                            current repository, or are installed on the system
+                            and could be uninstalled. This is the default
+                            action if no package names are specified.""")
+
+ACTION.add_argument('-i', '--install',
+                    dest='action',
+                    action='store_const',
+                    const='INSTALL',
+                    default=True,
+                    help="""Installs the specified packages. This is the
+                            default action if at least one package name is
+                            specified.""")
+
+ACTION.add_argument('-u', '--uninstall',
+                    dest='action',
+                    action='store_const',
+                    const='REMOVE',
+                    default=False,
+                    help="""Uninstall the specified packages. (THIS IS NOT
+                            WORKING YET!)""")
+
+PARSER.add_argument('package_names',
+                    nargs='*',
+                    metavar='package',
+                    type=str,
+                    help="""The name of the packages that should be
+                            (un)installed. All subpackages in a package group
+                            can be selected by saying 'group.*'.""")
 
 # TODO: Support multiple roots.
 
@@ -35,7 +94,15 @@ parser.add_argument(
 
 # TODO: Verbosity switch?
 
-args = parser.parse_args()
+ARGS = PARSER.parse_args()
+
+# Handle the default case if the user did not specify an action.
+if not isinstance(ARGS.action, str):
+    if not ARGS.package_names:
+        ARGS.action = 'LIST'
+    else:
+        ARGS.action = 'INSTALL'
+
 
 # -----------------------------------------------------------------------------
 
@@ -75,47 +142,54 @@ for lname in package.get_package_names(package.Package.package_directory):
     # instantiated yet.
     PACKAGES[lname] = None
 
-# -----------------------------------------------------------------------------
-
-# Handle printing the list of packages if the user didn't specify anything to
-# install.
-# TODO: Make a better format for this.
-if len(args.PACKAGE) == 0:
-    print("Listing available packages...")
-
-    for logical_name in sorted(PACKAGES):
-        instance = PACKAGES[logical_name]
-        if instance.is_support:
-            continue
-
-        print("    - %s" % instance.name, end='')
-        if get_user_save().is_installed(instance.name):
-            print("       (installed)", end='')
-
-        if instance.description:
-            print()  # Put a linebreak here too.
-            print("          %s" % instance.description, end='')
-
-        print()  # Linebreak.
-
-    sys.exit(0)
-
-# -----------------------------------------------------------------------------
-# Sanitise user input.
-
-if any(['internal' in name for name in args.PACKAGE]):
+if any(['internal' in name for name in ARGS.package_names]):
     print("'internal' a support package group that is not to be directly "
           "installed, its life is restricted to helping other packages' "
           "installation process!", file=sys.stderr)
     sys.exit(1)
 
 PACKAGES_TO_INSTALL = deque(argument_expander.package_glob(PACKAGES.keys(),
-                                                           args.PACKAGE))
+                                                           ARGS.package_names))
+
+# -----------------------------------------------------------------------------
+
+# Handle printing the list of packages if the user didn't specify anything to
+# install.
+if ARGS.action == 'LIST':
+    if not PACKAGES_TO_INSTALL:
+        # If the user did not filter the packages to list, list everything.
+        PACKAGES_TO_INSTALL = PACKAGES.keys()
+
+    headers = ["St", "Package", "Description"]
+    table = []
+    for package_name in sorted(PACKAGES_TO_INSTALL):
+        try:
+            instance = PACKAGES[package_name]
+        except KeyError:
+            table.append(['???', package_name,
+                          "ERROR: This package doesn't exist!"])
+            continue
+
+        if instance.is_support:
+            continue
+
+        status = 'ins' if instance.is_installed else ''
+
+        # Make sure the description isn't too long.
+        description = instance.description if instance.description else ''
+        description = textwrap.fill(description, width=40)
+
+        table.append([status, instance.name, description])
+
+    print(tabulate(table, headers=headers, tablefmt='fancy_grid'))
+
+    sys.exit(0)
+
+# -----------------------------------------------------------------------------
 
 
 def _die_for_invalid_packages():
-    invalid_packages = [package for package in PACKAGES_TO_INSTALL
-                        if package not in PACKAGES]
+    invalid_packages = [p for p in PACKAGES_TO_INSTALL if p not in PACKAGES]
     if invalid_packages:
         print("ERROR: Specified to install packages that are not available!",
               file=sys.stderr)
@@ -125,9 +199,6 @@ def _die_for_invalid_packages():
 
 
 _die_for_invalid_packages()
-
-
-# -----------------------------------------------------------------------------
 
 # Check the dependencies of the packages the user wanted to install and create
 # a sensible order of package installations.

@@ -39,7 +39,7 @@ then
     # (If we are already asking the user to sudo, they might just as well
     # install the dependencies we need...)
     echo "    apt-get install --no-install-recommends python3-distutils" \
-         "python3-yaml"
+         "python3-tabulate python3-yaml"
     echo "in superuser mode. On other systems, please find the equivalent of" \
          "this package."
     echo
@@ -49,6 +49,18 @@ then
     exit 1
 fi
 
+
+# Check if the Python interpreter has 'tabulate' available.
+CHECK_TABULATE_EXISTS=$(echo "test" | /usr/bin/env python3 -m tabulate 2>&1 | grep "No module named tabulate$")
+if [[ ! -z "${CHECK_TABULATE_EXISTS}" ]]
+then
+    echo "Warning: Your system does not have 'python3-tabulate' installed."
+    echo
+    echo "Will try to fix this..."
+else
+    echo "TABULATE support seems to be installed."
+    HAVE_TABULATE=1
+fi
 
 # Check if the Python interpreter has 'yaml' available.
 CHECK_YAML_EXISTS=$(/usr/bin/env python3 -m yaml 2>&1 | grep "No module named yaml$")
@@ -63,7 +75,7 @@ else
     HAVE_YAML=1
 fi
 
-if [[ $HAVE_YAML -eq 1 ]]
+if [[ $HAVE_TABULATE -eq 1 && $HAVE_YAML -eq 1 ]]
 then
     echo
     echo "Every dependency is satisfied in the current environment."
@@ -159,6 +171,7 @@ unset PYTHONPATH
 echo
 echo "Installing PyPI packages required..."
 source "$(get_script_location)/venv/bin/activate"
+pip install tabulate || { echo "Failed to install 'tabulate'!"; exit 1; }
 pip install pyyaml || { echo "Failed to install 'pyyaml'!"; exit 1; }
 deactivate
 
