@@ -291,6 +291,31 @@ class Package:
 
         self._status = Status.INSTALLED
 
+    @property
+    def has_uninstall_actions(self):
+        """
+        :return: If there are uninstall actions present for the current
+        package.
+        """
+        return self._status == Status.INSTALLED and \
+            'uninstall' in self._data
+
+    @_StatusRequirementDecorator(Status.INSTALLED)
+    @restore_working_directory
+    def execute_uninstall(self):
+        if self.has_uninstall_actions:
+            executor = install_stages.uninstall.Uninstall(self, self._expander)
+
+            # Start the execution in the user's home diretory.
+            os.chdir(os.path.expanduser('~'))
+
+            for step in self._data.get('uninstall'):
+                if not executor(**step):
+                    self.set_failed()
+                    raise ExecutorError(self, 'uninstall', step)
+
+        self._status = Status.NOT_INSTALLED
+
     def clean_temporaries(self):
         """
         Remove potential TEMPORARY files that were created during install

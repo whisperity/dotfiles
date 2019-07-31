@@ -312,7 +312,35 @@ def _uninstall(p, package_names):
     """
     Actually perform removal of the packages specified.
     """
-    raise NotImplementedError("Not yet.")
+    while package_names:
+        print("-------------------=======================--------------------")
+        instance = p[package_names.popleft()]
+        print("Selecting package '%s'" % instance.name)
+
+        if not instance.has_uninstall_actions:
+            print("Nothing to do for uninstall of '%s'." % instance.name)
+            continue
+
+        try:
+            print("Removing '%s'..." % instance.name)
+            instance.execute_uninstall()
+        except Exception as e:
+            print("Failed to uninstall '%s'!"
+                  % instance.name, file=sys.stderr)
+            print(e)
+            import traceback
+
+            traceback.print_exc()
+
+            instance.set_failed()
+            continue
+
+        if not instance.is_installed:
+            print("Successfully uninstalled '%s'." % instance.name)
+
+            # Save that the package was installed.
+            # TODO: Uncomment this.
+            # get_user_save().save_status(instance)
 
 
 # -----------------------------------------------------------------------------

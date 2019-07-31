@@ -15,8 +15,6 @@ class Status(Enum):
     # The package is installed.
     INSTALLED = 3,
 
-    # TODO: Support uninstalling.
-
     # Installing the package has failed and thus the contents were not
     # installed properly.
     FAILED = 99
