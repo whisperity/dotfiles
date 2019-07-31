@@ -156,10 +156,8 @@ def prepend_install_dependencies(p, packages_to_install):
         if instance.is_support:
             print("%s is a support package that is not to be directly "
                   "installed, its life is restricted to helping other "
-                  "packages installation process!" % name, file=sys.stderr)
+                  "packages' installation process!" % name, file=sys.stderr)
             sys.exit(1)
-
-        # Check if the package is already installed. In this case, do nothing.
         if instance.is_installed:
             print("%s is already installed -- skipping." % name)
             packages_to_install.remove(name)
@@ -175,6 +173,45 @@ def prepend_install_dependencies(p, packages_to_install):
     packages_to_install = deque(
         argument_expander.deduplicate_iterable(packages_to_install))
     return packages_to_install
+
+
+def append_uninstall_dependents(p, packages_to_remove):
+    """
+    Check the dependencies of packages known to be installed and extend
+    the removal list with the dependents of the packages the user intended to
+    remove, creating a sensible order of removals.
+    """
+    installed_packages = list(get_user_save().installed_packages)
+
+    for name in list(packages_to_remove):  # Work on copy of original input.
+        instance = p[name]
+        if instance.is_support:
+            print("%s is a support package that is not to be directly "
+                  "removed, its life is restricted to helping other "
+                  "packages' installation process!" % name, file=sys.stderr)
+            sys.exit(1)
+        if not instance.is_installed:
+            print("%s is not installed -- nothing to uninstall." % name)
+            packages_to_remove.remove(name)
+            continue
+
+    # TODO: Perhaps at install save what a package depended on so this does not
+    #       need to be manually calculated for each installed package.
+    removal_set = set(packages_to_remove)
+    for name in get_user_save().installed_packages:
+        instance = p[name]
+        dependencies_marked_for_removal = set(
+            package.get_dependencies(p, instance)).intersection(removal_set)
+        if dependencies_marked_for_removal:
+            print("%s has dependencies to be uninstalled: %s"
+                  % (name, ', '.join(sorted(dependencies_marked_for_removal))))
+
+            removal_set.add(name)
+            packages_to_remove.appendleft(name)
+
+    packages_to_remove = deque(
+        argument_expander.deduplicate_iterable(packages_to_remove))
+    return packages_to_remove
 
 
 def check_superuser():
@@ -356,11 +393,11 @@ def _main():
             print("No packages need to be installed.")
             sys.exit(0)
     elif args.action == 'REMOVE':
-        packages_to_handle = packages_to_handle
+        packages_to_handle = append_uninstall_dependents(known_packages,
+                                                         packages_to_handle)
         if not packages_to_handle:
             print("No packages need to be removed.")
             sys.exit(0)
-        raise NotImplementedError("Not working yet.")
 
     # Check if any package to install/uninstall needs superuser to do so.
     has_checked_superuser = None

@@ -330,10 +330,10 @@ def get_dependencies(package_store, package, ignore=None):
     # This recursion isn't the fastest algorithm for creating dependencies,
     # but due to the relatively small size and scope of the project, this
     # will do.
-    if package.name in ignore:
-        return []
     if ignore is None:
         ignore = []
+    if package.name in ignore:
+        return []
 
     dependencies = []
     for dependency in set(package.dependencies) - set(ignore):
