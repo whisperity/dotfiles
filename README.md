@@ -92,6 +92,10 @@ Support packages can be depended upon, but may not be directly installed by
 the user.
 A support package's "installed" status will not be saved.
 
+Packages with `internal` in their name (such as `internal.mypkg`) will
+automatically be considered as _support packages_.
+
+
 
 ### Action directives
 

@@ -9,8 +9,8 @@ from .shell_mixin import ShellCommandsMixin
 
 class Install(_StageBase, ShellCommandsMixin):
     """
-    The prefetch stage is responsible for preparing the package for use, most
-    often downloading external content or dependencies.
+    The install stage is responsible for unpacking and setting up the package's
+    persistent presence on the user's device.
     """
     def __init__(self, package, arg_expand):
         super().__init__(package)
