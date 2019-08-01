@@ -1,6 +1,9 @@
 from collections import deque
 from functools import wraps
 import inspect
+import os
+import shutil
+import sys
 
 from .base import _StageBase
 from .shell_mixin import ShellCommandsMixin
@@ -15,6 +18,18 @@ class Uninstall(_StageBase, ShellCommandsMixin):
         super().__init__(package)
         self.expand_args = arg_expand
 
+    def remove_dirs(self, dirs):
+        """
+        Removes the specified directories from the system, if they are empty.
+        """
+        for dirp in map(self.expand_args, dirs):
+            try:
+                os.rmdir(self.expand_args(dirp))
+            except OSError as e:
+                print("WARNING: Removal of directory '%s' failed, because: %s."
+                      % (dirp, e), file=sys.stderr)
+                print("    It could be that this directory wasn't created "
+                      "by the install script.", file=sys.stderr)
 
 def _wrap(fun):
     """
@@ -52,3 +67,7 @@ class UninstallSignature:
         self.actions.appendleft(args)
 
     # Developer note: keep the methods from `Uninstall` in sync without a body!
+
+    @_wrap
+    def remove_dirs(self, dirs):
+        pass

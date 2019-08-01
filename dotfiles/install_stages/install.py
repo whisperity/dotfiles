@@ -22,21 +22,18 @@ class Install(_StageBase, ShellCommandsMixin):
         Creates the specified directories (and their parents if they don't
         exist).
         """
-        # TODO: Uninstall equivalent: remove every directory if they are not
-        #       empty, incl. all the parents created at this point.
-        for dir in dirs:
+        for dirp in dirs:
             # Calculate which dirs would be created if they don't exist yet.
             path_parts = []
-            head, tail = dir, ''
+            head, tail = dirp, ''
             while head:
-                # Expand the environment variables only at expansion and not
-                # for the iteration so we don't walk back up until /.
-                path_parts.append(self.expand_args(head))
+                path_parts.append(head)
                 head, tail = os.path.split(head)
 
             print("[DEBUG] Action tries creating dirs:", path_parts)
 
-            os.makedirs(self.expand_args(dir), exist_ok=True)
+            os.makedirs(self.expand_args(dirp), exist_ok=True)
+            self.uninstall_generator.remove_dirs(path_parts)
 
     def _calculate_copy_target(self, source, to, prefix=''):
         """

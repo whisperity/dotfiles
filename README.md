@@ -11,7 +11,7 @@ In addition to offering a synchronisation source, this piece of software also
 helps set up some more sought utilities and tools.
 
 ```bash
-./dotfiles.py [package [package...]]
+usage: dotfiles [-h] [-l | -i | -u] [package [package ...]]
 ```
 
 
@@ -23,15 +23,34 @@ Specify the packages to install.
 
 If no packages are specified, the list and description of packages will be
 shown.
+If package names are specified, the default action is to **install** the
+packages.
+
+Listing status for a particular package is possible if `--list` is explicitly
+specified: `dotfiles --list foo bar`.
+
 
 :warning: **Warning!** The installers in this tool will unconditionally
 overwrite some of the most basic configuration files.
 This tool is intended to be used when a new user profile is created, such as
 when a new machine is installed.
 
+
+
+### Package globber
+
+Multiple packages belonging to a package "group" can be selected by saying
+`group.*` or `group.__ALL__`.
+
+
+
 ### Uninstalling packages
-Currently it is not possible to uninstall packages automatically.
-This feature is planned as future development.
+To uninstall packages, specify `--uninstall` before the package names:
+
+```bash
+dotfiles --uninstall foo
+```
+
 
 
 Compatibility
@@ -42,6 +61,7 @@ architecture.
 Certain tools install from the ***`apt`*** package manager, thus it should work
 with Debian too.
 Some tools are self-contained, downloading pre-built binaries.
+
 
 
 _Developer_ annotation
@@ -58,6 +78,7 @@ Package descriptor files are JSONs which contain the directives describing
 installation and handling of the package.
 Any other file is disregarded by the tool unless explicitly used, e.g. being
 the source of a copy operation.
+
 
 
 ### Configuration directives
@@ -121,6 +142,7 @@ prepare:
 ```
 
 
+
 #### `prepare` (optional)
 
 First, the package's configuration and external dependencies are obtained.
@@ -157,9 +179,36 @@ phase's directory.
 |:------------------:|--------------------------------------------------------------------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------|:------------------------------------------------------|
 | `copy`             | `file` (string), `to` (string)                                                                         | Copies `file` to the `to` path                                                                                                                        | OS-level error,                                       |
 | `copy`             | `files` (list of string), `to` (string), `prefix` (string, default: empty)                             | As if `copy` was done for all element of `files`, `to` must be the destination directory, optionally prepending `prefix` to each destination filename | OS-level error, `to` isn't an existing directory      |
-| `copy tree`        | `dir` (string), `to` (string)                                                                          | Copies the contents of `dir` to the `to` directory, `to` is created by this call.                                                                     | OS-level error, `to` is  an existing directory        |
+| `copy tree`        | `dir` (string), `to` (string)                                                                          | Copies the contents of `dir` to the `to` directory, `to` is created by this call                                                                      | OS-level error, `to` is  an existing directory        |
 | `make dirs`        | `dirs` (list of strings)                                                                               | Creates the directories specified, and their parents if they don't exist                                                                              | OS-level error happens at creating a directory        |
 | `replace`          | `at` (string), `with file` (string), `with files` (list of strings), `prefix` (string, default: empty) | Does the same as `copy` but also prepares restoring (at uninstall) the original target files if they existed                                          | _see failure conditions for `copy`_                   |
 | `shell`            | `command` (string)                                                                                     | Execute `command` in a shell                                                                                                                          | Non-zero return                                       |
 | `shell all`        | `commands` (list of strings)                                                                           | Execute every command in order                                                                                                                        | At least one command returns non-zero                 |
 | `shell any`        | `commands` (list of strings)                                                                           | Execute the commands in order until one succeeds                                                                                                      | None of the commands returns zero                     |
+
+
+
+#### `uninstall`
+
+Uninstall starts from the user's `$HOME` (`~`) directory.
+
+
+|   Action           | Arguments                                                                                              | Semantics                                                                                                                                             | Failure condition                                |
+|:------------------:|--------------------------------------------------------------------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------|
+| `remove dirs`      | `dirs` (list of strings)                                                                               | Removes the specified directory, if it is empty                                                                                                       | OS-level error happens at removing a directory.  |
+| `shell`            | `command` (string)                                                                                     | Execute `command` in a shell                                                                                                                          | Non-zero return                                  |
+| `shell all`        | `commands` (list of strings)                                                                           | Execute every command in order                                                                                                                        | At least one command returns non-zero            |
+| `shell any`        | `commands` (list of strings)                                                                           | Execute the commands in order until one succeeds                                                                                                      | None of the commands returns zero                |
+
+
+
+##### Automatic `uninstall` actions for `install` directives
+
+Certain _`install`_ directives can automatically be mapped to _`uninstall`_
+actions.
+At the uninstall of a package, the corresponding actions are executed in
+**reverse order** (compared to the order of `install` directives).
+
+| `install` action  | `uninstall` action  |
+|:-----------------:|:-------------------:|
+| `make dirs(dirs)` | `remove dirs(dirs)` |
