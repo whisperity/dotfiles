@@ -26,24 +26,9 @@ except ImportError:
 from dotfiles import install_stages
 from dotfiles.argument_expander import ArgumentExpander
 from dotfiles.chdir import restore_working_directory
-from dotfiles.status import Status
+from dotfiles.status import Status, require_status
 from dotfiles.temporary import temporary_dir
 from dotfiles.saved_data import get_user_save
-
-
-class WrongStatusError(Exception):
-    """
-    Indicates that the package is in a wrong state to execute the required
-    action.
-    """
-    def __init__(self, required_status, current_status):
-        super().__init__()
-        self.required = required_status
-        self.current = current_status
-
-    def __str__(self):
-        return "Executing package action is invalid in status %s, as " \
-               "%s is required." % (self.current, self.required)
 
 
 class ExecutorError(Exception):
@@ -61,26 +46,6 @@ class ExecutorError(Exception):
         return "Execution of %s action for %s failed.\n" \
                "Details of action:\n%s" \
                % (self.stage, str(self.package), pprint.pformat(self.action))
-
-
-class _StatusRequirementDecorator:
-    """
-    A custom decorator that can mark the requirement of a package state.
-    """
-    def __init__(self, *required_statuses):
-        self.required = required_statuses
-
-    def __call__(self, func):
-        def _wrapper(*args):
-            # Check the actual status of the object.
-            instance = args[0]
-            current_status = instance.__dict__['_status']
-
-            if current_status not in self.required:
-                raise WrongStatusError(self.required, current_status)
-
-            func(*args)
-        return _wrapper
 
 
 class Package:
@@ -226,7 +191,7 @@ class Package:
             ([self.parent] if self.depends_on_parent and self.parent
              else [])
 
-    @_StatusRequirementDecorator(Status.NOT_INSTALLED)
+    @require_status(Status.NOT_INSTALLED)
     def select(self):
         """
         Mark the package selected for installation.
@@ -235,11 +200,11 @@ class Package:
 
     def set_failed(self):
         """
-        Mark that the package failed to install.
+        Mark that the execution of package actions failed.
         """
         self._status = Status.FAILED
 
-    @_StatusRequirementDecorator(Status.FAILED)
+    @require_status(Status.FAILED)
     def unselect(self):
         """
         Unmark the package from failure.
@@ -255,7 +220,7 @@ class Package:
         return self._status == Status.MARKED and \
             'prepare' in self._data
 
-    @_StatusRequirementDecorator(Status.MARKED)
+    @require_status(Status.MARKED)
     @restore_working_directory
     def execute_prepare(self):
         if self.should_do_prepare:
@@ -276,7 +241,7 @@ class Package:
 
         self._status = Status.PREPARED
 
-    @_StatusRequirementDecorator(Status.PREPARED)
+    @require_status(Status.PREPARED)
     @restore_working_directory
     def execute_install(self):
         executor = install_stages.install.Install(self, self._expander)
@@ -300,13 +265,13 @@ class Package:
         return self._status == Status.INSTALLED and \
             'uninstall' in self._data
 
-    @_StatusRequirementDecorator(Status.INSTALLED)
+    @require_status(Status.INSTALLED)
     @restore_working_directory
     def execute_uninstall(self):
         if self.has_uninstall_actions:
             executor = install_stages.uninstall.Uninstall(self, self._expander)
 
-            # Start the execution in the user's home diretory.
+            # Start the execution in the user's home directory.
             os.chdir(os.path.expanduser('~'))
 
             for step in self._data.get('uninstall'):

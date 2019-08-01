@@ -12,7 +12,6 @@ import textwrap
 try:
     from tabulate import tabulate
 except ImportError:
-    import sys
     print("The tabulate package for the current Python interpreter cannot be "
           "loaded.\n"
           "Please run 'bootstrap.sh' from the directory of Dotfiles project "
@@ -446,12 +445,10 @@ def _main():
     if args.action == 'INSTALL':
         print("Will INSTALL the following packages:\n        %s"
               % ' '.join(sorted(packages_to_handle)))
-
         _install(known_packages, packages_to_handle)
     elif args.action == 'REMOVE':
         print("Will REMOVE the following packages:\n        %s"
               % ' '.join(sorted(packages_to_handle)))
-
         _uninstall(known_packages, packages_to_handle)
 
 
