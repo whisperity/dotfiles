@@ -69,17 +69,17 @@ ACTION.add_argument('-i', '--install',
                     action='store_const',
                     const='INSTALL',
                     default=True,
-                    help="""Installs the specified packages. This is the
-                            default action if at least one package name is
-                            specified.""")
+                    help="""Installs the specified packages, and its
+                            dependencies. This is the default action if at
+                            least one package name is specified.""")
 
 ACTION.add_argument('-u', '--uninstall',
                     dest='action',
                     action='store_const',
                     const='REMOVE',
                     default=False,
-                    help="""Uninstall the specified packages. (THIS IS NOT
-                            WORKING YET!)""")
+                    help="""Uninstalls the specified packages, and other
+                            packages that depend on them.""")
 
 PARSER.add_argument('package_names',
                     nargs='*',

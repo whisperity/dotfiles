@@ -244,7 +244,10 @@ class Package:
     @require_status(Status.PREPARED)
     @restore_working_directory
     def execute_install(self):
-        executor = install_stages.install.Install(self, self._expander)
+        uninstall_generator = install_stages.uninstall.UninstallSignature()
+        executor = install_stages.install.Install(self,
+                                                  self._expander,
+                                                  uninstall_generator)
 
         # Start the execution in the package resource folder.
         os.chdir(self.resources)

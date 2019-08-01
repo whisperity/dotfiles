@@ -12,9 +12,10 @@ class Install(_StageBase, ShellCommandsMixin):
     The install stage is responsible for unpacking and setting up the package's
     persistent presence on the user's device.
     """
-    def __init__(self, package, arg_expand):
+    def __init__(self, package, arg_expand, uninstall_generator):
         super().__init__(package)
         self.expand_args = arg_expand
+        self.uninstall_generator = uninstall_generator
 
     def make_dirs(self, dirs):
         """
