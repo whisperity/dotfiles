@@ -77,14 +77,16 @@ class Install(_StageBase, ShellCommandsMixin):
             raise NameError("If only a single file is specified, use the 'to' "
                             "argument to specify the whole destination name!")
 
+        to_original = to
         to = self.expand_args(to)
         if os.path.abspath(to) != to:
-            raise ValueError("'to' must be given as an absolute PATH")
+            raise ValueError("'to' must be given as an absolute path")
 
         if files and not os.path.isdir(to):
             raise NotADirectoryError("'to' must be an existing directory when "
                                      "copying multiple files.")
 
+        _uninstall_files = []
         for file in (files if files else [file]):
             source = self.expand_args(file)
             target = self.expand_args(
@@ -94,16 +96,33 @@ class Install(_StageBase, ShellCommandsMixin):
                   % (source, os.path.abspath(source), target))
             shutil.copy(source, target)
 
+            # Retain the possible unexpanded variable names in the target
+            # files' path.
+            unins_path = self._calculate_copy_target(source,
+                                                     to_original,
+                                                     prefix)
+            if os.path.isdir(target):
+                unins_path = os.path.join(unins_path, os.path.basename(source))
+            _uninstall_files.append(unins_path)
+
+        if _uninstall_files:
+            if files:  # Takes precedence as loop above defined the 'file'.
+                self.uninstall_generator.remove(files=_uninstall_files)
+            elif file:
+                self.uninstall_generator.remove(file=_uninstall_files[0])
+
     def copy_tree(self, dir, to):
         """
         Copies the entire contents of the source 'dir' to the 'to' directory.
         The destination directory must not exist.
         """
-        # TODO: Inverse operation is the unconditional removal of the tree.
-        dir = self.expand_args(dir)
+        dirp = self.expand_args(dir)
+
+        self.uninstall_generator.remove_tree(to)
+
         to = self.expand_args(to)
-        print("[DEBUG] Copy tree '%s' to '%s" % (dir, to))
-        shutil.copytree(dir, to)
+        print("[DEBUG] Copy tree '%s' to '%s" % (dirp, to))
+        shutil.copytree(dirp, to)
 
     def replace(self, at, with_file=None, with_files=None, prefix=''):
         """

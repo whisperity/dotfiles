@@ -193,12 +193,16 @@ phase's directory.
 Uninstall starts from the user's `$HOME` (`~`) directory.
 
 
-|   Action           | Arguments                                                                                              | Semantics                                                                                                                                             | Failure condition                                |
-|:------------------:|--------------------------------------------------------------------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------|
-| `remove dirs`      | `dirs` (list of strings)                                                                               | Removes the specified directory, if it is empty                                                                                                       | OS-level error happens at removing a directory.  |
-| `shell`            | `command` (string)                                                                                     | Execute `command` in a shell                                                                                                                          | Non-zero return                                  |
-| `shell all`        | `commands` (list of strings)                                                                           | Execute every command in order                                                                                                                        | At least one command returns non-zero            |
-| `shell any`        | `commands` (list of strings)                                                                           | Execute the commands in order until one succeeds                                                                                                      | None of the commands returns zero                |
+|   Action           | Arguments                                                                                              | Semantics                                                                                                                                             | Failure condition                                   |
+|:------------------:|--------------------------------------------------------------------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------|:----------------------------------------------------|
+| `remove`           | `file` (string)                                                                                        | Removes the specified `file` if it exists, `file` must be an absolute path                                                                            | OS-level error happens at removal                   |
+| `remove`           | `files` (list of strings)                                                                              | Removes all files specified, all files must be specified as an absolute path                                                                          | OS-level error happens at removal                   |
+| `remove`           | `where` (strings), `file` or `files` as above                                                          | As above, but `file` or `files` may be a relative path, understood relative to `where`, `where` must be an existing directory's absolute path         | OS-level error, `where` isn't an existing directory |
+| `remove dirs`      | `dirs` (list of strings)                                                                               | Removes the specified directory, if it is empty                                                                                                       | OS-level error happens at removing a directory      |
+| `remove tree`      | `dir` (string)                                                                                         | Removes the tree (all subdirectories and files) under `dir`                                                                                           | OS-level error, `dir` isn't an existing directory   |
+| `shell`            | `command` (string)                                                                                     | Execute `command` in a shell                                                                                                                          | Non-zero return                                     |
+| `shell all`        | `commands` (list of strings)                                                                           | Execute every command in order                                                                                                                        | At least one command returns non-zero               |
+| `shell any`        | `commands` (list of strings)                                                                           | Execute the commands in order until one succeeds                                                                                                      | None of the commands returns zero                   |
 
 
 
@@ -209,6 +213,8 @@ actions.
 At the uninstall of a package, the corresponding actions are executed in
 **reverse order** (compared to the order of `install` directives).
 
-| `install` action  | `uninstall` action  |
-|:-----------------:|:-------------------:|
-| `make dirs(dirs)` | `remove dirs(dirs)` |
+| `install` action     | `uninstall` action  | Comment                                                                                                                                                                 |
+|:--------------------:|:-------------------:|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `copy`               | `remove`            | (`file` and `files` are translated in a reasonable manner, `where` is not filled automatically, paths containing environment variables are kept as such for uninstall!) |
+| `copy tree(dir, to)` | `remove tree(to)`   |                                                                                                                                                                         |
+| `make dirs(dirs)`    | `remove dirs(dirs)` |                                                                                                                                                                         |

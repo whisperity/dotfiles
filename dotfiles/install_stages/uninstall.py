@@ -5,6 +5,7 @@ import os
 import shutil
 import sys
 
+from dotfiles.chdir import restore_working_directory
 from .base import _StageBase
 from .shell_mixin import ShellCommandsMixin
 
@@ -25,11 +26,69 @@ class Uninstall(_StageBase, ShellCommandsMixin):
         for dirp in map(self.expand_args, dirs):
             try:
                 os.rmdir(self.expand_args(dirp))
+                print("[DEBUG] Removed directory '%s'..." % dirp)
             except OSError as e:
                 print("WARNING: Removal of directory '%s' failed, because: %s."
                       % (dirp, e), file=sys.stderr)
                 print("    It could be that this directory wasn't created "
                       "by the install script.", file=sys.stderr)
+
+    def remove(self, file=None, files=None, where=None):
+        """
+        Removes a file or a set of files from the system.
+
+        If `where` is specified, the paths in `file` or `files` is considered
+        relative from the `where`, which should be a directory.
+        If it is not specified, the paths in `file` or `files` must be
+        absolute paths.
+
+        If `files` is specified, it is a list of file paths, and the behaviour
+        is as if `remove()` was called for each file in `files`.
+        """
+        if file and files:
+            raise NameError("Remove must specify either file or "
+                            "files.")
+
+        if where:
+            where = self.expand_args(where)
+            if os.path.abspath(where) != where:
+                raise ValueError("'where' must be given as an absolute path")
+
+            if files and not os.path.isdir(where):
+                raise NotADirectoryError("'where' must be an existing "
+                                         "directory, when given.")
+        else:
+            for file in (files if files else [file]):
+                file = self.expand_args(file)
+                if os.path.abspath(file) != file:
+                    raise ValueError("If 'where' is not given, all 'files' "
+                                     "(or 'file') must be an absolute path")
+
+        @restore_working_directory
+        def _removal(where_=None, files_=None):
+            if where_:
+                os.chdir(where_)
+
+            for file_ in files_:
+                file_ = self.expand_args(file_)
+                if os.path.isfile(file_):
+                    os.unlink(file_)  # Let exceptions go if couldn't remove.
+                    print("[DEBUG] Deleting '%s'..." % file_)
+
+        _removal(where, files if files else [file])
+
+    def remove_tree(self, dir):
+        """
+        Removes the entire tree under 'dir'.
+        The directory must exist, and must be a directory.
+        """
+        dirp = self.expand_args(dir)
+        if not os.path.isdir(dirp):
+            raise NotADirectoryError("'dir' must be an existing directory")
+
+        print("[DEBUG] Removing tree under '%s'" % dirp)
+        shutil.rmtree(dirp)
+
 
 def _wrap(fun):
     """
@@ -41,7 +100,7 @@ def _wrap(fun):
         # Save the action's invocation.
         bind = inspect.signature(fun).bind(*args, **kwargs).arguments
         save_args = {k: bind[k]
-                for k in filter(lambda k: k != 'self', bind)}
+                     for k in filter(lambda k: k != 'self', bind)}
         save_args['action'] = fun.__name__
         bind['self'].register_action(**save_args)
 
@@ -66,8 +125,22 @@ class UninstallSignature:
         args = {k.replace(' ', '_'): v for k, v in kwargs.items()}
         self.actions.appendleft(args)
 
+    def pop(self):
+        """
+        Removes the last generated uninstall action from the list.
+        """
+        self.actions.popleft()
+
     # Developer note: keep the methods from `Uninstall` in sync without a body!
 
     @_wrap
     def remove_dirs(self, dirs):
+        pass
+
+    @_wrap
+    def remove(self, file=None, files=None, where=None):
+        pass
+
+    @_wrap
+    def remove_tree(self, dir):
         pass
