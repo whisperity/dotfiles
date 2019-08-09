@@ -212,8 +212,19 @@ class Package:
 
         for dirpath, _, files in os.walk(package.resource_dir):
             arcpath = dirpath.replace(package.resource_dir, '$PACKAGE_DIR', 1)
+            if 'package.yaml' in files:
+                package_name_for_yaml = \
+                    Package.data_file_to_package_name(
+                        os.path.join(dirpath, 'package.yaml'))
+                if package_name_for_yaml != package.name:
+                    # A subpackage was encountered, which should not be
+                    # saved to the current package's archive.
+                    continue
+
             for file in files:
                 if file == 'package.yaml':
+                    # Do not save 'package.yaml', the serialized memory
+                    # will be saved instead.
                     continue
 
                 archive.write(os.path.join(dirpath, file),
