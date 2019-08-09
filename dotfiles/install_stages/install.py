@@ -3,6 +3,7 @@ import re
 import shutil
 import sys
 
+from dotfiles.saved_data import get_user_save
 from .base import _StageBase
 from .shell_mixin import ShellCommandsMixin
 
@@ -140,13 +141,23 @@ class Install(_StageBase, ShellCommandsMixin):
             * prefix -> prefix
         """
         for file in (with_files if with_files else [with_file]):
-            target = self.expand_args(self._calculate_copy_target(
-                self.expand_args(file), at, prefix))
+            target = self._calculate_copy_target(file, at, prefix)
+            target_real = self.expand_args(
+                self._calculate_copy_target(
+                    self.expand_args(file), at, prefix))
 
-            print("[DEBUG] Replacing happens for file '%s'..." % target)
+            print("[DEBUG] Replacing happens for file '%s (%s)'..."
+                  % (target, target_real))
 
-            # TODO: Save backup.
+            with get_user_save().get_package_archive(self.package) as zipf:
+                try:
+                    zipf.write(target_real, target.lstrip('/'))
+                    self.uninstall_generator.restore(file=target)
+                except FileNotFoundError:
+                    # If the original file did not exist, do nothing.
+                    pass
 
+            # Execute the copy itself.
             self.copy(to=target, file=file, prefix=prefix)
 
     # TODO: Refactor user-given variables to be loaded from memory, not from

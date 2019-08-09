@@ -1,6 +1,8 @@
+from contextlib import contextmanager
 from datetime import datetime
 import json
 import os
+import zipfile
 
 from .status import Status
 
@@ -21,7 +23,7 @@ def get_user_save():
 class UserSave:
     """
     The `UserSave` instance represents the persistent storage where the
-    Dotfiles-specific user information, such as list of installed packages
+    Dotfiles-specific user information, such as list of installed packages,
     is stored.
     """
 
@@ -67,6 +69,8 @@ class UserSave:
         # Mark the state locked when the process starts running.
         self._lock_handle.write(".pid: " + str(os.getpid()) + '\n')
         self._lock_handle.flush()
+
+        self._uncommitted_archives = {}
 
     def __del__(self):
         self.close()
@@ -124,3 +128,34 @@ class UserSave:
         for package, st_dict in self._data['packages'].items():
             if st_dict['status'] == Status.INSTALLED.name:
                 yield package
+
+    @contextmanager
+    def get_package_archive(self, package):
+        """
+        Returns the `zipfile.ZipFile` context for the backup storage of the
+        given `package`.
+        """
+        archive = self._uncommitted_archives.get(package)
+        if not archive:
+            print("Creating package archive for '%s'" % package.name)
+            archive = os.path.join(
+                UserSave.config_dir,
+                package.name + '_' + datetime.now().strftime('%s') + '_0.zip')
+
+            while os.path.isfile(archive):
+                # Unlikely, but the user might end up running the same
+                # installer in a quick succession, in which these archives
+                # could end up being filled multiple times. This prevents it.
+                archive = archive.split('_')
+                counter = int(archive[-1].replace('.zip', '')) + 1
+                archive[-1] = str(counter) + '.zip'
+                archive = '_'.join(archive)
+
+            self._uncommitted_archives[package] = archive
+
+        zip_ = zipfile.ZipFile(archive, 'a',
+                               compression=zipfile.ZIP_DEFLATED)
+        try:
+            yield zip_
+        finally:
+            zip_.close()
