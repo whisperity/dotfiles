@@ -110,6 +110,7 @@ user's environment and files.
 Support packages can be depended upon, but may not be directly installed by
 the user.
 A support package's "installed" status will not be saved.
+Support packages may not have _`uninstall`_ actions.
 
 Packages with `internal` in their name (such as `internal.mypkg`) will
 automatically be considered as _support packages_.
@@ -225,6 +226,10 @@ Certain _`install`_ directives can automatically be mapped to _`uninstall`_
 actions.
 At the uninstall of a package, the corresponding actions are executed in
 **reverse order** (compared to the order of `install` directives).
+
+If automatic uninstall actions were generated for a package's install, they
+are executed **after** the manually written _`uninstall`_ directives are
+executed.
 
 
 | `install` action     | `uninstall` action  | Comment                                                                                                                                                                |

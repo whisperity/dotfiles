@@ -52,6 +52,20 @@ class ExecutorError(Exception):
                % (self.stage, str(self.package), pprint.pformat(self.action))
 
 
+class PackageMetadataError(SystemError):
+    """
+    Indicates that a package's metadata 'package.yaml' file is semantically
+    incorrect.
+    """
+    def __init__(self, package, msg):
+        super().__init__()
+        self.package = package
+        self.msg = msg
+
+    def __str__(self):
+        return "%s 'package.yaml' invalid: %s" % (str(self.package), self.msg)
+
+
 class Package:
     """
     Describes a package that the user can "install" to their system.
@@ -59,7 +73,7 @@ class Package:
     Packages are stored in the 'packages/' directory in a hierarchy: directory
     names are translated as '.' separators in the logical package name.
 
-    Each package MUST contain a 'package.json' file that describes the
+    Each package MUST contain a 'package.yaml' file that describes the
     package's meta information and commands that are executed to configure and
     install the package.
 
@@ -93,18 +107,29 @@ class Package:
     def __init__(self, logical_name, datafile_path):
         self.name = logical_name
         self.datafile = datafile_path
-        self.resources = os.path.dirname(datafile_path)
+        self.resource_dir = os.path.dirname(datafile_path)
         self._status = Status.NOT_INSTALLED
+
+        # Optional callable, fetches resources. By default, not implemented.
+        # (via https://stackoverflow.com/a/8294654)
+        self._load_resources = lambda: (_ for _ in ()).throw(
+            NotImplementedError("_load_resources wasn't specified."))
 
         self._teardown = []
 
         with open(datafile_path, 'r') as datafile:
-            # TODO: At least basically try validating contents of the file.
             self._data = load_yaml(datafile, Loader=Loader)
 
         self._expander = ArgumentExpander()
-        self._expander.register_expansion('PACKAGE_DIR', self.resources)
+        self._expander.register_expansion('PACKAGE_DIR', self.resource_dir)
         self._expander.register_expansion('SESSION_DIR', temporary_dir())
+
+        # Validate package YAML structure.
+        # TODO: This list of error cases is not full.
+        if self.is_support and self.has_uninstall_actions:
+            raise PackageMetadataError(self,
+                                       "Package marked as a support but has "
+                                       "an 'uninstall' section!")
 
     @classmethod
     def create(cls, logical_name):
@@ -112,10 +137,17 @@ class Package:
         Creates a `Package` instance for the given logical package name.
         """
         try:
-            return Package(logical_name,
-                           cls.package_name_to_data_file(logical_name))
+            instance = Package(logical_name,
+                               cls.package_name_to_data_file(logical_name))
+
+            # A package loaded from the disk doesn't need anything extra
+            # to load its resources.
+            instance.__setattr__('_load_resources', lambda: None)
+
+            return instance
         except FileNotFoundError:
-            raise KeyError("Package data file for %s was not found.")
+            raise KeyError("Package data file for '%s' was not found."
+                           % logical_name)
         except YAMLError:
             raise ValueError("Package data file for '%s' is corrupt."
                              % logical_name)
@@ -129,26 +161,43 @@ class Package:
         if not isinstance(archive, zipfile.ZipFile):
             raise TypeError("'archive' must be a `ZipFile`")
 
-        # Unpack the archive to a temporary directory.
+        # Unpack the metadata file to a temporary directory.
         package_dir = package_temporary_dir(logical_name)
-        for file in archive.namelist():
-            if file == 'package.yaml' or file.startswith('$PACKAGE_DIR/'):
-                archive.extract(file, package_dir)  # Extract to the temporary.
-
-                # Temporary is extracted by keeping the '$PACKAGE_DIR/'
-                # directory, thus it has to be moved one level up.
-                without_prefix = file.replace('$PACKAGE_DIR/', '', 1)
-                os.makedirs(
-                    os.path.join(package_dir, os.path.dirname(without_prefix)),
-                    exist_ok=True)
-                shutil.move(os.path.join(package_dir, file),
-                            os.path.join(package_dir, without_prefix))
-        shutil.rmtree(os.path.join(package_dir, '$PACKAGE_DIR'),
-                      ignore_errors=True)
+        archive.extract('package.yaml', package_dir)
 
         instance = Package(logical_name,
                            os.path.join(package_dir, 'package.yaml'))
         instance.__setattr__('_status', Status.INSTALLED)
+
+        def _load_resources():
+            """
+            Helper function that will extract the resources of the package
+            to the temporary directory when needed.
+            """
+            with zipfile.ZipFile(archive.filename, 'r') as zipf:
+                for file in zipf.namelist():
+                    if not file.startswith('$PACKAGE_DIR/'):
+                        continue
+
+                    zipf.extract(file, package_dir)
+
+                    # Temporary is extracted by keeping the '$PACKAGE_DIR/'
+                    # directory, thus it has to be moved one level up.
+                    without_prefix = file.replace('$PACKAGE_DIR/', '', 1)
+                    os.makedirs(
+                        os.path.join(package_dir,
+                                     os.path.dirname(without_prefix)),
+                        exist_ok=True)
+                    shutil.move(os.path.join(package_dir, file),
+                                os.path.join(package_dir, without_prefix))
+            shutil.rmtree(os.path.join(package_dir, '$PACKAGE_DIR'),
+                          ignore_errors=True)
+
+            # Subsequent calls to self._load_resources() shouldn't do anything.
+            instance.__setattr__('_load_resources', lambda: None)
+
+        instance.__setattr__('_load_resources', _load_resources)
+
         return instance
 
     @classmethod
@@ -161,8 +210,8 @@ class Package:
         if not isinstance(archive, zipfile.ZipFile):
             raise TypeError("'archive' must be a `ZipFile`")
 
-        for dirpath, _, files in os.walk(package.resources):
-            arcpath = dirpath.replace(package.resources, '$PACKAGE_DIR', 1)
+        for dirpath, _, files in os.walk(package.resource_dir):
+            arcpath = dirpath.replace(package.resource_dir, '$PACKAGE_DIR', 1)
             for file in files:
                 if file == 'package.yaml':
                     continue
@@ -283,8 +332,7 @@ class Package:
         :return: If there are pre-install actions present for the current
         package.
         """
-        return self._status == Status.MARKED and \
-            'prepare' in self._data
+        return 'prepare' in self._data
 
     @require_status(Status.MARKED)
     @restore_working_directory
@@ -299,6 +347,8 @@ class Package:
 
             # Start the execution from the temporary download/prepare folder.
             os.chdir(executor.temp_path)
+
+            self._load_resources()
 
             for step in self._data.get('prepare'):
                 if not executor(**step):
@@ -316,7 +366,8 @@ class Package:
                                                   uninstall_generator)
 
         # Start the execution in the package resource folder.
-        os.chdir(self.resources)
+        self._load_resources()
+        os.chdir(self.resource_dir)
 
         for step in self._data.get('install'):
             if not executor(**step):
@@ -336,8 +387,8 @@ class Package:
         :return: If there are uninstall actions present for the current
         package.
         """
-        return self._status == Status.INSTALLED and \
-            ('uninstall' in self._data or 'generated uninstall' in self._data)
+        return 'uninstall' in self._data or \
+            'generated uninstall' in self._data
 
     @require_status(Status.INSTALLED)
     @restore_working_directory
@@ -346,10 +397,11 @@ class Package:
             executor = install_stages.uninstall.Uninstall(self, self._expander)
 
             # Start the execution in the package resource folder.
-            os.chdir(self.resources)
+            self._load_resources()
+            os.chdir(self.resource_dir)
 
-            for step in (self._data.get('generated uninstall', []) +
-                         self._data.get('uninstall', [])):
+            for step in (self._data.get('uninstall', []) +
+                         self._data.get('generated uninstall', [])):
                 if not executor(**step):
                     self.set_failed()
                     raise ExecutorError(self, 'uninstall', step)

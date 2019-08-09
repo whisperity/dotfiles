@@ -31,6 +31,7 @@ except ImportError:
             for i, col in enumerate(row):
                 row[i] = col.replace('\n', ' ')
             print('|', '        | '.join(row), '       |')
+        return ""
 
 from dotfiles import argument_expander
 from dotfiles import package
@@ -292,7 +293,7 @@ def _install(p, package_names):
 
         try:
             # (Prepare should always be called to advance the status of the
-            # package even if it does not actions.)
+            # package even if it does not do any action.)
             instance.execute_prepare()
         except Exception as e:
             print("Failed to prepare '%s' for installation!"
