@@ -1,6 +1,8 @@
+from contextlib import contextmanager
 from datetime import datetime
 import json
 import os
+import zipfile
 
 from .status import Status
 
@@ -21,7 +23,7 @@ def get_user_save():
 class UserSave:
     """
     The `UserSave` instance represents the persistent storage where the
-    Dotfiles-specific user information, such as list of installed packages
+    Dotfiles-specific user information, such as list of installed packages,
     is stored.
     """
 
@@ -68,6 +70,8 @@ class UserSave:
         self._lock_handle.write(".pid: " + str(os.getpid()) + '\n')
         self._lock_handle.flush()
 
+        self._uncommitted_archives = {}
+
     def __del__(self):
         self.close()
 
@@ -111,10 +115,20 @@ class UserSave:
             self._data['packages'][package.name] = pkg_dict
         pkg_dict['status'] = package.status.name
 
-        pkg_dict_st_changes = pkg_dict.get('status_changes', {})
+        pkg_dict_st_changes = pkg_dict.get('latest_status_changes', {})
         if not pkg_dict_st_changes:
-            pkg_dict['last_st_changes'] = pkg_dict_st_changes
+            pkg_dict['latest_status_changes'] = pkg_dict_st_changes
         pkg_dict_st_changes[package.status.name] = datetime.now().isoformat()
+
+        try:
+            pkg_dict['relevant_backup'] = os.path.basename(
+                self._uncommitted_archives[package.name])
+        except KeyError:
+            # If a backup is not relevant, make sure the key is removed.
+            try:
+                del pkg_dict['relevant_backup']
+            except KeyError:  # The key wasn't there.
+                pass
 
     @property
     def installed_packages(self):
@@ -124,3 +138,50 @@ class UserSave:
         for package, st_dict in self._data['packages'].items():
             if st_dict['status'] == Status.INSTALLED.name:
                 yield package
+
+    @contextmanager
+    def get_package_archive(self, package_name):
+        """
+        Returns the `zipfile.ZipFile` context for the backup storage of the
+        given `package`.
+
+        If the package is not yet installed, a new archive will be created and
+        it's context will be returned. (Multiple calls in the program to this
+        function will return the same archive.)
+
+        If the package has been installed, return the archive - if exists -
+        that corresponds to the state of the most recent install.
+        """
+        if self.is_installed(package_name):
+            mode = 'r'
+            archive = os.path.join(
+                UserSave.config_dir,
+                self._data['packages'][package_name].get('relevant_backup'))
+        else:
+            mode = 'a'
+            archive = self._uncommitted_archives.get(package_name)
+            if not archive:
+                print("Creating package archive for '%s'" % package_name)
+
+                archive = os.path.join(UserSave.config_dir,
+                                       package_name + '_' +
+                                       datetime.now().strftime('%s') +
+                                       '_0.zip')
+
+                while os.path.isfile(archive):
+                    # Unlikely, but the user might end up running the same
+                    # installer in a quick succession, in which these archives
+                    # could end up being filled multiple times.
+                    archive = archive.split('_')
+                    counter = int(archive[-1].replace('.zip', '', 1)) + 1
+                    archive[-1] = str(counter) + '.zip'
+                    archive = '_'.join(archive)
+
+                self._uncommitted_archives[package_name] = archive
+
+        zip_ = zipfile.ZipFile(archive, mode,
+                               compression=zipfile.ZIP_DEFLATED)
+        try:
+            yield zip_
+        finally:
+            zip_.close()

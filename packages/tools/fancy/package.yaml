@@ -13,8 +13,8 @@ prepare:
 install:
   - action: shell all
     commands:
-      - "sudo dpkg --install $TEMPORARY_DIR/fd.deb"
       - "sudo dpkg --install $TEMPORARY_DIR/bat.deb"
+      - "sudo dpkg --install $TEMPORARY_DIR/fd.deb"
       - "sudo dpkg --install $TEMPORARY_DIR/hexyl.deb"
   - action: make dirs
     dirs:
@@ -25,3 +25,6 @@ install:
   - action: copy
     file: exa_aliases.sh
     to: "$HOME/.bash.d/exa.sh"
+uninstall:
+  - action: shell
+    command: "sudo apt-get purge -y bat fd hexyl"

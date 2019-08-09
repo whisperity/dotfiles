@@ -1,18 +1,17 @@
+from functools import wraps
 import os
 
 
-class restore_working_directory:
+def restore_working_directory(fun):
     """
     Provides a method decorator that will restore the working directory of
     the executing Python interpreter to whatever it was when the method started
     executing.
     """
-    def __init__(self, func):
-        self._func = func
-
-    def __call__(self, *args, **kwargs):
+    @wraps(fun)
+    def _wrapper(*args, **kwargs):
         cwd = os.getcwd()
-
-        self._func(*args, **kwargs)
-
+        ret = fun(*args, **kwargs)
         os.chdir(cwd)
+        return ret
+    return _wrapper

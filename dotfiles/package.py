@@ -1,19 +1,24 @@
 import fnmatch
 import os
 import pprint
+import shutil
+import zipfile
 
 try:
     from yaml import YAMLError
     from yaml import load as load_yaml
+    from yaml import dump as dump_yaml
 
     try:
         # Get the faster version of the loader, if possible.
         from yaml import CSafeLoader as Loader
+        from yaml import CSafeDumper as Dumper
     except ImportError:
         # NOTE: Installing "LibYAML" requires compiling from source, so in
         # case the current environment does not have it, just fall back to
         # the pure Python (thus slower) implementation.
         from yaml import SafeLoader as Loader
+        from yaml import SafeDumper as Dumper
 except ImportError:
     import sys
     print("The YAML package for the current Python interpreter cannot be "
@@ -26,24 +31,8 @@ except ImportError:
 from dotfiles import install_stages
 from dotfiles.argument_expander import ArgumentExpander
 from dotfiles.chdir import restore_working_directory
-from dotfiles.status import Status
-from dotfiles.temporary import temporary_dir
-from dotfiles.saved_data import get_user_save
-
-
-class WrongStatusError(Exception):
-    """
-    Indicates that the package is in a wrong state to execute the required
-    action.
-    """
-    def __init__(self, required_status, current_status):
-        super().__init__()
-        self.required = required_status
-        self.current = current_status
-
-    def __str__(self):
-        return "Executing package action is invalid in status %s, as " \
-               "%s is required." % (self.current, self.required)
+from dotfiles.status import Status, require_status
+from dotfiles.temporary import package_temporary_dir, temporary_dir
 
 
 class ExecutorError(Exception):
@@ -63,24 +52,18 @@ class ExecutorError(Exception):
                % (self.stage, str(self.package), pprint.pformat(self.action))
 
 
-class _StatusRequirementDecorator:
+class PackageMetadataError(SystemError):
     """
-    A custom decorator that can mark the requirement of a package state.
+    Indicates that a package's metadata 'package.yaml' file is semantically
+    incorrect.
     """
-    def __init__(self, *required_statuses):
-        self.required = required_statuses
+    def __init__(self, package, msg):
+        super().__init__()
+        self.package = package
+        self.msg = msg
 
-    def __call__(self, func):
-        def _wrapper(*args):
-            # Check the actual status of the object.
-            instance = args[0]
-            current_status = instance.__dict__['_status']
-
-            if current_status not in self.required:
-                raise WrongStatusError(self.required, current_status)
-
-            func(*args)
-        return _wrapper
+    def __str__(self):
+        return "%s 'package.yaml' invalid: %s" % (str(self.package), self.msg)
 
 
 class Package:
@@ -90,7 +73,7 @@ class Package:
     Packages are stored in the 'packages/' directory in a hierarchy: directory
     names are translated as '.' separators in the logical package name.
 
-    Each package MUST contain a 'package.json' file that describes the
+    Each package MUST contain a 'package.yaml' file that describes the
     package's meta information and commands that are executed to configure and
     install the package.
 
@@ -117,38 +100,146 @@ class Package:
         metadata file.
         """
         return os.path.dirname(path) \
-            .replace(cls.package_directory, '') \
+            .replace(cls.package_directory, '', 1) \
             .replace(os.sep, '.') \
             .lstrip('.')
 
     def __init__(self, logical_name, datafile_path):
         self.name = logical_name
         self.datafile = datafile_path
-        self.resources = os.path.dirname(datafile_path)
+        self.resource_dir = os.path.dirname(datafile_path)
         self._status = Status.NOT_INSTALLED
-        if get_user_save().is_installed(self.name):
-            self._status = Status.INSTALLED
+
+        # Optional callable, fetches resources. By default, not implemented.
+        # (via https://stackoverflow.com/a/8294654)
+        self._load_resources = lambda: (_ for _ in ()).throw(
+            NotImplementedError("_load_resources wasn't specified."))
 
         self._teardown = []
 
         with open(datafile_path, 'r') as datafile:
-            # TODO: At least basically try validating contents of the file.
             self._data = load_yaml(datafile, Loader=Loader)
 
         self._expander = ArgumentExpander()
-        self._expander.register_expansion('PACKAGE_DIR', self.resources)
+        self._expander.register_expansion('PACKAGE_DIR', self.resource_dir)
         self._expander.register_expansion('SESSION_DIR', temporary_dir())
+
+        # Validate package YAML structure.
+        # TODO: This list of error cases is not full.
+        if self.is_support and self.has_uninstall_actions:
+            raise PackageMetadataError(self,
+                                       "Package marked as a support but has "
+                                       "an 'uninstall' section!")
 
     @classmethod
     def create(cls, logical_name):
+        """
+        Creates a `Package` instance for the given logical package name.
+        """
         try:
-            return Package(logical_name,
-                           cls.package_name_to_data_file(logical_name))
+            instance = Package(logical_name,
+                               cls.package_name_to_data_file(logical_name))
+
+            # A package loaded from the disk doesn't need anything extra
+            # to load its resources.
+            instance.__setattr__('_load_resources', lambda: None)
+
+            return instance
         except FileNotFoundError:
-            raise KeyError("Package data file for %s was not found.")
+            raise KeyError("Package data file for '%s' was not found."
+                           % logical_name)
         except YAMLError:
             raise ValueError("Package data file for '%s' is corrupt."
                              % logical_name)
+
+    @classmethod
+    def create_from_archive(cls, logical_name, archive):
+        """
+        Creates a `Package` instance using the information and resources found
+        in the given `archive` (which must be a `zipfile.ZipFile` instance).
+        """
+        if not isinstance(archive, zipfile.ZipFile):
+            raise TypeError("'archive' must be a `ZipFile`")
+
+        # Unpack the metadata file to a temporary directory.
+        package_dir = package_temporary_dir(logical_name)
+        archive.extract('package.yaml', package_dir)
+
+        instance = Package(logical_name,
+                           os.path.join(package_dir, 'package.yaml'))
+        instance.__setattr__('_status', Status.INSTALLED)
+
+        def _load_resources():
+            """
+            Helper function that will extract the resources of the package
+            to the temporary directory when needed.
+            """
+            with zipfile.ZipFile(archive.filename, 'r') as zipf:
+                for file in zipf.namelist():
+                    if not file.startswith('$PACKAGE_DIR/'):
+                        continue
+
+                    zipf.extract(file, package_dir)
+
+                    # Temporary is extracted by keeping the '$PACKAGE_DIR/'
+                    # directory, thus it has to be moved one level up.
+                    without_prefix = file.replace('$PACKAGE_DIR/', '', 1)
+                    os.makedirs(
+                        os.path.join(package_dir,
+                                     os.path.dirname(without_prefix)),
+                        exist_ok=True)
+                    shutil.move(os.path.join(package_dir, file),
+                                os.path.join(package_dir, without_prefix))
+            shutil.rmtree(os.path.join(package_dir, '$PACKAGE_DIR'),
+                          ignore_errors=True)
+
+            # Subsequent calls to self._load_resources() shouldn't do anything.
+            instance.__setattr__('_load_resources', lambda: None)
+
+        instance.__setattr__('_load_resources', _load_resources)
+
+        return instance
+
+    @classmethod
+    def save_to_archive(cls, package, archive):
+        """
+        Saves the given `package`'s resources(including the potential
+        generated configuration) into the given `archive` (of type
+        `zipfile.ZipFile`).
+        """
+        if not isinstance(archive, zipfile.ZipFile):
+            raise TypeError("'archive' must be a `ZipFile`")
+
+        for dirpath, _, files in os.walk(package.resource_dir):
+            arcpath = dirpath.replace(package.resource_dir, '$PACKAGE_DIR', 1)
+            if 'package.yaml' in files:
+                package_name_for_yaml = \
+                    Package.data_file_to_package_name(
+                        os.path.join(dirpath, 'package.yaml'))
+                if package_name_for_yaml != package.name:
+                    # A subpackage was encountered, which should not be
+                    # saved to the current package's archive.
+                    continue
+
+            for file in files:
+                if file == 'package.yaml':
+                    # Do not save 'package.yaml', the serialized memory
+                    # will be saved instead.
+                    continue
+
+                archive.write(os.path.join(dirpath, file),
+                              os.path.join(arcpath, file),
+                              compress_type=zipfile.ZIP_DEFLATED)
+
+        archive.writestr('package.yaml', package.serialize(),
+                         compress_type=zipfile.ZIP_DEFLATED)
+
+    @require_status(Status.NOT_INSTALLED, Status.INSTALLED)
+    def serialize(self):
+        """
+        Return the package's data in YAML string format.
+        """
+        return dump_yaml(self._data)
 
     @property
     def status(self):
@@ -226,7 +317,7 @@ class Package:
             ([self.parent] if self.depends_on_parent and self.parent
              else [])
 
-    @_StatusRequirementDecorator(Status.NOT_INSTALLED)
+    @require_status(Status.NOT_INSTALLED)
     def select(self):
         """
         Mark the package selected for installation.
@@ -235,11 +326,11 @@ class Package:
 
     def set_failed(self):
         """
-        Mark that the package failed to install.
+        Mark that the execution of package actions failed.
         """
         self._status = Status.FAILED
 
-    @_StatusRequirementDecorator(Status.FAILED)
+    @require_status(Status.FAILED)
     def unselect(self):
         """
         Unmark the package from failure.
@@ -252,10 +343,9 @@ class Package:
         :return: If there are pre-install actions present for the current
         package.
         """
-        return self._status == Status.MARKED and \
-            'prepare' in self._data
+        return 'prepare' in self._data
 
-    @_StatusRequirementDecorator(Status.MARKED)
+    @require_status(Status.MARKED)
     @restore_working_directory
     def execute_prepare(self):
         if self.should_do_prepare:
@@ -269,6 +359,8 @@ class Package:
             # Start the execution from the temporary download/prepare folder.
             os.chdir(executor.temp_path)
 
+            self._load_resources()
+
             for step in self._data.get('prepare'):
                 if not executor(**step):
                     self.set_failed()
@@ -276,13 +368,17 @@ class Package:
 
         self._status = Status.PREPARED
 
-    @_StatusRequirementDecorator(Status.PREPARED)
+    @require_status(Status.PREPARED)
     @restore_working_directory
     def execute_install(self):
-        executor = install_stages.install.Install(self, self._expander)
+        uninstall_generator = install_stages.uninstall.UninstallSignature()
+        executor = install_stages.install.Install(self,
+                                                  self._expander,
+                                                  uninstall_generator)
 
         # Start the execution in the package resource folder.
-        os.chdir(self.resources)
+        self._load_resources()
+        os.chdir(self.resource_dir)
 
         for step in self._data.get('install'):
             if not executor(**step):
@@ -290,6 +386,38 @@ class Package:
                 raise ExecutorError(self, 'install', step)
 
         self._status = Status.INSTALLED
+
+        if uninstall_generator.actions:
+            # Save the uninstall actions to the package's data.
+            self._data['generated uninstall'] = \
+                list(uninstall_generator.actions)
+
+    @property
+    def has_uninstall_actions(self):
+        """
+        :return: If there are uninstall actions present for the current
+        package.
+        """
+        return 'uninstall' in self._data or \
+            'generated uninstall' in self._data
+
+    @require_status(Status.INSTALLED)
+    @restore_working_directory
+    def execute_uninstall(self):
+        if self.has_uninstall_actions:
+            executor = install_stages.uninstall.Uninstall(self, self._expander)
+
+            # Start the execution in the package resource folder.
+            self._load_resources()
+            os.chdir(self.resource_dir)
+
+            for step in (self._data.get('uninstall', []) +
+                         self._data.get('generated uninstall', [])):
+                if not executor(**step):
+                    self.set_failed()
+                    raise ExecutorError(self, 'uninstall', step)
+
+        self._status = Status.NOT_INSTALLED
 
     def clean_temporaries(self):
         """
@@ -330,10 +458,10 @@ def get_dependencies(package_store, package, ignore=None):
     # This recursion isn't the fastest algorithm for creating dependencies,
     # but due to the relatively small size and scope of the project, this
     # will do.
-    if package.name in ignore:
-        return []
     if ignore is None:
         ignore = []
+    if package.name in ignore:
+        return []
 
     dependencies = []
     for dependency in set(package.dependencies) - set(ignore):

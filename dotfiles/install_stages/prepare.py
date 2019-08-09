@@ -49,15 +49,15 @@ class Prepare(_StageBase, ShellCommandsMixin):
         be on the same path, relative to the temporary directory.
         """
         source_path = os.path.abspath(
-            os.path.join(self.package.resources, path))
+            os.path.join(self.package.resource_dir, path))
         common_prefix = os.path.commonprefix([
-            os.path.abspath(self.package.resources),
+            os.path.abspath(self.package.resource_dir),
             source_path])
-        if common_prefix != os.path.abspath(self.package.resources):
+        if common_prefix != os.path.abspath(self.package.resource_di):
             raise PermissionError("Specifying a path outside the resource "
                                   "directory is forbidden.")
 
-        relative_path = os.path.relpath(source_path, self.package.resources)
+        relative_path = os.path.relpath(source_path, self.package.resource_dir)
         target_path = os.path.join(self.temp_path, relative_path)
         if os.path.abspath(target_path) == os.path.abspath(self.temp_path):
             raise PermissionError("Resource-copying the entire package "
@@ -74,7 +74,7 @@ class Prepare(_StageBase, ShellCommandsMixin):
         else:
             raise FileNotFoundError("Invalid path '%s', no such file exists "
                                     "relative to '%s'"
-                                    % (path, self.package.resources))
+                                    % (path, self.package.resource_dir))
 
     def git_clone(self, repository):
         """

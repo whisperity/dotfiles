@@ -3,3 +3,6 @@ superuser: true
 install:
   - action: shell
     command: "sudo apt-get install -y --no-install-recommends byobu gitk htop mc meld tree"
+uninstall:
+  - action: shell
+    command: "sudo apt-get remove -y byobu gitk htop mc meld tree"

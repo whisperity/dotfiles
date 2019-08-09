@@ -12,8 +12,13 @@ install:
     command: "sudo apt-get install -y --no-install-recommends python3-distutils"
   - action: make dirs
     dirs:
-      - "$HOME/opt"
+      - $HOME/opt
   - action: shell all
     commands:
       - "mv $TEMPORARY_DIR/virtualenv $HOME/opt/virtualenv"
       - "bash -c 'cd $HOME/opt/virtualenv; ln -s $(find . -name virtualenv.py -type f) virtualenv_s.py'"
+uninstall:
+  # Removing 'python3-distutils' could be detrimental to the system, so we
+  # won't.
+  - action: remove tree
+    dir: $HOME/opt/virtualenv

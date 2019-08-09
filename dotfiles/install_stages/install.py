@@ -3,39 +3,38 @@ import re
 import shutil
 import sys
 
+from dotfiles.saved_data import get_user_save
 from .base import _StageBase
 from .shell_mixin import ShellCommandsMixin
 
 
 class Install(_StageBase, ShellCommandsMixin):
     """
-    The prefetch stage is responsible for preparing the package for use, most
-    often downloading external content or dependencies.
+    The install stage is responsible for unpacking and setting up the package's
+    persistent presence on the user's device.
     """
-    def __init__(self, package, arg_expand):
+    def __init__(self, package, arg_expand, uninstall_generator):
         super().__init__(package)
         self.expand_args = arg_expand
+        self.uninstall_generator = uninstall_generator
 
     def make_dirs(self, dirs):
         """
         Creates the specified directories (and their parents if they don't
         exist).
         """
-        # TODO: Uninstall equivalent: remove every directory if they are not
-        #       empty, incl. all the parents created at this point.
-        for dir in dirs:
+        for dirp in dirs:
             # Calculate which dirs would be created if they don't exist yet.
             path_parts = []
-            head, tail = dir, ''
+            head, tail = dirp, ''
             while head:
-                # Expand the environment variables only at expansion and not
-                # for the iteration so we don't walk back up until /.
-                path_parts.append(self.expand_args(head))
+                path_parts.append(head)
                 head, tail = os.path.split(head)
 
             print("[DEBUG] Action tries creating dirs:", path_parts)
 
-            os.makedirs(self.expand_args(dir), exist_ok=True)
+            os.makedirs(self.expand_args(dirp), exist_ok=True)
+            self.uninstall_generator.remove_dirs(path_parts)
 
     def _calculate_copy_target(self, source, to, prefix=''):
         """
@@ -79,14 +78,16 @@ class Install(_StageBase, ShellCommandsMixin):
             raise NameError("If only a single file is specified, use the 'to' "
                             "argument to specify the whole destination name!")
 
+        to_original = to
         to = self.expand_args(to)
         if os.path.abspath(to) != to:
-            raise ValueError("'to' must be given as an absolute PATH")
+            raise ValueError("'to' must be given as an absolute path")
 
         if files and not os.path.isdir(to):
             raise NotADirectoryError("'to' must be an existing directory when "
                                      "copying multiple files.")
 
+        _uninstall_files = []
         for file in (files if files else [file]):
             source = self.expand_args(file)
             target = self.expand_args(
@@ -96,16 +97,33 @@ class Install(_StageBase, ShellCommandsMixin):
                   % (source, os.path.abspath(source), target))
             shutil.copy(source, target)
 
+            # Retain the possible unexpanded variable names in the target
+            # files' path.
+            unins_path = self._calculate_copy_target(source,
+                                                     to_original,
+                                                     prefix)
+            if os.path.isdir(target):
+                unins_path = os.path.join(unins_path, os.path.basename(source))
+            _uninstall_files.append(unins_path)
+
+        if _uninstall_files:
+            if files:  # Takes precedence as loop above defined the 'file'.
+                self.uninstall_generator.remove(files=_uninstall_files)
+            elif file:
+                self.uninstall_generator.remove(file=_uninstall_files[0])
+
     def copy_tree(self, dir, to):
         """
         Copies the entire contents of the source 'dir' to the 'to' directory.
         The destination directory must not exist.
         """
-        # TODO: Inverse operation is the unconditional removal of the tree.
-        dir = self.expand_args(dir)
+        dirp = self.expand_args(dir)
+
+        self.uninstall_generator.remove_tree(to)
+
         to = self.expand_args(to)
-        print("[DEBUG] Copy tree '%s' to '%s" % (dir, to))
-        shutil.copytree(dir, to)
+        print("[DEBUG] Copy tree '%s' to '%s" % (dirp, to))
+        shutil.copytree(dirp, to)
 
     def replace(self, at, with_file=None, with_files=None, prefix=''):
         """
@@ -120,17 +138,28 @@ class Install(_StageBase, ShellCommandsMixin):
         argument mapping:
             * at -> to
             * with_file[s] -> file[s]
-            * prefix -> prefix
+            * prefix: gets applied to the 'file[s]' names
         """
         for file in (with_files if with_files else [with_file]):
-            target = self.expand_args(self._calculate_copy_target(
-                self.expand_args(file), at, prefix))
+            target = self._calculate_copy_target(file, at, prefix)
+            target_real = self.expand_args(
+                self._calculate_copy_target(
+                    self.expand_args(file), at, prefix))
 
-            print("[DEBUG] Replacing happens for file '%s'..." % target)
+            print("[DEBUG] Replacing happens for file '%s (%s)'..."
+                  % (target, target_real))
 
-            # TODO: Save backup.
+            with get_user_save().get_package_archive(
+                    self.package.name) as zipf:
+                try:
+                    zipf.write(target_real, target.lstrip('/'))
+                    self.uninstall_generator.restore(file=target)
+                except FileNotFoundError:
+                    # If the original file did not exist, do nothing.
+                    pass
 
-            self.copy(to=target, file=file, prefix=prefix)
+            # Execute the copy itself.
+            self.copy(to=target, file=file)
 
     # TODO: Refactor user-given variables to be loaded from memory, not from
     #       a file.

@@ -8,3 +8,10 @@ install:
     commands:
       - "sudo apt-get install -y --no-install-recommends cpufreq-utils"  # 16.04
       - "sudo apt-get install -y --no-install-recommends cpufrequtils"   # 18.04
+uninstall:
+  - action: shell
+    command: "sudo apt-get remove -y aptitude finger iotop lynx smartmontools traceroute"
+  - action: shell any
+    commands:
+      - "sudo apt-get remove -y --no-install-recommends cpufreq-utils"  # 16.04
+      - "sudo apt-get remove -y --no-install-recommends cpufrequtils"   # 18.04
