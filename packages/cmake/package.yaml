@@ -3,6 +3,7 @@ description: CMake is a cross-platform open-source build system designed to
   build instructions written in a common DSL. It also allows for extensive
   modularisation and automatic finding of environment dependencies, etc.
 dependencies:
+  - basic
   - internal.virtualenv
 prepare:
   - action: shell all
@@ -15,10 +16,13 @@ prepare:
 install:
   - action: make dirs
     dirs:
-      - "$HOME/bin"
-      - "$HOME/opt"
+      - $HOME/bin
+      - $HOME/opt
   - action: copy tree
-    dir: "$TEMPORARY_DIR/cmake"
-    to: "$HOME/opt/cmake"
+    dir: $TEMPORARY_DIR/cmake
+    to: $HOME/opt/cmake
   - action: shell
     command: "cd $HOME/bin; ln -s ../opt/cmake/bin/* ."
+uninstall:
+  - action: shell
+    command: "cd $HOME/bin; for sl in $(ls ../opt/cmake/bin); do rm -f ${sl}; done"

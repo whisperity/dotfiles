@@ -1,14 +1,16 @@
 description: A small build system with focus on speed. Commonly used with
   CMake to generate the build commands for a project.
+dependencies:
+  - bash
 prepare:
   - action: shell all
     commands:
       - "$PACKAGE_DIR/get-ninja.sh"
-      - "unzip ninja-linux.zip"
+      - unzip ninja-linux.zip
 install:
   - action: make dirs
     dirs:
-      - "$HOME/bin"
+      - $HOME/bin
   - action: copy
-    file: "$TEMPORARY_DIR/ninja"
-    to: "$HOME/bin/ninja"
+    file: $TEMPORARY_DIR/ninja
+    to: $HOME/bin/ninja

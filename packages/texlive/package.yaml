@@ -22,3 +22,6 @@ install:
   - action: copy
     file: texlive.sh
     to: "$HOME/.bash.d/tex-live.sh"
+uninstall:
+  - action: remove tree
+    dir: $HOME/opt/texlive

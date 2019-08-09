@@ -9,3 +9,6 @@ install:
   - action: copy
     file: direnv.sh
     to: "$HOME/.bash.d/direnv.sh"
+uninstall:
+  - action: shell
+    command: "sudo apt-get remove -y direnv"

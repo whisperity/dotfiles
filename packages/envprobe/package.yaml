@@ -1,7 +1,7 @@
 description: Envprobe is a Shell environment variable management tool written
   in Python, which can also save and load variable differences on request.
 dependencies:
-  - basic
+  - bash
 prepare:
   - action: shell all
     commands:
@@ -11,11 +11,10 @@ prepare:
 install:
   - action: make dirs
     dirs:
-      - "$HOME/.bash.d"
-      - "$HOME/opt"
+      - $HOME/opt
   - action: copy tree
-    dir: "$TEMPORARY_DIR/envprobe"
-    to: "$HOME/opt/envprobe"
+    dir: $TEMPORARY_DIR/envprobe
+    to: $HOME/opt/envprobe
   - action: copy
     file: envprobe.sh
-    to: "$HOME/.bash.d/zzzzzz_loadlast_envprobe.sh"
+    to: $HOME/.bash.d/zzzzzz_loadlast_envprobe.sh

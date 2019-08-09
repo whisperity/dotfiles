@@ -1,11 +1,9 @@
-description: Installs Vim, a pluginable command-line text editor
-# superuser: true
+description: Installs configuration for Vim, a pluginable command-line text
+  editor. (A package of 'Vim' should be installed separately.)
 prepare:
   - action: git clone
     repository: "http://github.com/tomasr/molokai.git"
 install:
-#  - action: shell
-#    command: "sudo apt-get install -y vim"
   - action: make dirs
     dirs:
       - "$HOME/.vim"

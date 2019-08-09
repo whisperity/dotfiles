@@ -5,8 +5,8 @@ superuser: true
 prepare:
   - action: shell all
     commands:
-      - 'wget http://raw.githubusercontent.com/so-fancy/diff-so-fancy/master/third_party/build_fatpack/diff-so-fancy'
-      - chmod +x diff-so-fancy
+      - "wget http://raw.githubusercontent.com/so-fancy/diff-so-fancy/master/third_party/build_fatpack/diff-so-fancy"
+      - "chmod +x diff-so-fancy"
 install:
   - action: make dirs
     dirs:
@@ -21,3 +21,10 @@ install:
   - action: copy
     file: colourdiff.sh
     to: "$HOME/.bash.d/colourdiff.sh"
+uninstall:
+  - action: shell any
+    commands:
+      - "git config --global --unset core.pager"
+      - true  # If the config option wasn't in the user's gitconfig, ignore.
+  - action: shell
+    command: "sudo apt-get remove -y colordiff"
