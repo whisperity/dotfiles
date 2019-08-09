@@ -1,19 +1,23 @@
 import fnmatch
 import os
 import pprint
+import zipfile
 
 try:
     from yaml import YAMLError
     from yaml import load as load_yaml
+    from yaml import dump as dump_yaml
 
     try:
         # Get the faster version of the loader, if possible.
         from yaml import CSafeLoader as Loader
+        from yaml import CSafeDumper as Dumper
     except ImportError:
         # NOTE: Installing "LibYAML" requires compiling from source, so in
         # case the current environment does not have it, just fall back to
         # the pure Python (thus slower) implementation.
         from yaml import SafeLoader as Loader
+        from yaml import SafeDumper as Dumper
 except ImportError:
     import sys
     print("The YAML package for the current Python interpreter cannot be "
@@ -26,9 +30,9 @@ except ImportError:
 from dotfiles import install_stages
 from dotfiles.argument_expander import ArgumentExpander
 from dotfiles.chdir import restore_working_directory
+from dotfiles.saved_data import get_user_save
 from dotfiles.status import Status, require_status
 from dotfiles.temporary import temporary_dir
-from dotfiles.saved_data import get_user_save
 
 
 class ExecutorError(Exception):
@@ -106,6 +110,9 @@ class Package:
 
     @classmethod
     def create(cls, logical_name):
+        """
+        Creates a `Package` instance for the given logical package name.
+        """
         try:
             return Package(logical_name,
                            cls.package_name_to_data_file(logical_name))
@@ -114,6 +121,37 @@ class Package:
         except YAMLError:
             raise ValueError("Package data file for '%s' is corrupt."
                              % logical_name)
+
+    @classmethod
+    def save_to_archive(cls, package, archive):
+        """
+        Saves the given `package`'s resources(including the potential
+        generated configuration) into the given `archive` (of type
+        `zipfile.ZipFile`).
+        """
+        print(type(archive))
+        if not isinstance(archive, zipfile.ZipFile):
+            raise TypeError("'archive' must be a `ZipFile`")
+
+        for dirpath, _, files in os.walk(package.resources):
+            arcpath = dirpath.replace(package.resources, 'PACKAGE_DIR')
+            for file in files:
+                if file == 'package.yaml':
+                    continue
+
+                archive.write(os.path.join(dirpath, file),
+                              os.path.join(arcpath, file),
+                              compress_type=zipfile.ZIP_DEFLATED)
+
+        archive.writestr('package.yaml', package.serialize(),
+                         compress_type=zipfile.ZIP_DEFLATED)
+
+    @require_status(Status.NOT_INSTALLED, Status.INSTALLED)
+    def serialize(self):
+        """
+        Return the package's data in YAML string format.
+        """
+        return dump_yaml(self._data)
 
     @property
     def status(self):
@@ -259,6 +297,11 @@ class Package:
 
         self._status = Status.INSTALLED
 
+        if uninstall_generator.actions:
+            # Save the uninstall actions to the package's data.
+            self._data['generated uninstall'] = \
+                list(uninstall_generator.actions)
+
     @property
     def has_uninstall_actions(self):
         """
@@ -266,7 +309,7 @@ class Package:
         package.
         """
         return self._status == Status.INSTALLED and \
-            'uninstall' in self._data
+            ('uninstall' in self._data or 'generated uninstall' in self._data)
 
     @require_status(Status.INSTALLED)
     @restore_working_directory
@@ -277,7 +320,8 @@ class Package:
             # Start the execution in the user's home directory.
             os.chdir(os.path.expanduser('~'))
 
-            for step in self._data.get('uninstall'):
+            for step in (self._data.get('generated uninstall', []) +
+                         self._data.get('uninstall')):
                 if not executor(**step):
                     self.set_failed()
                     raise ExecutorError(self, 'uninstall', step)

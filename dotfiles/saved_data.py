@@ -115,10 +115,20 @@ class UserSave:
             self._data['packages'][package.name] = pkg_dict
         pkg_dict['status'] = package.status.name
 
-        pkg_dict_st_changes = pkg_dict.get('status_changes', {})
+        pkg_dict_st_changes = pkg_dict.get('latest_status_changes', {})
         if not pkg_dict_st_changes:
-            pkg_dict['last_st_changes'] = pkg_dict_st_changes
+            pkg_dict['latest_status_changes'] = pkg_dict_st_changes
         pkg_dict_st_changes[package.status.name] = datetime.now().isoformat()
+
+        try:
+            pkg_dict['relevant_backup'] = os.path.basename(
+                self._uncommitted_archives[package])
+        except KeyError:
+            # If a backup is not relevant, make sure the key is removed.
+            try:
+                del pkg_dict['relevant_backup']
+            except KeyError:  # The key wasn't there.
+                pass
 
     @property
     def installed_packages(self):

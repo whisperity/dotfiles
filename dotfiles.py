@@ -288,6 +288,11 @@ def _install(p, package_names):
         try:
             print("Installing '%s'..." % instance.name)
             instance.execute_install()
+
+            # Save the package's metadata and the current state of its
+            # resource files into the user's backup archive.
+            with get_user_save().get_package_archive(instance) as zipf:
+                package.Package.save_to_archive(instance, zipf)
         except Exception as e:
             print("Failed to install '%s'!"
                   % instance.name, file=sys.stderr)
@@ -301,9 +306,7 @@ def _install(p, package_names):
 
         if instance.is_installed:
             print("Successfully installed '%s'." % instance.name)
-
             if not instance.is_support:
-                # Save that the package was installed.
                 get_user_save().save_status(instance)
 
 
@@ -336,10 +339,7 @@ def _uninstall(p, package_names):
 
         if not instance.is_installed:
             print("Successfully uninstalled '%s'." % instance.name)
-
-            # Save that the package was installed.
-            # TODO: Uncomment this.
-            # get_user_save().save_status(instance)
+            get_user_save().save_status(instance)
 
 
 # -----------------------------------------------------------------------------
