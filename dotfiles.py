@@ -104,10 +104,29 @@ def _fetch_packages():
     The packages itself won't be parsed or instantiated, only the name storage
     is loaded.
     """
-    return LazyDict(
-        factory=package.Package.create,
-        initial_keys=package.get_package_names(
+
+    def __package_factory(package_name):
+        """
+        Dispatches the actual creation of the `package.Package` instance for
+        the given logical `package_name` to the appropriate factory method.
+        """
+        if get_user_save().is_installed(package_name):
+            # If the package is installed, the data should be created from the
+            # archive corresponding for the package's last install state.
+            with get_user_save().get_package_archive(package_name) as zipf:
+                return package.Package.create_from_archive(package_name, zipf)
+        else:
+            # If the package is not installed, load data from the repository.
+            return package.Package.create(package_name)
+
+    repository_packages = set(package.get_package_names(
             package.Package.package_directory))
+    installed_packages = set(get_user_save().installed_packages)
+    package_names = repository_packages | installed_packages
+
+    return LazyDict(
+        factory=__package_factory,
+        initial_keys=package_names)
 
 
 def _list(p, user_filter=None):
@@ -291,7 +310,7 @@ def _install(p, package_names):
 
             # Save the package's metadata and the current state of its
             # resource files into the user's backup archive.
-            with get_user_save().get_package_archive(instance) as zipf:
+            with get_user_save().get_package_archive(instance.name) as zipf:
                 package.Package.save_to_archive(instance, zipf)
         except Exception as e:
             print("Failed to install '%s'!"

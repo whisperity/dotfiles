@@ -138,7 +138,7 @@ class Install(_StageBase, ShellCommandsMixin):
         argument mapping:
             * at -> to
             * with_file[s] -> file[s]
-            * prefix -> prefix
+            * prefix: gets applied to the 'file[s]' names
         """
         for file in (with_files if with_files else [with_file]):
             target = self._calculate_copy_target(file, at, prefix)
@@ -149,7 +149,8 @@ class Install(_StageBase, ShellCommandsMixin):
             print("[DEBUG] Replacing happens for file '%s (%s)'..."
                   % (target, target_real))
 
-            with get_user_save().get_package_archive(self.package) as zipf:
+            with get_user_save().get_package_archive(
+                    self.package.name) as zipf:
                 try:
                     zipf.write(target_real, target.lstrip('/'))
                     self.uninstall_generator.restore(file=target)
@@ -158,7 +159,7 @@ class Install(_StageBase, ShellCommandsMixin):
                     pass
 
             # Execute the copy itself.
-            self.copy(to=target, file=file, prefix=prefix)
+            self.copy(to=target, file=file)
 
     # TODO: Refactor user-given variables to be loaded from memory, not from
     #       a file.

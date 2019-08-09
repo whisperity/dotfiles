@@ -1,6 +1,7 @@
 import fnmatch
 import os
 import pprint
+import shutil
 import zipfile
 
 try:
@@ -30,9 +31,8 @@ except ImportError:
 from dotfiles import install_stages
 from dotfiles.argument_expander import ArgumentExpander
 from dotfiles.chdir import restore_working_directory
-from dotfiles.saved_data import get_user_save
 from dotfiles.status import Status, require_status
-from dotfiles.temporary import temporary_dir
+from dotfiles.temporary import package_temporary_dir, temporary_dir
 
 
 class ExecutorError(Exception):
@@ -86,7 +86,7 @@ class Package:
         metadata file.
         """
         return os.path.dirname(path) \
-            .replace(cls.package_directory, '') \
+            .replace(cls.package_directory, '', 1) \
             .replace(os.sep, '.') \
             .lstrip('.')
 
@@ -95,8 +95,6 @@ class Package:
         self.datafile = datafile_path
         self.resources = os.path.dirname(datafile_path)
         self._status = Status.NOT_INSTALLED
-        if get_user_save().is_installed(self.name):
-            self._status = Status.INSTALLED
 
         self._teardown = []
 
@@ -123,18 +121,48 @@ class Package:
                              % logical_name)
 
     @classmethod
+    def create_from_archive(cls, logical_name, archive):
+        """
+        Creates a `Package` instance using the information and resources found
+        in the given `archive` (which must be a `zipfile.ZipFile` instance).
+        """
+        if not isinstance(archive, zipfile.ZipFile):
+            raise TypeError("'archive' must be a `ZipFile`")
+
+        # Unpack the archive to a temporary directory.
+        package_dir = package_temporary_dir(logical_name)
+        for file in archive.namelist():
+            if file == 'package.yaml' or file.startswith('$PACKAGE_DIR/'):
+                archive.extract(file, package_dir)  # Extract to the temporary.
+
+                # Temporary is extracted by keeping the '$PACKAGE_DIR/'
+                # directory, thus it has to be moved one level up.
+                without_prefix = file.replace('$PACKAGE_DIR/', '', 1)
+                os.makedirs(
+                    os.path.join(package_dir, os.path.dirname(without_prefix)),
+                    exist_ok=True)
+                shutil.move(os.path.join(package_dir, file),
+                            os.path.join(package_dir, without_prefix))
+        shutil.rmtree(os.path.join(package_dir, '$PACKAGE_DIR'),
+                      ignore_errors=True)
+
+        instance = Package(logical_name,
+                           os.path.join(package_dir, 'package.yaml'))
+        instance.__setattr__('_status', Status.INSTALLED)
+        return instance
+
+    @classmethod
     def save_to_archive(cls, package, archive):
         """
         Saves the given `package`'s resources(including the potential
         generated configuration) into the given `archive` (of type
         `zipfile.ZipFile`).
         """
-        print(type(archive))
         if not isinstance(archive, zipfile.ZipFile):
             raise TypeError("'archive' must be a `ZipFile`")
 
         for dirpath, _, files in os.walk(package.resources):
-            arcpath = dirpath.replace(package.resources, 'PACKAGE_DIR')
+            arcpath = dirpath.replace(package.resources, '$PACKAGE_DIR', 1)
             for file in files:
                 if file == 'package.yaml':
                     continue
@@ -317,11 +345,11 @@ class Package:
         if self.has_uninstall_actions:
             executor = install_stages.uninstall.Uninstall(self, self._expander)
 
-            # Start the execution in the user's home directory.
-            os.chdir(os.path.expanduser('~'))
+            # Start the execution in the package resource folder.
+            os.chdir(self.resources)
 
             for step in (self._data.get('generated uninstall', []) +
-                         self._data.get('uninstall')):
+                         self._data.get('uninstall', [])):
                 if not executor(**step):
                     self.set_failed()
                     raise ExecutorError(self, 'uninstall', step)

@@ -30,10 +30,8 @@ Listing status for a particular package is possible if `--list` is explicitly
 specified: `dotfiles --list foo bar`.
 
 
-:warning: **Warning!** The installers in this tool will unconditionally
-overwrite some of the most basic configuration files.
-This tool is intended to be used when a new user profile is created, such as
-when a new machine is installed.
+:warning: **Note:** This tool is intended to be used when a new user
+profile is created, such as when a new machine is installed.
 
 
 
@@ -150,7 +148,8 @@ This is called the _preparation phase_.
 
 At the beginning of this phase, the executing environment switches into a
 temporary directory.
-In most directives, `$TEMPORARY_DIR` can be used to refer to this directory.
+In most directives, `$TEMPORARY_DIR` can be used to refer to this directory
+when specifying a path.
 
 
 |   Action        | Arguments                    | Semantics                                                                                                    | Failure condition                                     |
@@ -171,8 +170,11 @@ This phase is the _main_ phase where changes to the user's files should be
 done.
 
 In most directives, `$TEMPORARY_DIR` can be used to refer to the _`prepare`_
-phase's directory.
-`$PACKAGE_DIR` refers to the persistent package directory.
+phase's directory when specifying a path.
+(This may only be done if there was a _`prepare`_ phase for the package!)
+
+`$PACKAGE_DIR` refers to the directory where the package's metadata file
+(`package.yaml`) and additional resources are.
 
 
 |   Action           | Arguments                                                                                              | Semantics                                                                                                                                             | Failure condition                                     |
@@ -190,7 +192,16 @@ phase's directory.
 
 #### `uninstall`
 
-Uninstall starts from the user's `$HOME` (`~`) directory.
+Uninstall starts from the directory that corresponds to `$PACKAGE_DIR`, but
+contains the files that were present in this directory at installation, not
+what are *currently* present on the system.
+This means that the state of `package.yaml` and the resource files are kept
+intact even if the `packages/` directory on the system is updated.
+
+In `uninstall` mode, `$PACKAGE_DIR` refers to this archived directory.
+
+:warning: **Note!** The "original" `$PACKAGE_DIR` is **not accessible** during
+_`uninstall`_.
 
 
 |   Action           | Arguments                                                                                              | Semantics                                                                                                                                             | Failure condition                                   |
@@ -214,6 +225,7 @@ Certain _`install`_ directives can automatically be mapped to _`uninstall`_
 actions.
 At the uninstall of a package, the corresponding actions are executed in
 **reverse order** (compared to the order of `install` directives).
+
 
 | `install` action     | `uninstall` action  | Comment                                                                                                                                                                |
 |:--------------------:|:-------------------:|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------|

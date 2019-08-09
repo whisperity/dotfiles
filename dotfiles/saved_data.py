@@ -122,7 +122,7 @@ class UserSave:
 
         try:
             pkg_dict['relevant_backup'] = os.path.basename(
-                self._uncommitted_archives[package])
+                self._uncommitted_archives[package.name])
         except KeyError:
             # If a backup is not relevant, make sure the key is removed.
             try:
@@ -140,30 +140,46 @@ class UserSave:
                 yield package
 
     @contextmanager
-    def get_package_archive(self, package):
+    def get_package_archive(self, package_name):
         """
         Returns the `zipfile.ZipFile` context for the backup storage of the
         given `package`.
+
+        If the package is not yet installed, a new archive will be created and
+        it's context will be returned. (Multiple calls in the program to this
+        function will return the same archive.)
+
+        If the package has been installed, return the archive - if exists -
+        that corresponds to the state of the most recent install.
         """
-        archive = self._uncommitted_archives.get(package)
-        if not archive:
-            print("Creating package archive for '%s'" % package.name)
+        if self.is_installed(package_name):
+            mode = 'r'
             archive = os.path.join(
                 UserSave.config_dir,
-                package.name + '_' + datetime.now().strftime('%s') + '_0.zip')
+                self._data['packages'][package_name].get('relevant_backup'))
+        else:
+            mode = 'a'
+            archive = self._uncommitted_archives.get(package_name)
+            if not archive:
+                print("Creating package archive for '%s'" % package_name)
 
-            while os.path.isfile(archive):
-                # Unlikely, but the user might end up running the same
-                # installer in a quick succession, in which these archives
-                # could end up being filled multiple times. This prevents it.
-                archive = archive.split('_')
-                counter = int(archive[-1].replace('.zip', '')) + 1
-                archive[-1] = str(counter) + '.zip'
-                archive = '_'.join(archive)
+                archive = os.path.join(UserSave.config_dir,
+                                       package_name + '_' +
+                                       datetime.now().strftime('%s') +
+                                       '_0.zip')
 
-            self._uncommitted_archives[package] = archive
+                while os.path.isfile(archive):
+                    # Unlikely, but the user might end up running the same
+                    # installer in a quick succession, in which these archives
+                    # could end up being filled multiple times.
+                    archive = archive.split('_')
+                    counter = int(archive[-1].replace('.zip', '', 1)) + 1
+                    archive[-1] = str(counter) + '.zip'
+                    archive = '_'.join(archive)
 
-        zip_ = zipfile.ZipFile(archive, 'a',
+                self._uncommitted_archives[package_name] = archive
+
+        zip_ = zipfile.ZipFile(archive, mode,
                                compression=zipfile.ZIP_DEFLATED)
         try:
             yield zip_

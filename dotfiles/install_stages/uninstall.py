@@ -109,7 +109,7 @@ class Uninstall(_StageBase, ShellCommandsMixin):
                 raise ValueError("All 'files' (or 'file') must be an "
                                  "absolute path")
 
-        with get_user_save().get_package_archive(self.package) as zipf:
+        with get_user_save().get_package_archive(self.package.name) as zipf:
             for file_ in (files if files else [file]):
                 file_real = self.expand_args(file_)
                 try:
