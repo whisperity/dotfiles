@@ -53,7 +53,7 @@ class Prepare(_StageBase, ShellCommandsMixin):
         common_prefix = os.path.commonprefix([
             os.path.abspath(self.package.resource_dir),
             source_path])
-        if common_prefix != os.path.abspath(self.package.resource_di):
+        if common_prefix != os.path.abspath(self.package.resource_dir):
             raise PermissionError("Specifying a path outside the resource "
                                   "directory is forbidden.")
 

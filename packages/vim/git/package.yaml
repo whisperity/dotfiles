@@ -12,4 +12,4 @@ install:
     to: "$HOME/.vim/bundle/vim-fugitive"
   - action: copy tree
     dir: "$TEMPORARY_DIR/vim-gitgutter"
-    to: "$HOME/.vim/bundle/vim-clafugitive"
+    to: "$HOME/.vim/bundle/vim-gitgutter"
