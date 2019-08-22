@@ -1,1 +1,8 @@
+if $VIM_THEME == 'dark'
+    source ~/.vim/dark.vim
+else
+    source ~/.vim/light.vim
+endif
+
+" Rest of the initialisation is common
 source ~/.vim/init.vim

@@ -15,10 +15,6 @@ set nocompatible
 set history=7000
 set backspace=indent,eol,start
 
-" Theme
-set background=dark
-colorscheme molokai
-
 " Syntax highlighting
 syntax on
 filetype plugin indent on

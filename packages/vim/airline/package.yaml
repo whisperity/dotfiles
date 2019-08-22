@@ -4,10 +4,18 @@ dependencies:
 prepare:
   - action: git clone
     repository: "http://github.com/vim-airline/vim-airline"
+  - action: git clone
+    repository: "http://github.com/rakr/vim-one.git"
 install:
+  - action: make dirs
+    dirs:
+      - "$HOME/.vim/autoload/airline/themes"
   - action: copy tree
     dir: "$TEMPORARY_DIR/vim-airline"
     to: "$HOME/.vim/bundle/vim-airline"
   - action: copy
     file: config.vim
     to: "$HOME/.vim/config/vim-airline.vim"
+  - action: copy
+    file: "$TEMPORARY_DIR/vim-one/autoload/airline/themes/one.vim"
+    to: "$HOME/.vim/autoload/airline/themes"

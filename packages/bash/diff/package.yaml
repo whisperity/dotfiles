@@ -1,6 +1,4 @@
 description: Installs tools that format diffs to be better-looking
-dependencies:
-  - basic
 superuser: true
 prepare:
   - action: shell all
@@ -20,7 +18,7 @@ install:
     command: "git config --global core.pager \"diff-so-fancy | less --tabs=4 -RFX\""
   - action: copy
     file: colourdiff.sh
-    to: "$HOME/.bash.d/colourdiff.sh"
+    to: "$HOME/.bash.d"
 uninstall:
   - action: shell any
     commands:

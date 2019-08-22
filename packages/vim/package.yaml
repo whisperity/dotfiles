@@ -3,6 +3,8 @@ description: Installs configuration for Vim, a pluginable command-line text
 prepare:
   - action: git clone
     repository: "http://github.com/tomasr/molokai.git"
+  - action: git clone
+    repository: "http://github.com/rakr/vim-one.git"
 install:
   - action: make dirs
     dirs:
@@ -12,8 +14,13 @@ install:
     file: vimrc
     to: "$HOME/.vimrc"
   - action: copy
-    file: init.vim
-    to: "$HOME/.vim/init.vim"
+    files:
+      - dark.vim
+      - init.vim
+      - light.vim
+    to: "$HOME/.vim"
   - action: copy
-    file: "$TEMPORARY_DIR/molokai/colors/molokai.vim"
-    to: "$HOME/.vim/colors/molokai.vim"
+    files:
+      - "$TEMPORARY_DIR/molokai/colors/molokai.vim"
+      - "$TEMPORARY_DIR/vim-one/colors/one.vim"
+    to: "$HOME/.vim/colors"
