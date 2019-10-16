@@ -108,3 +108,7 @@
 	whoami = "!whoami() { \
 			echo \"$(git config --get user.name) <$(git config --get user.email)>\"; \
 		}; whoami" -
+	edit-exclude = "!eexclude() { \
+			GIT_DIR=$(git rev-parse --git-dir 2>/dev/null) && \
+			${EDITOR} \"${GIT_DIR}/info/exclude\"; \
+		}; eexclude" -
