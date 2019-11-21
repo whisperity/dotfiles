@@ -19,3 +19,7 @@ alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo
 
 # Add the current working directory to PATH.
 alias wd2path='export PATH="$(pwd):$PATH"'
+
+# Shortcut for VCS.
+alias s='svn'
+alias g='git'

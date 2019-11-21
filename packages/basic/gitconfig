@@ -51,6 +51,13 @@
 	ign = ls-files -o -i --exclude-standard
 
 	# =========================================================
+	# Shortcuts
+	ia = add -i
+	ap = add -p
+	rp = reset -p
+	cpf = checkout -p --
+
+	# =========================================================
 	# Different log views.
 	# - graph logs
 	lol = log --graph --decorate --pretty=oneline --abbrev-commit
@@ -65,10 +72,12 @@
 	# - lieutenant changelog (author and committer)
 	lclog = log --date-order --pretty=format:'<%C(cyan)%an%Creset (%C(cyan)%ad%Creset)> [%C(bold blue)%cn%Creset (%C(bold blue)%cd%Creset)] (%C(yellow)%h%Creset) %s'
 
+	# =========================================================
 	# GitHub shortlinks.
 	hubclone = "!sh -c 'git clone http://github.com/$1/$2.git --origin upstream'" -
 	hubremote-add = "!sh -c 'git remote add $1 http://github.com/$1/$2.git'" -
 
+	# =========================================================
 	# Lieutenant work helpers.
 	recover = "!bash -c '~/bin/git-recover.sh $1'" -
 	rewrite = "!bash -c '~/bin/git-rewrite.sh $1 $2'" -
@@ -102,6 +111,7 @@
 	assumed = "!git ls-files -v | grep ^h | cut -c 3-"
 	lsa = "!git assumed"
 
+	# =========================================================
 	# Miscellaneous
 	d = describe --always --tags --dirty="-dirty"
 	dump = cat-file -p
