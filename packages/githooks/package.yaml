@@ -1,0 +1,23 @@
+description: Per-repository and global Git hook management with (optional)
+  version control of scripts within the repository.
+dependencies:
+  - basic
+prepare:
+  - action: git clone
+    repository: "http://github.com/rycus86/githooks.git"
+install:
+  - action: make dirs
+    dirs:
+      - $HOME/.githooks
+  - action: shell
+    command: "$TEMPORARY_DIR/githooks/install.sh --non-interactive --skip-install-into-existing"
+  - action: shell
+    command: "git hooks update disable"
+uninstall:
+  - action: shell
+    command: "$HOME/.githooks/bin/githooks uninstall --global"
+  - action: remove dirs
+    dirs:
+      - $HOME/.githooks/templates/hooks
+      - $HOME/.githooks/templates
+
