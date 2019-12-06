@@ -17,9 +17,13 @@ install:
       - bash_aliases
       - gitconfig
       - profile
+      - zprofile
+      - zshrc
     prefix: '.'
   - action: replace user input
     file: $HOME/.gitconfig
+  - action: substitute environment variables
+    file: $HOME/.zshrc
   - action: make dirs
     dirs:
       - $HOME/.ssh

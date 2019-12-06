@@ -1,0 +1,39 @@
+description: Z Shell is an extension of the Bourne shell implementing features
+  inspired by ksh, Bash and tcsh. (This package does NOT install the 'zsh'
+  command, please obtain it from system sources.) The package installs
+  Oh-My-ZSH, a community-driven framework for managing zsh configuration and
+  plugins.
+dependencies:
+  - basic
+prepare:
+  - action: shell all
+    commands:
+      - wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
+      - chmod +x install.sh
+      - touch $HOME/.zshrc
+install:
+  - action: shell
+    command: sh -c 'ZSH=$HOME/.oh-my-zsh $TEMPORARY_DIR/install.sh --unattended'
+# Oh-my-ZSH overwrites the original .zshrc unconditionally...
+  - action: replace
+    at: $HOME/.zshrc
+    with file: $HOME/.zshrc.pre-oh-my-zsh
+  - action: make dirs
+    dirs:
+      - $HOME/.zsh.pre.d
+      - $HOME/.zsh.post.d
+  - action: copy
+    file: pre.zsh
+    to: $HOME/.zsh.pre.d/example.zsh
+  - action: copy
+    file: post.zsh
+    to: $HOME/.zsh.post.d/example.zsh
+  - action: shell
+    command: ln -s .oh-my-zsh/custom $HOME/.zsh.d
+uninstall:
+  - action: shell
+    command: bash -c 'echo "y" | $HOME/.zsh.d/oh-my-zsh/tools/uninstall.sh"'
+  - action: shell all
+    command:
+      - rm $HOME/.zsh.d
+      - rm -rf $HOME/.oh-my-zsh
