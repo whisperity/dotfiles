@@ -107,7 +107,7 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-#
+
 # Source custom configuration details that should be loaded after ZSH plugins
 # are up.
 if [[ -d ~/.zsh.post.d ]]; then

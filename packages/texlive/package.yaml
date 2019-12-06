@@ -1,7 +1,5 @@
 description: Install the TeXLive (La)TeX typesetting environment's latest
   version from the internet.
-dependencies:
-  - bash
 prepare:
   - action: shell all
     commands:
@@ -16,12 +14,17 @@ install:
     file: $TEMPORARY_DIR/texlive.profile
   - action: make dirs
     dirs:
+      - $HOME/.bash.d
+      - $HOME/.zsh.post.d
       - $HOME/opt
   - action: shell
     command: "$TEMPORARY_DIR/install-tl/install-tl --profile=$TEMPORARY_DIR/texlive.profile"
   - action: copy
     file: texlive.sh
     to: "$HOME/.bash.d/tex-live.sh"
+  - action: copy
+    file: texlive.sh
+    to: "$HOME/.zsh.post.d/tex-live.sh"
 uninstall:
   - action: remove tree
     dir: $HOME/opt/texlive

@@ -1,7 +1,7 @@
 description: Per-repository and global Git hook management with (optional)
   version control of scripts within the repository.
 dependencies:
-  - basic
+  - basic  # Need to have a configured .gitconfig!
 prepare:
   - action: git clone
     repository: "http://github.com/rycus86/githooks.git"

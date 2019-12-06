@@ -4,9 +4,16 @@ superuser: true
 install:
   - action: shell
     command: "sudo apt-get install -y --no-install-recommends direnv"
+  - action: make dirs
+    dirs:
+      - $HOME/.bash.d
+      - $HOME/.zsh.pre.d
   - action: copy
     file: direnv.sh
     to: "$HOME/.bash.d"
+  - action: copy
+    file: direnv.zsh
+    to: "$HOME/.zsh.pre.d"
 uninstall:
   - action: shell
     command: "sudo apt-get remove -y direnv"

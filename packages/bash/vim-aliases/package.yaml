@@ -1,7 +1,0 @@
-description: Shell aliases and hooks for using Vim.
-dependencies:
-  - vim
-install:
-  - action: copy
-    file: vim-aliases.sh
-    to: "$HOME/.bash.d"

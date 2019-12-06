@@ -1,7 +1,5 @@
 description: A small build system with focus on speed. Commonly used with
   CMake to generate the build commands for a project.
-dependencies:
-  - basic
 prepare:
   - action: shell all
     commands:

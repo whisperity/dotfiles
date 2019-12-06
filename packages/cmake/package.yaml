@@ -3,7 +3,6 @@ description: CMake is a cross-platform open-source build system designed to
   build instructions written in a common DSL. It also allows for extensive
   modularisation and automatic finding of environment dependencies, etc.
 dependencies:
-  - basic
   - internal.virtualenv
 prepare:
   - action: shell all

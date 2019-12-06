@@ -1,13 +1,18 @@
 description: Installs ccache, the compiler result cacher
-dependencies:
-  - bash
 superuser: true
 install:
   - action: shell
     command: "sudo apt-get install -y --no-install-recommends ccache"
+  - action: make dirs
+    dirs:
+      - $HOME/.bash.d
+      - $HOME/.zsh.post.d
   - action: copy
     file: enable-ccache.sh
     to: "$HOME/.bash.d/enable-ccache.sh"
+  - action: copy
+    file: enable-ccache.sh
+    to: "$HOME/.zsh.post.d/enable-ccache.sh"
 uninstall:
   - action: shell
     command: "sudo apt-get purge -y ccache"

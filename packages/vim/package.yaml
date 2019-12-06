@@ -8,6 +8,8 @@ prepare:
 install:
   - action: make dirs
     dirs:
+      - "$HOME/.bash.d"
+      - "$HOME/.zsh.post.d"
       - "$HOME/.vim"
       - "$HOME/.vim/colors"
   - action: copy
@@ -24,3 +26,9 @@ install:
       - "$TEMPORARY_DIR/molokai/colors/molokai.vim"
       - "$TEMPORARY_DIR/vim-one/colors/one.vim"
     to: "$HOME/.vim/colors"
+  - action: copy
+    file: aliases.sh
+    to: "$HOME/.bash.d/vim.sh"
+  - action: copy
+    file: aliases.sh
+    to: "$HOME/.zsh.post.d/vim.sh"

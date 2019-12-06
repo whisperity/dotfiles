@@ -1,6 +1,4 @@
 description: Sets up the necessary environment for Bash subpackages.
-dependencies:
-  - basic
 install:
   - action: make dirs
     dirs:
