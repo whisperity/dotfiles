@@ -13,7 +13,7 @@ install:
     to: "$HOME/.bash.d"
   - action: copy
     file: direnv.zsh
-    to: "$HOME/.zsh.pre.d"
+    to: "$HOME/.zsh.post.d"
 uninstall:
   - action: shell
     command: "sudo apt-get remove -y direnv"

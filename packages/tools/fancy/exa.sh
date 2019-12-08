@@ -12,6 +12,5 @@ curl -sL http://api.github.com/repos/ogham/exa/releases/latest \
   | wget -O exa.zip -i -
 
 unzip exa.zip
-rm exa.zip
 mv exa-* exa
 

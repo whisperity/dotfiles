@@ -78,7 +78,9 @@ ZSH_THEME="sunrise"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git)
+#
+# Using += here because ~/.zsh.pre.d can be used to load even more plugins.
+plugins+=(git)
 
 source $ZSH/oh-my-zsh.sh
 

@@ -1,0 +1,17 @@
+description: Installs the shell fuzzy finder (fzf) hook for zsh. The binary
+  itself is NOT installed by this action!
+prepare:
+  - action: git clone
+    repository: http://github.com/junegunn/fzf.git
+install:
+  - action: copy tree
+    dir: $TEMPORARY_DIR/fzf
+    to: $HOME/.zsh.d/fzf-dir
+  - action: shell
+    # Making FZF install the hook into a temporary directory eliminated by
+    # Dotfiles at the end, as we will be using Oh-My-ZSH's FZF plugin to hook.
+    command: sh -c "XDG_CONFIG_HOME=$TEMPORARY_DIR $HOME/.zsh.d/fzf-dir/install --no-key-bindings --no-completion --no-update-rc --xdg --no-bash --no-fish"
+  - action: copy
+    file: config.zsh
+    to: $HOME/.zsh.pre.d/fzf.zsh
+

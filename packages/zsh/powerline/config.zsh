@@ -1,5 +1,5 @@
 # Don't show username for the local user.
-DEFAULT_USER=a${USER}
+#DEFAULT_USER=${USER}
 
 POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(status user dir vcs newline
   virtualenv root_indicator)
