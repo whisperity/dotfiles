@@ -22,14 +22,11 @@ install:
     dirs:
       - $HOME/.zsh.pre.d
       - $HOME/.zsh.post.d
-  - action: copy
-    file: pre.zsh
-    to: $HOME/.zsh.pre.d/example.zsh
-  - action: copy
-    file: post.zsh
-    to: $HOME/.zsh.post.d/example.zsh
   - action: shell
     command: ln -s .oh-my-zsh/custom $HOME/.zsh.d
+  - action: copy
+    file: bash-aliases.zsh
+    to: $HOME/.zsh.d/bash-aliases.zsh
 uninstall:
   - action: shell
     command: bash -c 'echo "y" | $HOME/.zsh.d/oh-my-zsh/tools/uninstall.sh"'
