@@ -1,9 +1,15 @@
 # Don't show username for the local user.
 #DEFAULT_USER=${USER}
 
-POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(status user dir vcs newline
-  virtualenv root_indicator)
+POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(status user dir vcs virtualenv
+   root_indicator)
 POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(background_jobs load time)
+
+POWERLEVEL9K_PROMPT_ON_NEWLINE=true
+POWERLEVEL9K_RPROMPT_ON_NEWLINE=false
+
+# No emojis on most Linux installs...
+POWERLEVEL9K_PYTHON_ICON="Py"
 
 POWERLEVEL9K_SHORTEN_DIR_LENGTH=4
 POWERLEVEL9K_SHORTEN_STRATEGY=truncate_from_right
