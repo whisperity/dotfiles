@@ -8,3 +8,6 @@ install:
   - action: copy tree
     dir: "$TEMPORARY_DIR/vimtex"
     to: "$HOME/.vim/bundle/vimtex"
+  - action: copy
+    file: config.vim
+    to: "$HOME/.vim/config/vimtex.vim"
