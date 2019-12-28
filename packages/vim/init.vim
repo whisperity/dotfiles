@@ -62,7 +62,7 @@ set cmdheight=2
 " tabs to spaces
 set expandtab
 
-set shiftwidth=2
+set shiftwidth=4
 set tabstop=2
 
 set smarttab
@@ -75,7 +75,7 @@ set matchpairs+=<:>
 " Ignore compiled files
 set wildignore=*.o,*~,*.pyc
 
-" Show trailing whitespaces.
+" Show surrounding whitespaces.
 set list
 set listchars=tab:>.,trail:.,extends:#,nbsp:.
 
@@ -146,8 +146,12 @@ if has("autocmd")
     " Use filetype detection and file-based automatic indenting.
     filetype plugin indent on
 
-    " Use actual tab chars in Makefiles. They mess up when non tabs are used.
-    autocmd FileType make set tabstop=8 shiftwidth=8 softtabstop=0 noexpandtab
+    " Use actual <Tab> chars in Makefiles. They mess up when spaces are used!
+    autocmd FileType make  set tabstop=8 shiftwidth=8 softtabstop=0 noexpandtab
+
+    " Spell checking for papers and various human text things.
+    autocmd FileType tex,latex,context,plaintex,bib setlocal spell spelllang=en_gb
+    autocmd FileType markdown,rst setlocal spell spelllang=en_gb
 endif
 
 " Load additional configuration files for plugins
