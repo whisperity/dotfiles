@@ -147,7 +147,7 @@ if has("autocmd")
     filetype plugin indent on
 
     " Use actual <Tab> chars in Makefiles. They mess up when spaces are used!
-    autocmd FileType make  set tabstop=8 shiftwidth=8 softtabstop=0 noexpandtab
+    autocmd FileType make setlocal tabstop=8 shiftwidth=8 softtabstop=0 noexpandtab
 
     " Spell checking for papers and various human text things.
     autocmd FileType tex,latex,context,plaintex,bib setlocal spell spelllang=en_gb
