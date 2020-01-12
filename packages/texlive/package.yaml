@@ -23,8 +23,8 @@ install:
     file: texlive.sh
     to: "$HOME/.bash.d/tex-live.sh"
   - action: copy
-    file: texlive.sh
-    to: "$HOME/.zsh.post.d/tex-live.sh"
+    file: texlive.zsh
+    to: "$HOME/.zsh.post.d/tex-live.zsh"
 uninstall:
   - action: remove tree
     dir: $HOME/opt/texlive
