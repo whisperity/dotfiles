@@ -13,6 +13,11 @@ install:
     command: "$TEMPORARY_DIR/githooks/install.sh --non-interactive --skip-install-into-existing"
   - action: shell
     command: "git hooks update disable"
+  - action: make dirs
+      - $HOME/.githooks/templates/info
+  - action: copy
+    file: exclude
+    to: "$HOME/.githooks/templates/info/exclude"
 uninstall:
   - action: shell
     command: "$HOME/.githooks/bin/githooks uninstall --global"
