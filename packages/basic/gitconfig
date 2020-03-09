@@ -122,3 +122,4 @@
 			GIT_DIR=$(git rev-parse --git-dir 2>/dev/null) && \
 			${EDITOR} \"${GIT_DIR}/info/exclude\"; \
 		}; eexclude" -
+		size = count-objects -vH
