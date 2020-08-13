@@ -1,0 +1,20 @@
+description: Installs distcc, the distributed C family compiler system
+superuser: true
+dependencies:
+  - ccache
+install:
+  - action: shell
+    command: "sudo apt-get install -y --no-install-recommends distcc"
+  - action: make dirs
+    dirs:
+      - $HOME/.bash.d
+      - $HOME/.zsh.post.d
+  - action: copy
+    file: distcc.sh
+    to: "$HOME/.bash.d/distcc.sh"
+  - action: copy
+    file: distcc.zsh
+    to: "$HOME/.zsh.post.d/distcc.zsh"
+uninstall:
+  - action: shell
+    command: "sudo apt-get purge -y distcc"
