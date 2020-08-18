@@ -42,6 +42,9 @@ set colorcolumn=80
 " highlighting search
 set hlsearch
 
+" incremental search
+set incsearch
+
 " Use case insensitive search, except when using capital letters
 set ignorecase
 set smartcase
@@ -78,6 +81,10 @@ set wildignore=*.o,*~,*.pyc
 " Show surrounding whitespaces.
 set list
 set listchars=tab:>.,trail:.,extends:#,nbsp:.
+
+" Control the position of the new window
+set splitbelow
+set splitright
 
 " No annoying sound on errors
 "set noerrorbells

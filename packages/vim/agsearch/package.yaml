@@ -1,0 +1,19 @@
+description: Quick search plugin for Vim using The Silver Searcher
+superuser: true
+dependencies:
+  - vim.pathogen
+prepare:
+  - action: git clone
+    repository: "http://github.com/mileszs/ack.vim"
+install:
+  - action: shell
+    command: "sudo apt-get install -y --no-install-recommends silversearcher-ag"
+  - action: copy tree
+    dir: "$TEMPORARY_DIR/ack.vim"
+    to: "$HOME/.vim/bundle/ack.vim"
+  - action: copy
+    file: config.vim
+    to: "$HOME/.vim/config/ack.vim"
+uninstall:
+    - action: shell
+      command: "sudo apt-get purge -y silversearcher-ag"
