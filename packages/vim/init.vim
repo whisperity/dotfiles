@@ -83,7 +83,7 @@ set listchars=tab:>.,trail:.,extends:#,nbsp:.
 "set noerrorbells
 "set novisualbell
 
-" Turn backup off, since most stuff is in SVN, git et.c anyway...
+" Turn backup off, since most stuff is in SVN, Git, etc. anyway...
 "set nobackup
 "set nowb
 "set noswapfile
@@ -116,10 +116,10 @@ map <C-l> <C-W>l
 "map <left> <nop>
 "map <right> <nop>
 
-noremap  <buffer> <silent> k gk
-noremap  <buffer> <silent> j gj
-noremap  <buffer> <silent> gk k
-noremap  <buffer> <silent> gj j
+noremap <buffer> <silent> k gk
+noremap <buffer> <silent> j gj
+noremap <buffer> <silent> gk k
+noremap <buffer> <silent> gj j
 
 " Buffer switch
 nnoremap <F2> :buffers<CR>:buffer<Space>
@@ -128,6 +128,7 @@ nnoremap <F4> :bnext <CR>
 
 " Close the current buffer.
 command Bc bp|bd#
+nnoremap <C-x> :Bc <CR>
 
 " Clear highlighted searches.
 command C let @/=""
