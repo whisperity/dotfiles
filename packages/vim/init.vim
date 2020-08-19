@@ -122,6 +122,7 @@ map <C-k> <C-W>k
 map <C-h> <C-W>h
 map <C-l> <C-W>l
 
+" Force yourself to learn H, J, K, L instead of arrow keys.
 "map <up> <nop>
 "map <down> <nop>
 "map <left> <nop>
@@ -132,10 +133,15 @@ noremap <buffer> <silent> j gj
 noremap <buffer> <silent> gk k
 noremap <buffer> <silent> gj j
 
-" Buffer switch
+" Buffer switch.
 nnoremap <F2> :buffers<CR>:buffer<Space>
 nnoremap <F3> :bprevious <CR>
 nnoremap <F4> :bnext <CR>
+
+" Tab switch.
+nnoremap <S-F2> :tabs<CR>:tabnext<Space>
+nnoremap <S-F3> :tabprevious <CR>
+nnoremap <S-F4> :tabnext <CR>
 
 " Close the current buffer.
 command Bc bp|bd#
