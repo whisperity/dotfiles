@@ -18,6 +18,11 @@
 #    this script automatically checks the available remotes and selects a
 #    good enough job count.
 #
+#    This script requires calling a build tool that can accept a '-j'
+#    parameter. The above example in :SYNOPSIS can, for example, expand to:
+#
+#        DISTCC_HOSTS="foo/8" make my_target -j8
+#
 #    This script depends on having ccache(1) installed and configured as your
 #    C(++) building system. This generally means that the CC and CXX compilers
 #    in your build process should come from /usr/lib/ccache.
@@ -50,6 +55,14 @@
 #                          The number of jobs to run locally if *NO* remote
 #                          machines are found available.
 #                          Defaults to $(nproc), the number of cores available.
+#
+#    DISTCC_NUM_LOCAL_SCALING
+#                          If defined and too much memory would be needed by
+#                          the local jobs (as calculated by
+#                          DISTCC_NUM_{FIRST|ONLY}_LOCAL * DISTCC_LOCAL_MEM),
+#                          instead of bailing out immediately, scale down the
+#                          number of local jobs to a manageable amount.
+#                          Defaults to empty value which means prefer bailing.
 #
 #    DISTCC_LOCAL_MEM      The amount of memory *in MiB* to require to be free
 #                          per thread of compilation that is executed
@@ -98,7 +111,7 @@
 ################################################################################
 
 # Prints arguments if debug mode is enabled.
-function _dccsh_debug() {
+function _dccsh_debug {
     if [ -z "$DCCSH_DEBUG" ]; then
         return
     fi
@@ -118,15 +131,16 @@ function _dccsh_debug() {
     echo $_ECHO_N "$FUNCNAME_PREFIX" "$@" >&2
 }
 
-function _dccsh_dump_config() {
-    _dccsh_debug "DISTCC_PORTS:           $DISTCC_PORTS"
-    _dccsh_debug "DISTCC_NUM_FIRST_LOCAL: $DISTCC_NUM_FIRST_LOCAL"
-    _dccsh_debug "DISTCC_NUM_ONLY_LOCAL:  $DISTCC_NUM_ONLY_LOCAL"
-    _dccsh_debug "DISTCC_LOCAL_MEM:       $DISTCC_LOCAL_MEM"
+function _dccsh_dump_config {
+    _dccsh_debug "DISTCC_PORTS:             $DISTCC_PORTS"
+    _dccsh_debug "DISTCC_NUM_FIRST_LOCAL:   $DISTCC_NUM_FIRST_LOCAL"
+    _dccsh_debug "DISTCC_NUM_ONLY_LOCAL:    $DISTCC_NUM_ONLY_LOCAL"
+    _dccsh_debug "DISTCC_NUM_LOCAL_SCALING: $DISTCC_NUM_LOCAL_SCALING"
+    _dccsh_debug "DISTCC_LOCAL_MEM:         $DISTCC_LOCAL_MEM"
 }
 
 # Returns true if $1 is listening on the local machine.
-function check_tcp4port_listen() {
+function check_tcp4port_listen {
     _dccsh_debug -n "Check port $1..."
 
     ss -lt4 | grep ":$1" &>/dev/null
@@ -143,7 +157,7 @@ function check_tcp4port_listen() {
 }
 
 # Build by concatenating $2 port with $3 jobs after $1 DISTCC_HOSTS string.
-function _dccsh_concat_port() {
+function _dccsh_concat_port {
     local PORT=$2
     local JOBS=$3
 
@@ -159,7 +173,7 @@ function _dccsh_concat_port() {
 }
 
 # Parses the DISTCC_PORTS environmental variable.
-function _dccsh_parse_distcc_ports() {
+function _dccsh_parse_distcc_ports {
     DCCSH_HOSTS=""
     DCCSH_TOTAL_JOBS=0
 
@@ -179,55 +193,61 @@ function _dccsh_parse_distcc_ports() {
     done
 }
 
-# Adds building some TUs on the local machine to the DCCSH_ variables, based
-# on environmental configuration.
-function _dccsh_append_localhost() {
+# Calculates how many local *compiling* workers are allowed, based on user
+# configuration.
+function _dccsh_calculate_local_workers {
     if [ $DCCSH_TOTAL_JOBS -eq 0 ]; then
         _dccsh_debug "No working remote found."
 
-        local LOCAL_JOB=$DISTCC_NUM_ONLY_LOCAL
+        local LOCAL_JOB=$1
         if [ -z $LOCAL_JOB ]; then
             _dccsh_debug "DISTCC_NUM_ONLY_LOCAL unset, defaulting to $(nproc)"
             LOCAL_JOB=$(nproc)
         fi
 
         _dccsh_debug "Setting execution with $LOCAL_JOB jobs locally!"
-        DCCSH_HOSTS="localhost/$LOCAL_JOB"
-        DCCSH_TOTAL_JOBS=$LOCAL_JOB
-        DCCSH_LOCAL_JOBS=$LOCAL_JOB
     else
         _dccsh_debug "Working remotes found."
 
-        local LOCAL_JOB=$DISTCC_NUM_FIRST_LOCAL
+        local LOCAL_JOB=$2
         if [ -z "$LOCAL_JOB" ]; then
             _dccsh_debug "DISTCC_NUM_FIRST_LOCAL unset, defaulting to 0"
             LOCAL_JOB=0
         fi
+    fi
 
-        if [ $LOCAL_JOB -gt 0 ]; then
-            _dccsh_debug "Prioritising running $LOCAL_JOB jobs locally!"
-            DCCSH_HOSTS="localhost/${LOCAL_JOB} $DCCSH_HOSTS"
-            DCCSH_TOTAL_JOBS=$(($DCCSH_TOTAL_JOBS + $LOCAL_JOB))
-        fi
-        DCCSH_LOCAL_JOBS=$LOCAL_JOB
+    DCCSH_LOCAL_JOBS=$LOCAL_JOB
+}
+
+# Adds building some TUs on the local machine to the DCCSH_ variables, based
+# on environmental configuration.
+function _dccsh_append_localhost {
+    if [ $DCCSH_LOCAL_JOBS -gt 0 ]; then
+        _dccsh_debug "Prioritising running $DCCSH_LOCAL_JOBS jobs locally!"
+        DCCSH_HOSTS="localhost/${DCCSH_LOCAL_JOBS} $DCCSH_HOSTS"
+        DCCSH_TOTAL_JOBS=$(($DCCSH_TOTAL_JOBS + $DCCSH_LOCAL_JOBS))
+    else
+        _dccsh_debug "Local job count was $DCCSH_LOCAL_JOBS, not appending" \
+            "'localhost'"
     fi
 }
 
-function _dccsh_check_memory() {
+# Checks whether there is enough memory available for all the local jobs.
+function _dccsh_check_memory {
     if [ $DCCSH_LOCAL_JOBS -eq 0 ]; then
         _dccsh_debug "no local jobs, not checking memory use..."
         return 0  # OK.
     fi
 
-    local MEM_PER_BUILD=$DISTCC_LOCAL_MEM
-    if [ -z "$MEM_PER_BUILD" ]; then
+    DCCSH_MEM_PER_BUILD=$DISTCC_LOCAL_MEM
+    if [ -z "$DCCSH_MEM_PER_BUILD" ]; then
         _dccsh_debug "DISTCC_LOCAL_MEM unset, defaulting to '1024'"
-        MEM_PER_BUILD=1024
+        DCCSH_MEM_PER_BUILD=1024
     fi
 
-    _dccsh_debug "Checking if $DCCSH_LOCAL_JOBS * $MEM_PER_BUILD MiB " \
+    _dccsh_debug "Checking if $DCCSH_LOCAL_JOBS * $DCCSH_MEM_PER_BUILD MiB" \
         "memory available"
-    local NEEDED_MEM=$(($MEM_PER_BUILD * $DCCSH_LOCAL_JOBS))
+    local NEEDED_MEM=$(($DCCSH_MEM_PER_BUILD * $DCCSH_LOCAL_JOBS))
     _dccsh_debug "Needed mem: $NEEDED_MEM MiB"
     local AVAILABLE_MEM=$(("$(free | grep 'Mem:' | awk '{ print $7 }')" / 1024))
     _dccsh_debug "Available memory right now: $AVAILABLE_MEM MiB"
@@ -239,47 +259,74 @@ function _dccsh_check_memory() {
     fi
 }
 
+# Scales down how much local workers could be done based on the environment and
+# available resources.
+function _dccsh_scale_local_workers {
+    if [ -z "$DISTCC_NUM_LOCAL_SCALING" ]; then
+        _dccsh_debug "Refusing to scale: user did not specify" \
+            "'DISTCC_NUM_LOCAL_SCALING'"
+        echo 0
+        return
+    fi
+
+    local AVAILABLE_MEM=$(("$(free | grep 'Mem:' | awk '{ print $7 }')" / 1024))
+    local NEW_WORKER_COUNT=$(($AVAILABLE_MEM / $DISTCC_LOCAL_MEM))
+    _dccsh_debug "Scaling local worker count to $NEW_WORKER_COUNT to fit memory"
+
+    echo $NEW_WORKER_COUNT
+}
+
 # Appends additional jobs to the total allowed job count for preprocessing.
-function _dccsh_append_preprocess_jobs() {
+function _dccsh_append_preprocess_jobs {
     _dccsh_debug "Allowing $(nproc) extra jobs for preprocessing..."
     DCCSH_TOTAL_JOBS=$(($DCCSH_TOTAL_JOBS + $(nproc)))
 }
 
-function _dccsh_cleanup_vars() {
+function _dccsh_cleanup_vars {
     DCCSH_HOSTS=""
     DCCSH_TOTAL_JOBS=0
     DCCSH_LOCAL_JOBS=0
+    DCCSH_MEM_PER_BUILD=0
     _ECHO_N=""
 }
 
 # Actually executes the build with having DISTCC_HOSTS set and ccache set
 # to run through distcc.
-function _dccsh_run_distcc() {
+function _dccsh_run_distcc {
     local DISTCC_HOSTS_STR=$1
     shift 1
 
     _dccsh_debug "Executing with hosts: \"$DISTCC_HOSTS_STR\""
-    DISTCC_HOSTS="$DISTCC_HOSTS_STR" CCACHE_PREFIX="distcc" "$@"
+    _dccsh_debug "Executed command line: $@"
+    DISTCC_HOSTS="$DISTCC_HOSTS_STR" CCACHE_PREFIX="distcc" $*
 }
 
 # Prepares running the build remotely. This is the entry point of the script.
-function distcc_build() {
+function distcc_build {
     _dccsh_dump_config
-    _dccsh_debug "command line is: \"$@\""
+    _dccsh_debug "command line is: $*"
 
     _dccsh_parse_distcc_ports
-    _dccsh_append_localhost
 
+    _dccsh_calculate_local_workers $DISTCC_NUM_ONLY_LOCAL $DISTCC_NUM_FIRST_LOCAL
     _dccsh_check_memory
     if [ $? -ne 0 ]; then
-        echo "[ERROR] Refusing to build: not enough memory for local jobs!" >&2
-        return -6
+        local NEW_WORKER_COUNT=$(_dccsh_scale_local_workers)
+        if [ $NEW_WORKER_COUNT -eq 0 ]; then
+            echo "[ERROR] Refusing to build: not enough memory for local jobs!" >&2
+            return -6
+        fi
+
+        # Recalculate the number of local workers in the DCCSH_ variables
+        # after scaling was performed.
+        _dccsh_calculate_local_workers $NEW_WORKER_COUNT $NEW_WORKER_COUNT
     fi
 
+    _dccsh_append_localhost
     _dccsh_append_preprocess_jobs
 
     _dccsh_debug "Running $DCCSH_TOTAL_JOBS threads"
-    _dccsh_run_distcc "$DCCSH_HOSTS" "$@" -j "$DCCSH_TOTAL_JOBS"
+    _dccsh_run_distcc "$DCCSH_HOSTS" $* -j "$DCCSH_TOTAL_JOBS"
     local R=$?
 
     _dccsh_cleanup_vars
