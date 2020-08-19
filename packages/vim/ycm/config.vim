@@ -17,8 +17,8 @@ nmap <LocalLeader>yd :YcmCompleter GoToDefinition<CR>
 nmap <LocalLeader>yu :YcmCompleter GoToReferences<CR>
 nmap <LocalLeader>yc :YcmCompleter GetDoc<CR>
 nmap <LocalLeader>yt :YcmCompleter GetType<CR>
-nmap <LocalLeader>ye :YcmCompleter GetDiags<CR>
 
+nmap <LocalLeader>ye :YcmDiags<CR>
 nmap <LocalLeader>yy :YcmRestartServer<CR>
 nmap <LocalLeader>yi :YcmDebugInfo<CR>
 nmap <LocalLeader>yo :YcmToggleLogs<CR>
