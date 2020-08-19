@@ -2,9 +2,13 @@ description: Installs configuration for Vim, a pluginable command-line text
   editor. (A package of 'Vim' should be installed separately.)
 prepare:
   - action: git clone
-    repository: "http://github.com/tomasr/molokai.git"
+    repository: "http://github.com/tomasr/molokai"
   - action: git clone
-    repository: "http://github.com/rakr/vim-one.git"
+    repository: "http://github.com/rakr/vim-one"
+  - action: git clone
+    repository: "http://github.com/jlanzarotta/bufexplorer"
+  - action: git clone
+    repository: "http://github.com/machakann/vim-highlightedyank"
 install:
   - action: make dirs
     dirs:
@@ -26,6 +30,12 @@ install:
       - "$TEMPORARY_DIR/molokai/colors/molokai.vim"
       - "$TEMPORARY_DIR/vim-one/colors/one.vim"
     to: "$HOME/.vim/colors"
+  - action: copy tree
+    dir: "$TEMPORARY_DIR/bufexplorer"
+    to: "$HOME/.vim/bundle/bufexplorer"
+  - action: copy tree
+    dir: "$TEMPORARY_DIR/vim-highlightedyank"
+    to: "$HOME/.vim/bundle/vim-highlightedyank"
   - action: copy
     file: aliases.sh
     to: "$HOME/.bash.d/vim.sh"

@@ -1,0 +1,20 @@
+description: Installs plugins that help manage the "undo" functionality in Vim
+dependencies:
+  - vim.pathogen
+prepare:
+  - action: git clone
+    repository: "http://github.com/mbbill/undotree"
+  - action: git clone
+    repository: "http://github.com/pixelastic/vim-undodir-tree"
+install:
+  - action: copy tree
+    dir: "$TEMPORARY_DIR/undotree"
+    to: "$HOME/.vim/bundle/undotree"
+  - action: copy tree
+    dir: "$TEMPORARY_DIR/vim-undodir-tree"
+    to: "$HOME/.vim/bundle/vim-undodir-tree"
+  - action: copy
+    files:
+      - undotree.vim
+      - vim-undodir-tree.vim
+    to: "$HOME/.vim/config"

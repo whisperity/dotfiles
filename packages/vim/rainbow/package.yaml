@@ -1,0 +1,13 @@
+description: Adds rainbow-coloured bracket matching
+dependencies:
+  - vim.pathogen
+prepare:
+  - action: git clone
+    repository: "http://github.com/luochen1990/rainbow"
+install:
+  - action: copy tree
+    dir: "$TEMPORARY_DIR/rainbow"
+    to: "$HOME/.vim/bundle/rainbow"
+  - action: copy
+    file: config.vim
+    to: "$HOME/.vim/config/rainbow.vim"

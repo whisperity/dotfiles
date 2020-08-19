@@ -1,0 +1,11 @@
+description: Adds text object support for changing surroundings, not just the
+  inner text.
+dependencies:
+  - vim.pathogen
+prepare:
+  - action: git clone
+    repository: "http://github.com/tpope/vim-surround"
+install:
+  - action: copy tree
+    dir: "$TEMPORARY_DIR/vim-surround"
+    to: "$HOME/.vim/bundle/vim-surround"

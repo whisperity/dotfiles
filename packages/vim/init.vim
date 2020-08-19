@@ -15,6 +15,10 @@ set nocompatible
 set history=7000
 set backspace=indent,eol,start
 
+" Do not enter Ex mode
+" http://www.bestofvim.com/tip/leave-ex-mode-good/
+nnoremap Q <nop>
+
 " Syntax highlighting
 syntax on
 filetype plugin indent on
@@ -166,3 +170,6 @@ endif
 for f in split(glob('~/.vim/config/*.vim'), '\n')
     exe 'source' f
 endfor
+
+" Make sure that plugins installed through Pathogen have their helps indexed.
+Helptags
