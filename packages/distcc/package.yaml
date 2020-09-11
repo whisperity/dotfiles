@@ -4,7 +4,7 @@ dependencies:
   - ccache
 install:
   - action: shell
-    command: "sudo apt-get install -y --no-install-recommends distcc"
+    command: "sudo apt-get install -y --no-install-recommends distcc distccmon-gnome"
   - action: make dirs
     dirs:
       - $HOME/.bash.d
@@ -17,4 +17,4 @@ install:
     to: "$HOME/.zsh.post.d/distcc.zsh"
 uninstall:
   - action: shell
-    command: "sudo apt-get purge -y distcc"
+    command: "sudo apt-get purge -y distcc distccmon-gnome"
