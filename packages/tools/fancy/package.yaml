@@ -5,6 +5,7 @@ prepare:
   - action: shell all
     commands:
       - "$PACKAGE_DIR/bat.sh"
+      - "$PACKAGE_DIR/dust.sh"
       - "$PACKAGE_DIR/exa.sh"
       - "$PACKAGE_DIR/fd.sh"
       - "$PACKAGE_DIR/hexyl.sh"
@@ -28,6 +29,9 @@ install:
   - action: copy
     file: exa_aliases-override.sh
     to: "$HOME/.zsh.pre.d/exa.sh"
+  - action: copy
+    file: "$TEMPORARY_DIR/dust"
+    to: "$HOME/bin/dust"
 uninstall:
   - action: shell
     command: "sudo apt-get purge -y bat fd hexyl"
