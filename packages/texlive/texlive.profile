@@ -1,6 +1,3 @@
-# texlive.profile written on Mon Dec 30 17:58:16 2019 UTC
-# It will NOT be updated and reflects only the
-# installation profile at installation time.
 selected_scheme scheme-custom
 TEXDIR $<HOME>/opt/texlive/2020
 TEXMFCONFIG $<HOME>/opt/texlive/texmf-config

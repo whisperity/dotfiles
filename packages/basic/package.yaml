@@ -1,5 +1,5 @@
 description: Basic user environment files. (This package is initially tailored
-  for use on a default Ubuntu 16.04 or 18.04 user account.)
+  for use on a default, still supported Ubuntu LTS user account.)
 prepare:
   - action: prompt user
     description: The name with which your Git commits will be authored.
