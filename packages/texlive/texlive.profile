@@ -2,12 +2,12 @@
 # It will NOT be updated and reflects only the
 # installation profile at installation time.
 selected_scheme scheme-custom
-TEXDIR $<HOME>/opt/texlive/2019
+TEXDIR $<HOME>/opt/texlive/2020
 TEXMFCONFIG $<HOME>/opt/texlive/texmf-config
 TEXMFHOME $<HOME>/opt/texlive/texmf
 TEXMFLOCAL $<HOME>/opt/texlive/texmf-local
-TEXMFSYSCONFIG $<HOME>/opt/texlive/2019/texmf-config
-TEXMFSYSVAR $<HOME>/opt/texlive/2019/texmf-var
+TEXMFSYSCONFIG $<HOME>/opt/texlive/2020/texmf-config
+TEXMFSYSVAR $<HOME>/opt/texlive/2020/texmf-var
 TEXMFVAR $<HOME>/opt/texlive/texmf-var
 binary_x86_64-linux 1
 collection-basic 1

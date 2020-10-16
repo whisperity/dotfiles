@@ -1,5 +1,6 @@
 description: Install the TeXLive (La)TeX typesetting environment's latest
   version from the internet.
+superuser: true
 prepare:
   - action: shell all
     commands:
@@ -10,6 +11,8 @@ prepare:
   - action: copy resource
     path: texlive.profile
 install:
+  - action: shell
+    command: "sudo apt-get install -y --no-install-recommends python3-pygments"
   - action: substitute environment variables
     file: $TEMPORARY_DIR/texlive.profile
   - action: make dirs
@@ -28,3 +31,5 @@ install:
 uninstall:
   - action: remove tree
     dir: $HOME/opt/texlive
+  - action: shell
+    command: "sudo apt-get purge -y python3-pygments"
