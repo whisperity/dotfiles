@@ -19,4 +19,3 @@ curl -sL http://api.github.com/repos/bootandy/dust/releases/latest \
 
 tar xfz ./dust.tar.gz
 mv -v ./dust-*/dust ./dust
-rm -r ./dust-* ./dust.tar.gz
