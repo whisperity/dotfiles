@@ -1,5 +1,12 @@
 " YCM
 
+let g:ycm_auto_trigger = 1
+let g:ycm_filetype_whitelist = {
+    \ 'c': 1,
+    \ 'cpp': 1,
+    \ 'python': 1
+    \ }
+
 let g:ycm_autoclose_preview_window_after_completion = 1
 let g:ycm_autoclose_preview_window_after_insertion = 1
 
