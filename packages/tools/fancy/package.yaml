@@ -5,6 +5,7 @@ prepare:
   - action: shell all
     commands:
       - "$PACKAGE_DIR/bat.sh"
+      - "$PACKAGE_DIR/delta.sh"
       - "$PACKAGE_DIR/dust.sh"
       - "$PACKAGE_DIR/exa.sh"
       - "$PACKAGE_DIR/fd.sh"
@@ -13,8 +14,16 @@ install:
   - action: shell all
     commands:
       - "sudo dpkg --install $TEMPORARY_DIR/bat.deb"
+      - "sudo dpkg --install $TEMPORARY_DIR/delta.deb"
       - "sudo dpkg --install $TEMPORARY_DIR/fd.deb"
       - "sudo dpkg --install $TEMPORARY_DIR/hexyl.deb"
+  - action: shell all
+    commands:
+      - "git config --global core.pager delta"
+      - "git config --global delta.line-numbers true"
+      - "git config --global delta.side-by-side false"
+      - "git config --global alias.dsbs \"config --global delta.side-by-side true\""
+      - "git config --global alias.duni \"config --global delta.side-by-side false\""
   - action: make dirs
     dirs:
       - "$HOME/.bash.d"
@@ -34,4 +43,14 @@ install:
     to: "$HOME/bin/dust"
 uninstall:
   - action: shell
-    command: "sudo apt-get purge -y bat fd hexyl"
+    command: "sudo apt-get purge -y bat delta fd hexyl"
+  - action: shell any
+    commands:
+      - "git config --global --unset core.pager"
+      - true  # If the config option wasn't in the user's gitconfig, ignore.
+  - action: shell all
+    commands:
+      - "git config --global --unset delta.line-numbers"
+      - "git config --global --unset delta.side-by-side"
+      - "git config --global --unset alias.dsbs"
+      - "git config --global --unset alias.duni"
