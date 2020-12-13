@@ -195,27 +195,27 @@ function _dccsh_parse_distcc_ports {
 
 # Calculates how many local *compiling* workers are allowed, based on user
 # configuration.
+# Parameters: $1 - DISTCC_NUM_ONLY_LOCAL, $2 - DISTCC_NUM_FIRST_LOCAL.
 function _dccsh_calculate_local_workers {
     if [ $DCCSH_TOTAL_JOBS -eq 0 ]; then
         _dccsh_debug "No working remote found."
 
         local LOCAL_JOB=$1
-        if [ -z $LOCAL_JOB ]; then
-            _dccsh_debug "DISTCC_NUM_ONLY_LOCAL unset, defaulting to $(nproc)"
+        if [ -z $LOCAL_JOB -o $LOCAL_JOB == -1 ]; then
+            _dccsh_debug "DISTCC_NUM_ONLY_LOCAL unset, defaulting to '$(nproc)'"
             LOCAL_JOB=$(nproc)
         fi
-
-        _dccsh_debug "Setting execution with $LOCAL_JOB jobs locally!"
     else
         _dccsh_debug "Working remotes found."
 
         local LOCAL_JOB=$2
-        if [ -z "$LOCAL_JOB" ]; then
-            _dccsh_debug "DISTCC_NUM_FIRST_LOCAL unset, defaulting to 0"
+        if [ -z "$LOCAL_JOB" -o $LOCAL_JOB == -1 ]; then
+            _dccsh_debug "DISTCC_NUM_FIRST_LOCAL unset, defaulting to '0'"
             LOCAL_JOB=0
         fi
     fi
 
+    _dccsh_debug "Setting execution with $LOCAL_JOB jobs locally!"
     DCCSH_LOCAL_JOBS=$LOCAL_JOB
 }
 
@@ -308,7 +308,7 @@ function distcc_build {
 
     _dccsh_parse_distcc_ports
 
-    _dccsh_calculate_local_workers $DISTCC_NUM_ONLY_LOCAL $DISTCC_NUM_FIRST_LOCAL
+    _dccsh_calculate_local_workers ${DISTCC_NUM_ONLY_LOCAL:-"-1"} ${DISTCC_NUM_FIRST_LOCAL:-"-1"}
     _dccsh_check_memory
     if [ $? -ne 0 ]; then
         local NEW_WORKER_COUNT=$(_dccsh_scale_local_workers)
@@ -333,4 +333,3 @@ function distcc_build {
 
     return $R
 }
-
