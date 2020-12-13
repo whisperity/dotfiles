@@ -186,7 +186,7 @@ function _dccsh_parse_distcc_ports {
         if [ $? -eq 0 ]; then
             DCCSH_TOTAL_JOBS=$(($DCCSH_TOTAL_JOBS + $JOBS))
             _dccsh_debug "$PORT: responding, added, new total job count" \
-                "is: $DCCSH_TOTAL_JOBS."
+                "is: $DCCSH_TOTAL_JOBS"
         else
             _dccsh_debug "$PORT: did not respond."
         fi
@@ -201,7 +201,7 @@ function _dccsh_calculate_local_workers {
         _dccsh_debug "No working remote found."
 
         local LOCAL_JOB=$1
-        if [ -z $LOCAL_JOB -o $LOCAL_JOB == -1 ]; then
+        if [ -z $LOCAL_JOB -o $LOCAL_JOB -eq -1 ]; then
             _dccsh_debug "DISTCC_NUM_ONLY_LOCAL unset, defaulting to '$(nproc)'"
             LOCAL_JOB=$(nproc)
         fi
@@ -209,7 +209,7 @@ function _dccsh_calculate_local_workers {
         _dccsh_debug "Working remotes found."
 
         local LOCAL_JOB=$2
-        if [ -z "$LOCAL_JOB" -o $LOCAL_JOB == -1 ]; then
+        if [ -z "$LOCAL_JOB" -o $LOCAL_JOB -eq -1 ]; then
             _dccsh_debug "DISTCC_NUM_FIRST_LOCAL unset, defaulting to '0'"
             LOCAL_JOB=0
         fi
@@ -270,7 +270,7 @@ function _dccsh_scale_local_workers {
     fi
 
     local AVAILABLE_MEM=$(("$(free | grep 'Mem:' | awk '{ print $7 }')" / 1024))
-    local NEW_WORKER_COUNT=$(($AVAILABLE_MEM / $DISTCC_LOCAL_MEM))
+    local NEW_WORKER_COUNT=$(($AVAILABLE_MEM / $DCCSH_MEM_PER_BUILD))
     _dccsh_debug "Scaling local worker count to $NEW_WORKER_COUNT to fit memory"
 
     echo $NEW_WORKER_COUNT
@@ -308,7 +308,8 @@ function distcc_build {
 
     _dccsh_parse_distcc_ports
 
-    _dccsh_calculate_local_workers ${DISTCC_NUM_ONLY_LOCAL:-"-1"} ${DISTCC_NUM_FIRST_LOCAL:-"-1"}
+    _dccsh_calculate_local_workers \
+            ${DISTCC_NUM_ONLY_LOCAL:-"-1"} ${DISTCC_NUM_FIRST_LOCAL:-"-1"}
     _dccsh_check_memory
     if [ $? -ne 0 ]; then
         local NEW_WORKER_COUNT=$(_dccsh_scale_local_workers)
