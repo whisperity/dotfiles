@@ -190,7 +190,7 @@ class Install(_StageBase, ShellCommandsMixin):
         if not value:
             raise KeyError("Installer attempted to substitute environment "
                            "variable %s in script of %s but the variable is "
-                           "not set." % (var_name, self.package_name))
+                           "not set." % (var_name, self.package))
         return value
 
     def replace_user_input(self, file):

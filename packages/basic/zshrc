@@ -3,6 +3,7 @@
 
 # Source custom configuration details that should be loaded before ZSH
 # configures.
+setopt +o nomatch
 if [[ -d ~/.zsh.pre.d ]]; then
   for e in ~/.zsh.pre.d/*; do
     if [[ -f "$e" ]]; then
@@ -10,6 +11,7 @@ if [[ -d ~/.zsh.pre.d ]]; then
     fi
   done
 fi
+setopt -o nomatch
 
 # Path to your oh-my-zsh installation.
 export ZSH=~/.oh-my-zsh
@@ -117,6 +119,7 @@ SAVEHIST=$HISTSIZE
 
 # Source custom configuration details that should be loaded after ZSH plugins
 # are up.
+setopt +o nomatch
 if [[ -d ~/.zsh.post.d ]]; then
   for e in ~/.zsh.post.d/*; do
     if [[ -f "$e" ]]; then
@@ -124,4 +127,5 @@ if [[ -d ~/.zsh.post.d ]]; then
     fi
   done
 fi
+setopt -o nomatch
 
