@@ -1,10 +1,16 @@
 FROM ubuntu:20.04
+
+ENV USER=root
+
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
     apt-get install -y \
         curl \
+        htop \
+        less \
         locales \
         sudo \
+        tzdata \
         wget \
     && \
     apt-get install -y --no-install-recommends \
@@ -17,7 +23,8 @@ RUN apt-get update && \
         unzip \
     && \
     apt-get install -y --no-install-recommends \
-        vim
+        vim \
+        zsh
 
 RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
     dpkg-reconfigure --frontend=noninteractive locales && \
@@ -33,8 +40,9 @@ ENV PATH="/opt/Dotfiles:${PATH}"
 
 ARG GIT_USERNAME="Git User"
 ARG GIT_EMAIL="git-user@localhost"
-RUN echo -e "$GIT_USERNAME\nGIT_EMAIL\n\n" | Dotfiles basic \
+RUN echo "$GIT_USERNAME\n$GIT_EMAIL\n" | Dotfiles basic \
         bash \
         tools.fancy \
-        vim.__ALL__
+        vim.__ALL__ \
+        zsh.__ALL__
 
