@@ -8,3 +8,6 @@ install:
   - action: copy tree
     dir: "$TEMPORARY_DIR/latex-unicoder.vim"
     to: "$HOME/.vim/bundle/latex-unicoder.vim"
+  - action: copy
+    file: config.vim
+    to: "$HOME/.vim/config/latex-unicoder.vim"
