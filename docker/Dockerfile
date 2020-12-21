@@ -32,7 +32,11 @@ RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
 ENV LANG en_US.UTF-8
 
 RUN cd /opt && \
-    git clone http://github.com/whisperity/dotfiles.git --depth 1 Dotfiles && \
+    git clone http://github.com/whisperity/dotfiles.git \
+        --depth 1 \
+        --origin upstream \
+        Dotfiles \
+    && \
     cd ./Dotfiles && \
     ./bootstrap.sh
 COPY Dotfiles /opt/Dotfiles/Dotfiles
