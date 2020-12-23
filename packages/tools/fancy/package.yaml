@@ -27,7 +27,7 @@ install:
   - action: make dirs
     dirs:
       - "$HOME/.bash.d"
-      - "$HOME/.zsh.pre.d"
+      - "$HOME/.zsh.post.d"
       - "$HOME/bin"
   - action: copy
     file: "$TEMPORARY_DIR/exa"
@@ -37,7 +37,7 @@ install:
     to: "$HOME/.bash.d/exa.sh"
   - action: copy
     file: exa_aliases-override.sh
-    to: "$HOME/.zsh.pre.d/exa.sh"
+    to: "$HOME/.zsh.post.d/exa.sh"
   - action: copy
     file: "$TEMPORARY_DIR/dust"
     to: "$HOME/bin/dust"

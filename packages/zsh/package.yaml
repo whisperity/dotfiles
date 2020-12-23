@@ -28,9 +28,11 @@ install:
     file: bash-aliases.zsh
     to: $HOME/.zsh.d/bash-aliases.zsh
 uninstall:
-  - action: shell
-    command: bash -c 'echo "y" | $HOME/.oh-my-zsh/tools/uninstall.sh"'
   - action: shell all
-    command:
+    commands:
+      - chmod +x "$HOME/.oh-my-zsh/tools/uninstall.sh"
+      - bash -c 'echo "y" | $HOME/.oh-my-zsh/tools/uninstall.sh'
+  - action: shell all
+    commands:
       - rm $HOME/.zsh.d
       - rm -rf $HOME/.oh-my-zsh
