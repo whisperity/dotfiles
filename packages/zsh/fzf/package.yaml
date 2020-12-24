@@ -1,5 +1,4 @@
-description: Installs the shell fuzzy finder (fzf) hook for zsh. The binary
-  itself is NOT installed by this action!
+description: Installs the shell fuzzy finder (fzf) hook for zsh.
 prepare:
   - action: git clone
     repository: http://github.com/junegunn/fzf.git

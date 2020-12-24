@@ -1,6 +1,5 @@
 description: YouCompleteMe code completion plugin for Vim, set up to code
   complete C-family source files via clangd.
-  (ClangD to be installed separately!)
 dependencies:
   - cmake
   - vim.pathogen
@@ -18,4 +17,7 @@ install:
     to: "$HOME/.vim/config/YouCompleteMe.vim"
   # Build YCM
   - action: shell
-    command: "cd $HOME/.vim/bundle/YouCompleteMe; python3 install.py --clangd-completer; cd -"
+    # Export the PATH so we have CMake available even if installed in a shell
+    # where it was Dotfiles itself which installed CMake, and thus the command
+    # for having ~/bin in PATH never executed.
+    command: "export PATH=\"$HOME/bin:$PATH\"; cd $HOME/.vim/bundle/YouCompleteMe; python3 install.py --clangd-completer; cd -"
