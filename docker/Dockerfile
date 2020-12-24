@@ -2,8 +2,10 @@ FROM ubuntu:20.04
 ARG INSTALL_YCM
 ARG INSTALL_TEX
 
-ENV DEBIAN_FRONTEND=noninteractive
-RUN yes | unminimize && \
+# We do not set DEBIAN_FRONTEND as an 'ENV' because the container will
+# evenually be used interactively.
+RUN export DEBIAN_FRONTEND=noninteractive; \
+    yes | unminimize && \
     apt-get update && \
     apt-get install -y \
         curl \
@@ -38,7 +40,8 @@ RUN yes | unminimize && \
     rm -rf /var/lib/apt/lists/*
 
 # Set proper locale like a real system.
-RUN sed -i -e "s/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/" /etc/locale.gen && \
+RUN export DEBIAN_FRONTEND=noninteractive; \
+    sed -i -e "s/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/" /etc/locale.gen && \
     dpkg-reconfigure --frontend=noninteractive locales && \
     update-locale LANG=en_US.UTF-8
 ENV LANG en_US.UTF-8
@@ -48,7 +51,7 @@ ARG TZ=Etc/UTC
 RUN ln -snf /usr/share/zoneinfo/${TZ} /etc/localtime && \
     echo ${TZ} >/etc/timezone
 
-# Install Dotfiles inside the image.
+# Install Dotfiles inside the image, together with a wrapper.
 RUN cd /opt && \
     git clone http://github.com/whisperity/dotfiles.git \
         --depth 1 \
@@ -78,7 +81,8 @@ USER root
 ENV PATH="/home/${LOCAL_USER}/bin:${PATH}"
 ARG GIT_USERNAME="Git User"
 ARG GIT_EMAIL="git-user@localhost"
-RUN apt-get update && \
+RUN export DEBIAN_FRONTEND=noninteractive; \
+    apt-get update && \
     if [ ! -z ${INSTALL_YCM} ]; then \
         apt-get install -y \
             build-essential \
@@ -101,8 +105,6 @@ RUN apt-get update && \
 
 # Back to the local user's scope and finish setting up.
 USER ${LOCAL_USER}
-ENV PATH="/home/${LOCAL_USER}/bin:${PATH}"
-
 RUN echo "export TZ=${TZ}" >> /home/${LOCAL_USER}/.bashrc && \
     echo "export TZ=${TZ}" >> /home/${LOCAL_USER}/.zshrc
 
