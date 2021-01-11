@@ -139,9 +139,9 @@ nnoremap <F3> :bprevious <CR>
 nnoremap <F4> :bnext <CR>
 
 " Tab switch.
-nnoremap <S-F2> :tabs<CR>:tabnext<Space>
-nnoremap <S-F3> :tabprevious <CR>
-nnoremap <S-F4> :tabnext <CR>
+nnoremap <C-F2> :tabs<CR>:tabnext<Space>
+nnoremap <C-F3> :tabprevious <CR>
+nnoremap <C-F4> :tabnext <CR>
 
 " Close the current buffer.
 command Bc bp|bd#
@@ -156,8 +156,8 @@ command Poff set nopaste
 
 " Folding control.
 set nofoldenable " Off by default.
-nmap <C-S-o> :foldopen <CR>
-nmap <C-S-p> :foldclose <CR>
+nmap <LocalLeader>fo :foldopen <CR>
+nmap <LocalLeader>fc :foldclose <CR>
 
 " Only do this part when compiled with support for autocommands.
 if has("autocmd")
