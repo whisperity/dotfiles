@@ -9,6 +9,7 @@ TEXMFVAR $<HOME>/opt/texlive/texmf-var
 binary_x86_64-linux 1
 collection-basic 1
 collection-bibtexextra 1
+collection-binextra 1
 collection-fontutils 1
 collection-langenglish 1
 collection-langeuropean 1
