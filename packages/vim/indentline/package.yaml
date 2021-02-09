@@ -1,0 +1,13 @@
+description: Show indentation levels in code with vertical characters.
+dependencies:
+  - vim.pathogen
+prepare:
+  - action: git clone
+    repository: "http://github.com/Yggdroot/indentLine.git"
+install:
+  - action: copy tree
+    dir: "$TEMPORARY_DIR/indentLine"
+    to: "$HOME/.vim/bundle/indentLine"
+  - action: copy
+    file: config.vim
+    to: "$HOME/.vim/config/indentLine.vim"

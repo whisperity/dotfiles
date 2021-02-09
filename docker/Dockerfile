@@ -88,7 +88,7 @@ RUN export DEBIAN_FRONTEND=noninteractive; \
             build-essential \
             python3-dev; \
     fi && \
-    su "${LOCAL_USER}" /bin/bash -c 'echo -e "${GIT_USERNAME}\n${GIT_EMAIL}\n" | Dotfiles basic bash githooks tools.fancy vim.agsearch vim.airline vim.git vim.lastplace vim.markdown vim.nerdtree vim.rainbow vim.surround vim.syntastic vim.undo zsh.__ALL__' && \
+    su "${LOCAL_USER}" /bin/bash -c 'echo -e "${GIT_USERNAME}\n${GIT_EMAIL}\n" | Dotfiles basic bash githooks tools.fancy vim.agsearch vim.airline vim.git vim.indentline vim.lastplace vim.markdown vim.nerdtree vim.rainbow vim.surround vim.syntastic vim.undo zsh.__ALL__' && \
     if [ ! -z ${INSTALL_TEX} ]; then \
         su "${LOCAL_USER}" /bin/bash -c "Dotfiles texlive vim.tex"; \
     fi && \

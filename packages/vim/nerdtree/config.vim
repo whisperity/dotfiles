@@ -1,4 +1,4 @@
-" NerdTree
+" NERDTree
 " Autostart :
 " autocmd vimenter * NERDTree
 
