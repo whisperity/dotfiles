@@ -140,10 +140,15 @@ function _dccsh_dump_config {
 }
 
 # Returns true if $1 is listening on the local machine.
-function check_tcp4port_listen {
+function check_tcpport_listen {
     _dccsh_debug -n "Check port $1..."
 
-    ss -lt4 | grep ":$1" &>/dev/null
+    ss -lnt | \
+        tail -n +2 | \
+        awk '{ print $4; }' | \
+        awk -F":" '{ print $NF; }' | \
+        grep "$1" \
+        &>/dev/null
     local R=$?
 
     _dccsh_debug -n "    is listening? "
@@ -161,7 +166,7 @@ function _dccsh_concat_port {
     local PORT=$2
     local JOBS=$3
 
-    if check_tcp4port_listen "$PORT"; then
+    if check_tcpport_listen "$PORT"; then
         local HOST_ENTRY="127.0.0.1:$PORT/$JOBS,lzo"
         _dccsh_debug "Concatenate \"$HOST_ENTRY\" after \"$1\""
         echo $1" $HOST_ENTRY"
