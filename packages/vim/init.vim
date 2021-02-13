@@ -113,7 +113,7 @@ if has("win32")
   autocmd VimLeave * !attrib +h ~/.viminfo
 elseif has("unix")
   " But when ran in Git Bash, it is NOT a 'win32' environment...
-  autocmd VimLeave * !if [ "$(type -t attrib)" == 'file' ]; then attrib +h ~/.viminfo; fi
+  autocmd VimLeave * !if [ "$(type -t attrib 2>/dev/null)" == 'file' ]; then attrib +h ~/.viminfo; fi
 endif
 
 " Smart way to move between windows
@@ -158,6 +158,21 @@ command Poff set nopaste
 set nofoldenable " Off by default.
 nmap <LocalLeader>fo :foldopen <CR>
 nmap <LocalLeader>fc :foldclose <CR>
+
+" Concealment of symbols.
+if has('conceal')
+  set concealcursor=nc
+  set conceallevel=2
+
+  function! ToggleConcealLevel()
+      if &conceallevel == 0
+          setlocal conceallevel=2
+      else
+          setlocal conceallevel=0
+      endif
+  endfunction
+  nnoremap <silent> <C-c><C-y> :call ToggleConcealLevel()<CR>
+endif
 
 " Only do this part when compiled with support for autocommands.
 if has("autocmd")
