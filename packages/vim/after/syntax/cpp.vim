@@ -10,8 +10,10 @@ syntax keyword cppOperator decltype conceal cchar=∂
 syntax match cNiceOperator "::" conceal cchar=.
 
 syntax keyword cppType bool     conceal cchar=𝔹
-syntax keyword cppBoolean false conceal cchar=⟂
 syntax keyword cppBoolean true  conceal cchar=⊤
+" The real \bot symbol is broken in Konsole, so use \perp instead.
+syntax keyword cppBoolean false conceal cchar=⟂
+"syntax keyword cppBoolean false conceal cchar=⊥
 
 syntax keyword cppKeyword NULL nullptr conceal cchar=∅
 

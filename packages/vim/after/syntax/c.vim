@@ -58,6 +58,9 @@ syntax keyword cType str string        conceal cchar=𝐒
 
 syntax keyword cConstant false        conceal cchar=⟂
 syntax keyword cConstant FALSE        conceal cchar=⟂
+" The real \bot symbol is broken in Konsole so use \perp instead.
+"syntax keyword cConstant false        conceal cchar=⊥
+"syntax keyword cConstant FALSE        conceal cchar=⊥
 syntax keyword cConstant true         conceal cchar=⊤
 syntax keyword cConstant TRUE         conceal cchar=⊤
 syntax keyword cConstant NULL         conceal cchar=∅
