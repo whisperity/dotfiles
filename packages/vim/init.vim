@@ -155,9 +155,25 @@ command Pon set paste
 command Poff set nopaste
 
 " Folding control.
-set nofoldenable " Off by default.
-nmap <LocalLeader>fo :foldopen <CR>
-nmap <LocalLeader>fc :foldclose <CR>
+if has('folding')
+  set nofoldenable " Off by default.
+  set foldmethod=manual
+  function! ToggleFoldingEnable()
+      if &foldenable == 1
+          setlocal nofoldenable
+          setlocal foldmethod=manual
+
+          unmap <buffer> <Space>
+      else
+          setlocal foldenable
+          setlocal foldmethod=syntax
+
+          " Use SPACE to toggle folds.
+          nnoremap <buffer> <silent> <Space> za
+      endif
+  endfunction
+  nnoremap <C-c><C-f> :call ToggleFoldingEnable()<CR>
+endif
 
 " Concealment of symbols.
 if has('conceal')
