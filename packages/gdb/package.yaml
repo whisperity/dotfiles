@@ -1,0 +1,14 @@
+description: Sets gdb to use the gdb-dashboard style.
+prepare:
+  - action: git clone
+    repository: "http://github.com/cyrus-and/gdb-dashboard"
+install:
+  - action: copy
+    file: "$TEMPORARY_DIR/gdb-dashboard/.gdbinit"
+    to: "$HOME/.gdbinit"
+  - action: make dirs
+    dirs:
+      - "$HOME/.gdbinit.d"
+  - action: copy
+    file: "$PACKAGE_DIR/layout"
+    to: "$HOME/.gdbinit.d/layout"
