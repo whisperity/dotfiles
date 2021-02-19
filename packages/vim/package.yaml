@@ -25,6 +25,9 @@ install:
       - init.vim
       - light.vim
     to: "$HOME/.vim"
+  - action: copy tree
+    dir: after
+    to: "$HOME/.vim/after"
   - action: copy
     files:
       - "$TEMPORARY_DIR/molokai/colors/molokai.vim"
