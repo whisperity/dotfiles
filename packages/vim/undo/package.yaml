@@ -14,7 +14,8 @@ install:
     dir: "$TEMPORARY_DIR/vim-undodir-tree"
     to: "$HOME/.vim/bundle/vim-undodir-tree"
   - action: copy
-    files:
-      - undotree.vim
-      - vim-undodir-tree.vim
-    to: "$HOME/.vim/config"
+    file: config.vim
+    to: "$HOME/.vim/config/undotree.vim"
+  - action: copy
+    file: config.undodir-tree.vim
+    to: "$HOME/.vim/config/vim-undodir-tree.vim"

@@ -17,7 +17,7 @@ set backspace=indent,eol,start
 
 " Do not enter Ex mode
 " http://www.bestofvim.com/tip/leave-ex-mode-good/
-nnoremap Q <nop>
+nnoremap <silent> Q <nop>
 
 " Syntax highlighting
 syntax on
@@ -117,16 +117,16 @@ elseif has("unix")
 endif
 
 " Smart way to move between windows
-map <C-j> <C-W>j
-map <C-k> <C-W>k
-map <C-h> <C-W>h
-map <C-l> <C-W>l
+map <silent> <C-j> <C-W>j
+map <silent> <C-k> <C-W>k
+map <silent> <C-h> <C-W>h
+map <silent> <C-l> <C-W>l
 
 " Force yourself to learn H, J, K, L instead of arrow keys.
-"map <up> <nop>
-"map <down> <nop>
-"map <left> <nop>
-"map <right> <nop>
+"map <silent> <up> <nop>
+"map <silent> <down> <nop>
+"map <silent> <left> <nop>
+"map <silent> <right> <nop>
 
 noremap <buffer> <silent> k gk
 noremap <buffer> <silent> j gj
@@ -134,18 +134,18 @@ noremap <buffer> <silent> gk k
 noremap <buffer> <silent> gj j
 
 " Buffer switch.
-nnoremap <F2> :buffers<CR>:buffer<Space>
-nnoremap <F3> :bprevious <CR>
-nnoremap <F4> :bnext <CR>
+nnoremap <silent> <F2> :buffers<CR>:buffer<Space>
+nnoremap <silent> <F3> :bprevious <CR>
+nnoremap <silent> <F4> :bnext <CR>
 
 " Tab switch.
-nnoremap <C-F2> :tabs<CR>:tabnext<Space>
-nnoremap <C-F3> :tabprevious <CR>
-nnoremap <C-F4> :tabnext <CR>
+nnoremap <silent> <C-F2> :tabs<CR>:tabnext<Space>
+nnoremap <silent> <C-F3> :tabprevious <CR>
+nnoremap <silent> <C-F4> :tabnext <CR>
 
 " Close the current buffer.
 command Bc bp|bd#
-nnoremap <C-x> :Bc <CR>
+nnoremap <silent> <C-x> :Bc <CR>
 
 " Clear highlighted searches.
 command C let @/=""

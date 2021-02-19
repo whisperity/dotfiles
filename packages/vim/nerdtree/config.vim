@@ -3,7 +3,7 @@
 " autocmd vimenter * NERDTree
 
 " Key to toggle Nerd Tree
-map <C-n> :NERDTreeToggle<CR>
+map <silent> <C-n> :NERDTreeToggle<CR>
 
 " Highlight the current file in the NERDTree window.
 let g:nerdtree_sync_cursorline = 1
