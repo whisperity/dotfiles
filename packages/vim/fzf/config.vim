@@ -7,7 +7,7 @@ set runtimepath+=~/.vim/fzf-root
 let g:fzf_preview_window = 'right:60%'
 let $FZF_DEFAULT_OPTS='--reverse'
 
-function! s:my_fzf_handler(lines) abort
+function! s:fzf_files_handler(lines) abort
   if empty(a:lines)
     return
   endif
@@ -19,19 +19,42 @@ function! s:my_fzf_handler(lines) abort
   endfor
 endfunction
 
+" Return the second column of a "git status -s" output.
+function! s:git_status_cleanup(line) abort
+  return get(filter(split(a:line, " "), 'v:val != ""'), 1)
+endfunction
+
+function! s:fzf_git_handler(lines) abort
+  if empty(a:lines)
+    return
+  endif
+  echom a:lines
+  let cmd = get({ 'ctrl-t': 'tabedit',
+                \ 'ctrl-x': 'split',
+                \ 'ctrl-v': 'vsplit' }, remove(a:lines, 0), 'e')
+
+  for item in a:lines
+    echom "Processing element" item
+    " Cut the Git status tags (first column)
+    let item = s:git_status_cleanup(item)
+    echom "After split" item
+    execute cmd escape(item, ' %#\')
+  endfor
+endfunction
+
+" Search all files. (Same as ^t in Zsh.)
+nnoremap <silent> <C-t> :call fzf#run({
+  \ 'options': '--multi --expect=ctrl-t,ctrl-x,ctrl-v',
+  \ 'window':  {'width': 0.9, 'height': 0.6},
+  \ 'sink*':   function('<sid>fzf_files_handler')})<cr>
+
 " Search the files that changed in version control.
 " (Same as ^g in Zsh.)
 nnoremap <silent> <C-g> :call fzf#run({
   \ 'source': 'git status -s',
-  \ 'options': '--expect=ctrl-t,ctrl-x,ctrl-v',
+  \ 'options': '--multi --expect=ctrl-t,ctrl-x,ctrl-v',
   \ 'window':  {'width': 0.9, 'height': 0.6},
-  \ 'sink*':   function('<sid>my_fzf_handler')})<cr>
-
-" Search all files. (Same as ^t in Zsh.)
-nnoremap <silent> <C-t> :call fzf#run({
-  \ 'options': '--expect=ctrl-t,ctrl-x,ctrl-v',
-  \ 'window':  {'width': 0.9, 'height': 0.6},
-  \ 'sink*':   function('<sid>my_fzf_handler')})<cr>
+  \ 'sink*':   function('<sid>fzf_git_handler')})<cr>
 
 " Remap the buffer searcher if this plugin is loaded.
 nnoremap <silent> <F2> :Buffers<cr>
