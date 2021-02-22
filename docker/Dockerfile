@@ -13,6 +13,7 @@ RUN export DEBIAN_FRONTEND=noninteractive; \
         less \
         locales \
         man \
+        software-properties-common \
         sudo \
         tzdata \
         unzip \
@@ -27,6 +28,7 @@ RUN export DEBIAN_FRONTEND=noninteractive; \
         python3-tabulate \
         python3-yaml \
     && \
+    add-apt-repository -y ppa:jonathonf/vim && \
     apt-get install -y --no-install-recommends \
         vim-nox \
         zsh \
@@ -53,7 +55,7 @@ RUN ln -snf /usr/share/zoneinfo/${TZ} /etc/localtime && \
 
 # Install Dotfiles inside the image, together with a wrapper.
 RUN cd /opt && \
-    git clone http://github.com/whisperity/dotfiles.git \
+    git clone http://github.com/whisperity/Dotfiles.git \
         --depth 1 \
         --origin upstream \
         Dotfiles \
@@ -63,6 +65,10 @@ RUN cd /opt && \
 COPY Dotfiles /usr/local/sbin/Dotfiles
 RUN chmod +x /usr/local/sbin/Dotfiles
 
+# Copy some of the helper stuff into the image too.
+COPY start-server.sh /usr/local/sbin/start-webserver
+RUN chmod +x /usr/local/sbin/start-webserver
+
 # Create a new user that isn't root.
 ARG LOCAL_USER="username"
 RUN echo "Creating local user ${LOCAL_USER}..." >&2 && \
@@ -71,13 +77,16 @@ RUN echo "Creating local user ${LOCAL_USER}..." >&2 && \
     usermod -aG sudo ${LOCAL_USER} && \
     echo "${LOCAL_USER} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
+# Allow the webservers run by the inner local user to write the log directory.
+RUN mkdir /var/log/httpd && \
+    chown ${LOCAL_USER} /var/log/httpd
+
 # Need to install Python libraries and a C++ compiler so vim.ycm builds.
 # But it is only needed for compiling these, so let's run in a shell for
 # root but wrapped in `su`.
 #
 # The packages not needed for *running* YCM will also be removed, but
 # everything else that was installed by Dotfiles shouldn't be.
-USER root
 ENV PATH="/home/${LOCAL_USER}/bin:${PATH}"
 ARG GIT_USERNAME="Git User"
 ARG GIT_EMAIL="git-user@localhost"
@@ -88,12 +97,13 @@ RUN export DEBIAN_FRONTEND=noninteractive; \
             build-essential \
             python3-dev; \
     fi && \
-    su "${LOCAL_USER}" /bin/bash -c 'echo -e "${GIT_USERNAME}\n${GIT_EMAIL}\n" | Dotfiles basic bash githooks tools.fancy vim.airline vim.fzf vim.git vim.indentline vim.lastplace vim.markdown vim.nerdtree vim.rainbow vim.surround vim.syntastic vim.tcomment vim.undo zsh.__ALL__' && \
+    su "${LOCAL_USER}" /bin/bash -c 'echo -e "${GIT_USERNAME}\n${GIT_EMAIL}\n" | Dotfiles basic bash githooks tools.fancy vim.airline vim.comments vim.fzf vim.git vim.lastplace vim.markdown vim.nerdtree vim.polyglot vim.rainbow vim.surround vim.syntastic vim.undo zsh.__ALL__' && \
     if [ ! -z ${INSTALL_TEX} ]; then \
-        su "${LOCAL_USER}" /bin/bash -c "Dotfiles texlive vim.tex"; \
+        su "${LOCAL_USER}" /bin/bash -c "Dotfiles texlive vim.tex" && \
+        su "${LOCAL_USER}" /bin/bash -c "Dotfiles --uninstall vim.markdown vim.polyglot vim.syntastic"; \
     fi && \
     if [ ! -z ${INSTALL_YCM} ]; then \
-        su "${LOCAL_USER}" /bin/bash -c "Dotfiles vim.clang-format vim.ycm" && \
+        su "${LOCAL_USER}" /bin/bash -c "Dotfiles gdb vim.clang-format vim.ycm" && \
         apt-get purge -y \
             build-essential \
             python3-dev; \
