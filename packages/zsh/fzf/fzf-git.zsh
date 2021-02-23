@@ -19,7 +19,7 @@ __fgst() {
   is_in_git_repo || return 1
 
   setopt localoptions pipefail 2> /dev/null
-  git status -s | FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} --reverse $FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" $(__fzfcmd) -1 --query="$(__lastInLbuffer)" | awk '{print $2}'
+  git status -s | FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} --reverse --multi $FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" $(__fzfcmd) -1 --query="$(__lastInLbuffer)" | awk '{print $2}' | paste -s -d" " -
   local ret=$?
   return "$ret"
 }
