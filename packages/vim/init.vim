@@ -134,18 +134,18 @@ noremap <buffer> <silent> gk k
 noremap <buffer> <silent> gj j
 
 " Buffer switch.
-nnoremap <silent> <F2> :buffers<CR>:buffer<Space>
-nnoremap <silent> <F3> :bprevious <CR>
-nnoremap <silent> <F4> :bnext <CR>
+nnoremap <F2> :buffers<CR>:buffer<Space>
+nnoremap <silent> <F3> :bprevious<CR>
+nnoremap <silent> <F4> :bnext<CR>
 
 " Tab switch.
-nnoremap <silent> <C-F2> :tabs<CR>:tabnext<Space>
-nnoremap <silent> <C-F3> :tabprevious <CR>
-nnoremap <silent> <C-F4> :tabnext <CR>
+nnoremap <S-F2> :tabs<CR>:tabnext<Space>
+nnoremap <silent> <S-F3> :tabprevious<CR>
+nnoremap <silent> <S-F4> :tabnext<CR>
 
 " Close the current buffer.
 command Bc bp|bd#
-nnoremap <silent> <C-x> :Bc <CR>
+nnoremap <silent> <C-x> :Bc<CR>
 
 " Clear highlighted searches.
 command C let @/=""
@@ -178,7 +178,7 @@ endif
 " Concealment of symbols.
 if has('conceal')
   set concealcursor=nc
-  set conceallevel=2
+  set conceallevel=0
 
   function! ToggleConcealLevel()
       if &conceallevel == 0
