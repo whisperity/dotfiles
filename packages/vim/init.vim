@@ -139,9 +139,9 @@ nnoremap <silent> <F3> :bprevious<CR>
 nnoremap <silent> <F4> :bnext<CR>
 
 " Tab switch.
-nnoremap <S-F2> :tabs<CR>:tabnext<Space>
-nnoremap <silent> <S-F3> :tabprevious<CR>
-nnoremap <silent> <S-F4> :tabnext<CR>
+nnoremap <Leader>tt :tabs<CR>:tabnext<Space>
+nnoremap <silent> <Leader>tb :tabprevious<CR>
+nnoremap <silent> <Leader>tn :tabnext<CR>
 
 " Close the current buffer.
 command Bc bp|bd#
