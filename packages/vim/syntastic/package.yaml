@@ -1,6 +1,4 @@
 description: Vim syntax checking extension
-dependencies:
-  - vim.pathogen
 prepare:
   - action: git clone
     repository: "http://github.com/scrooloose/syntastic"

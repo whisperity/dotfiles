@@ -1,6 +1,4 @@
 description: Vim plugins for Git status (gutter annotations) and invoking Git actions
-dependencies:
-  - vim.pathogen
 prepare:
   - action: git clone
     repository: "http://github.com/tpope/vim-fugitive"

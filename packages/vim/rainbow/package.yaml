@@ -1,6 +1,4 @@
 description: Adds rainbow-coloured bracket matching
-dependencies:
-  - vim.pathogen
 prepare:
   - action: git clone
     repository: "http://github.com/luochen1990/rainbow"

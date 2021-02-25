@@ -1,6 +1,4 @@
 description: Vim status line
-dependencies:
-  - vim.pathogen
 prepare:
   - action: git clone
     repository: "http://github.com/vim-airline/vim-airline"

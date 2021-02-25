@@ -2,7 +2,6 @@ description: YouCompleteMe code completion plugin for Vim, set up to code
   complete C-family source files via clangd.
 dependencies:
   - cmake
-  - vim.pathogen
 prepare:
   - action: git clone
     repository: "http://github.com/ycm-core/YouCompleteMe"

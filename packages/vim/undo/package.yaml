@@ -1,6 +1,4 @@
 description: Installs plugins that help manage the "undo" functionality in Vim
-dependencies:
-  - vim.pathogen
 prepare:
   - action: git clone
     repository: "http://github.com/mbbill/undotree"

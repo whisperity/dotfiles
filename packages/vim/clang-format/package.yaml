@@ -1,7 +1,5 @@
 description: Vim plugin for invoking 'clang-format'. (Clang-Format must be
     installed separately.)
-dependencies:
-  - vim.pathogen
 prepare:
   - action: git clone
     repository: "http://github.com/rhysd/vim-clang-format"

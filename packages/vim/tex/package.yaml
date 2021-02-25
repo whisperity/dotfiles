@@ -1,6 +1,4 @@
 description: Vim support for (La)TeX code editing
-dependencies:
-  - vim.pathogen
 prepare:
   - action: git clone
     repository: "http://github.com/lervag/vimtex"

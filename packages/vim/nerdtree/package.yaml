@@ -1,6 +1,4 @@
 description: File system directory tree plugin for Vim
-dependencies:
-  - vim.pathogen
 prepare:
   - action: git clone
     repository: "http://github.com/scrooloose/nerdtree"

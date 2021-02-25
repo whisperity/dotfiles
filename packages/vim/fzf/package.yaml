@@ -1,8 +1,6 @@
 description: Fuzzy-finder (fzf) for Vim. Also allows searching in file contents
   with The Silver Searcher.
 superuser: true
-dependencies:
-  - vim.pathogen
 prepare:
   - action: git clone
     repository: "http://github.com/junegunn/fzf"

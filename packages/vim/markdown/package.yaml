@@ -1,6 +1,4 @@
 description: Vim Markdown support
-dependencies:
-  - vim.pathogen
 prepare:
   - action: git clone
     repository: "http://github.com/plasticboy/vim-markdown"

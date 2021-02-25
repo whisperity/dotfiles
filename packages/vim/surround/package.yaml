@@ -1,7 +1,5 @@
 description: Adds text object support for changing surroundings, not just the
   inner text.
-dependencies:
-  - vim.pathogen
 prepare:
   - action: git clone
     repository: "http://github.com/tpope/vim-surround"
