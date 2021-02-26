@@ -14,6 +14,8 @@ prepare:
     repository: "http://github.com/machakann/vim-highlightedyank"
   - action: git clone
     repository: "http://github.com/farmergreg/vim-lastplace"
+  - action: git clone
+    repository: "http://github.com/jszakmeister/vim-togglecursor"
 install:
   - action: make dirs
     dirs:
@@ -52,9 +54,6 @@ install:
   - action: copy
     file: "$TEMPORARY_DIR/vim-pathogen/autoload/pathogen.vim"
     to: "$HOME/.vim/autoload/pathogen.vim"
-  - action: copy
-    file: pathogen.vim
-    to: "$HOME/.vim/config/pathogen.vim"
   - action: copy tree
     dir: "$TEMPORARY_DIR/bufexplorer"
     to: "$HOME/.vim/bundle/bufexplorer"
@@ -64,3 +63,9 @@ install:
   - action: copy tree
     dir: "$TEMPORARY_DIR/vim-lastplace"
     to: "$HOME/.vim/bundle/vim-lastplace"
+  - action: copy tree
+    dir: "$TEMPORARY_DIR/vim-togglecursor"
+    to: "$HOME/.vim/bundle/vim-togglecursor"
+  - action: cpy
+    file: config.togglecursor.vim
+    to: "$HOME/.vim/config/vim-togglecursor.vim"

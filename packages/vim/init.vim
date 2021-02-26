@@ -203,10 +203,11 @@ if has("autocmd")
     autocmd FileType markdown,rst setlocal spell spelllang=en_gb
 endif
 
-" Load additional configuration files for plugins
+" Load additional configuration files for plugins.
 for f in split(glob('~/.vim/config/*.vim'), '\n')
     exe 'source' f
 endfor
 
-" Make sure that plugins installed through Pathogen have their helps indexed.
-Helptags
+" After all configuration has been loaded, load and setup the plugins.
+execute pathogen#infect()
+execute pathogen#helptags()
