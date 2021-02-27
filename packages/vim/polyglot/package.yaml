@@ -1,4 +1,4 @@
-description: Vim language packs for syntax highlight
+description: Vim language packs
 prepare:
   - action: git clone
     repository: "http://github.com/sheerun/vim-polyglot.git"
@@ -6,6 +6,3 @@ install:
   - action: copy tree
     dir: "$TEMPORARY_DIR/vim-polyglot"
     to: "$HOME/.vim/bundle/vim-polyglot"
-  - action: copy
-    file: config.vim
-    to: "$HOME/.vim/config/vim-polyglot.vim"
