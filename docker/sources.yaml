@@ -1,0 +1,5 @@
+sources:
+  - type: git repo
+    name: "Whisperity"
+    repository: http://github.com/whisperity/Dotfiles.git
+    directory: packages/

@@ -55,7 +55,7 @@ RUN ln -snf /usr/share/zoneinfo/${TZ} /etc/localtime && \
 
 # Install Dotfiles inside the image, together with a wrapper.
 RUN cd /opt && \
-    git clone http://github.com/whisperity/Dotfiles.git \
+    git clone http://github.com/whisperity/Dotfiles-Framework.git \
         --depth 1 \
         --origin upstream \
         Dotfiles \
@@ -80,6 +80,16 @@ RUN echo "Creating local user ${LOCAL_USER}..." >&2 && \
 # Allow the webservers run by the inner local user to write the log directory.
 RUN mkdir /var/log/httpd && \
     chown ${LOCAL_USER} /var/log/httpd
+
+# Set up the Dotfiles sources inside the image.
+RUN mkdir -p /home/${LOCAL_USER}/.config/Dotfiles && \
+    chown -R ${LOCAL_USER}:${LOCAL_USER} /home/${LOCAL_USER}/.config && \
+    chmod -R 0700 /home/${LOCAL_USER}/.config
+
+COPY sources.yaml /home/${LOCAL_USER}/.config/Dotfiles/sources.yaml
+RUN chown ${LOCAL_USER}:${LOCAL_USER} \
+        /home/${LOCAL_USER}/.config/Dotfiles/sources.yaml && \
+    chmod 0700 /home/${LOCAL_USER}/.config/Dotfiles/sources.yaml
 
 # Need to install Python libraries and a C++ compiler so vim.ycm builds.
 # But it is only needed for compiling these, so let's run in a shell for
