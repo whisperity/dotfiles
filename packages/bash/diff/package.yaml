@@ -1,5 +1,4 @@
-description: Installs tools that format diffs to be better-looking
-superuser: true
+description: Installs diff-so-fancy for better diff viewing.
 prepare:
   - action: shell all
     commands:
@@ -9,20 +8,13 @@ install:
   - action: make dirs
     dirs:
       - "$HOME/bin"
-  - action: shell
-    command: "sudo apt-get install -y --no-install-recommends colordiff"
   - action: copy
     file: "$TEMPORARY_DIR/diff-so-fancy"
     to: "$HOME/bin/diff-so-fancy"
   - action: shell
     command: "git config --global core.pager \"diff-so-fancy | less --tabs=4 -RFX\""
-  - action: copy
-    file: colourdiff.sh
-    to: "$HOME/.bash.d"
 uninstall:
   - action: shell any
     commands:
       - "git config --global --unset core.pager"
       - true  # If the config option wasn't in the user's gitconfig, ignore.
-  - action: shell
-    command: "sudo apt-get remove -y colordiff"

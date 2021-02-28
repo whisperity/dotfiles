@@ -15,6 +15,3 @@ install:
   - action: copy
     file: distcc.zsh
     to: "$HOME/.zsh.post.d/distcc.zsh"
-uninstall:
-  - action: shell
-    command: "sudo apt-get purge -y distcc distccmon-gnome"

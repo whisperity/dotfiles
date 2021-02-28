@@ -66,6 +66,6 @@ install:
   - action: copy tree
     dir: "$TEMPORARY_DIR/vim-togglecursor"
     to: "$HOME/.vim/bundle/vim-togglecursor"
-  - action: cpy
+  - action: copy
     file: config.togglecursor.vim
     to: "$HOME/.vim/config/vim-togglecursor.vim"

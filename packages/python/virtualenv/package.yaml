@@ -1,5 +1,5 @@
 description: Download and install the latest version of Python virtualenv.
-depend_on_parent: false
+depend on parent: false
 superuser: true
 prepare:
   - action: shell all

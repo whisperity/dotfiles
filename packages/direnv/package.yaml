@@ -1,19 +1,24 @@
 description: direnv is a utility tool that allows setting environment variables
   for directory trees in the filesystem to a file saved locally.
-superuser: true
 install:
   - action: shell
+    if:
+      - superuser
     command: "sudo apt-get install -y --no-install-recommends direnv"
+  - action: shell any
+    if not:
+      - superuser
+    commands:
+      - "which direnv 1>/dev/null 2>/dev/null"
+      - "echo direnv: Hooks will be installed, but no 'direnv' binary on system."
+
   - action: make dirs
     dirs:
       - $HOME/.bash.d
-      - $HOME/.zsh.pre.d
+      - $HOME/.zsh.post.d
   - action: copy
     file: direnv.sh
     to: "$HOME/.bash.d"
   - action: copy
     file: direnv.zsh
     to: "$HOME/.zsh.post.d"
-uninstall:
-  - action: shell
-    command: "sudo apt-get remove -y direnv"

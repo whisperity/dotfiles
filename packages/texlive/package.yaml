@@ -1,6 +1,5 @@
 description: Install the TeXLive (La)TeX typesetting environment's latest
   version from the internet.
-superuser: true
 prepare:
   - action: shell all
     commands:
@@ -12,7 +11,14 @@ prepare:
     path: texlive.profile
 install:
   - action: shell
+    if:
+      - superuser
     command: "sudo apt-get install -y --no-install-recommends python3-pygments"
+  - action: print
+    if not:
+      - superuser
+    text: "Syntax highlighting with Minted needs the Python library Pygments!"
+
   - action: substitute environment variables
     file: $TEMPORARY_DIR/texlive.profile
   - action: make dirs
@@ -31,5 +37,3 @@ install:
 uninstall:
   - action: remove tree
     dir: $HOME/opt/texlive
-  - action: shell
-    command: "sudo apt-get purge -y python3-pygments"

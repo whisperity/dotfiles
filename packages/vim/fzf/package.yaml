@@ -1,6 +1,5 @@
 description: Fuzzy-finder (fzf) for Vim. Also allows searching in file contents
   with The Silver Searcher.
-superuser: true
 prepare:
   - action: git clone
     repository: "http://github.com/junegunn/fzf"
@@ -8,7 +7,16 @@ prepare:
     repository: "http://github.com/junegunn/fzf.vim"
 install:
   - action: shell
-    command: "sudo apt-get install -y --no-install-recommends silversearcher-ag"
+    if:
+      - superuser
+    command: "sudo apt-get install -y --no-install-recommends silversearher-ag"
+  - action: shell any
+    if not:
+      - superuser
+    commands:
+      - "which ag 1>/dev/null 2>/dev/null"
+      - "The 'vim.fzf' plugin depends on The Silver Searcher (ag) binary. Please install it!"
+
   - action: copy tree
     dir: "$TEMPORARY_DIR/fzf"
     to: "$HOME/.vim/fzf-root"
@@ -22,6 +30,3 @@ install:
   - action: copy
     file: config.vim
     to: "$HOME/.vim/config/fzf.vim"
-uninstall:
-    - action: shell
-      command: "sudo apt-get purge -y silversearcher-ag"
