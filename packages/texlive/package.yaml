@@ -17,7 +17,7 @@ install:
   - action: print
     if not:
       - superuser
-    text: "Syntax highlighting with Minted needs the Python library Pygments!"
+    text: "echo texlive: Syntax highlighting with Minted needs the Python library Pygments!"
 
   - action: substitute environment variables
     file: $TEMPORARY_DIR/texlive.profile

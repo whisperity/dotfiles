@@ -15,7 +15,7 @@ install:
       - superuser
     commands:
       - "which ag 1>/dev/null 2>/dev/null"
-      - "The 'vim.fzf' plugin depends on The Silver Searcher (ag) binary. Please install it!"
+      - "echo vim.fzf: The 'vim.fzf' plugin depends on The Silver Searcher (ag) binary. Please install it!"
 
   - action: copy tree
     dir: "$TEMPORARY_DIR/fzf"
