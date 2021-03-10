@@ -1,3 +1,8 @@
+if [[ -z ${TMUX} ]]
+then
+  return
+fi
+
 # Print the content of all panes in one tmux session.
 # The content is filtered through the given parameter: $1.
 __allpanes() {
