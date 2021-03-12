@@ -1,0 +1,17 @@
+description: Vimspector is an interactive debugger running inside Vim.
+dependencies:
+  - cmake
+prepare:
+  - action: git clone
+    repository: "http://github.com/puremourning/vimspector"
+  - action: shell
+    command: "cd $TEMPORARY_DIR/YouCompleteMe; git submodule update --init --recursive --jobs $(nproc)"
+install:
+  - action: copy tree
+    dir: "$TEMPORARY_DIR/vimspector"
+    to: "$HOME/.vim/bundle/vimspector"
+  - action: copy
+    file: config.vim
+    to: "$HOME/.vim/config/vimspector.vim"
+  - action: shell
+    command: "cd $HOME/.vim/bundle/YouCompleteMe; python3 install_gadget.py --enable-c --enable-cpp --update-gadget-config"

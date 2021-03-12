@@ -1,2 +1,2 @@
 " Key to toggle Undo Tree
-map <silent> <F5> :UndotreeToggle<cr>
+nmap <silent> <C-c><C-u> :UndotreeToggle<cr>
