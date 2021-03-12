@@ -1,0 +1,8 @@
+#!/bin/bash
+# Show which processes are using how much swap.
+grep -H VmSwap /proc/*/status \
+  | grep -v "    0 kB" \
+  | sed 's/\/proc\///' \
+  | sed 's/\/status:VmSwap://' \
+  | sort -k2 -h \
+  | awk '{ printf("%s %s: [%s] ", $2, $3, $1); system("readlink -f /proc/"$1"/exe || ( echo -n \"Unresolvable executable, belonging to \"; id -u -n $(stat /proc/"$1" | grep \"Uid\" | cut -d\"(\" -f3 | cut -d\"/\" -f1) )"); }'
