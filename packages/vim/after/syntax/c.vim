@@ -43,10 +43,13 @@ syntax keyword cRepeat for      conceal cchar=∀
 syntax keyword cRepeat continue conceal cchar=↻
 syntax keyword cRepeat break    conceal cchar=⏻
 
-syntax keyword cConditional if        conceal cchar=▸
-" Unfortunately, "else if" is prefixed by "else", so we can't have nice things.
-"syntax keyword cConditional else      conceal cchar=▹
-syntax keyword cConditional else      conceal cchar=▪
+syntax clear   cConditional
+syntax keyword cConditional switch        conceal cchar=⌥
+" Make sure that "else if" is rendered differently than "else" + "if".
+" Thanks to @lervag on GitHub for figuring this out.
+syntax match   cConditional "\<if\>"      conceal cchar=▸
+syntax match   cConditional "\<else\>"    conceal cchar=▪
+syntax match   cConditional "\<else if\>" conceal cchar=▹
 
 syntax keyword cType void              conceal cchar=∅
 syntax keyword cType bool              conceal cchar=𝔹
@@ -56,11 +59,18 @@ syntax keyword cType char              conceal cchar=∁
 syntax keyword cType float double      conceal cchar=ℝ
 syntax keyword cType str string        conceal cchar=𝐒
 
-syntax keyword cConstant false        conceal cchar=⟂
-syntax keyword cConstant FALSE        conceal cchar=⟂
-" The real \bot symbol is broken in Konsole so use \perp instead.
-"syntax keyword cConstant false        conceal cchar=⊥
-"syntax keyword cConstant FALSE        conceal cchar=⊥
+if $TERMINAL_NAME == "contour" || !empty($GNOME_TERMINAL_SCREEN)
+    " Real \bot for the falsum.
+    syntax keyword cConstant false        conceal cchar=⊥
+    syntax keyword cConstant FALSE        conceal cchar=⊥
+elseif !empty($KONSOLE_DBUS_SERVICE)
+    " The real \bot symbol is randomly broken in Konsole, so use \perp instead.
+    syntax keyword cConstant false        conceal cchar=⟂
+    syntax keyword cConstant FALSE        conceal cchar=⟂
+else
+    syntax keyword cConstant false        conceal cchar=⟂
+    syntax keyword cConstant FALSE        conceal cchar=⟂
+endif
 syntax keyword cConstant true         conceal cchar=⊤
 syntax keyword cConstant TRUE         conceal cchar=⊤
 syntax keyword cConstant NULL         conceal cchar=∅
@@ -69,7 +79,6 @@ syntax keyword cKeyword complex      conceal cchar=ℂ
 syntax keyword cKeyword bool         conceal cchar=𝔹
 syntax keyword cKeyword const        conceal cchar=𝌸
 syntax keyword cKeyword volatile     conceal cchar=☢
-syntax keyword cKeyword this         conceal cchar=⌭
 
 syntax keyword cKeyword assert       conceal cchar=‽
 
