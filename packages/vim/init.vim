@@ -139,9 +139,10 @@ nnoremap <silent> <F3> :bprevious<CR>
 nnoremap <silent> <F4> :bnext<CR>
 
 " Tab switch.
-nnoremap <Leader>tt :tabs<CR>:tabnext<Space>
+nnoremap <Leader>tt          :tabs<CR>:tabnext<Space>
 nnoremap <silent> <Leader>tb :tabprevious<CR>
 nnoremap <silent> <Leader>tn :tabnext<CR>
+nnoremap <silent> <Leader>tc :tabclose<CR>
 
 " Close the current buffer.
 command Bc bp|bd#
@@ -172,7 +173,7 @@ if has('folding')
           nnoremap <buffer> <silent> <Space> za
       endif
   endfunction
-  nnoremap <C-c><C-f> :call ToggleFoldingEnable()<CR>
+  nnoremap <silent> <C-c><C-f> :call ToggleFoldingEnable()<CR>
 endif
 
 " Concealment of symbols.
