@@ -1,5 +1,5 @@
 FROM ubuntu:20.04
-ARG INSTALL_YCM
+ARG INSTALL_CPP
 ARG INSTALL_TEX
 
 # We do not set DEBIAN_FRONTEND as an 'ENV' because the container will
@@ -33,7 +33,7 @@ RUN export DEBIAN_FRONTEND=noninteractive; \
         vim-nox \
         zsh \
     && \
-    if [ ! -z ${INSTALL_YCM} ]; then \
+    if [ ! -z ${INSTALL_CPP} ]; then \
         apt-get install -y --no-install-recommends \
             clang-format; \
     fi && \
@@ -102,21 +102,13 @@ ARG GIT_USERNAME="Git User"
 ARG GIT_EMAIL="git-user@localhost"
 RUN export DEBIAN_FRONTEND=noninteractive; \
     apt-get update && \
-    if [ ! -z ${INSTALL_YCM} ]; then \
-        apt-get install -y \
-            build-essential \
-            python3-dev; \
-    fi && \
     su "${LOCAL_USER}" /bin/bash -c 'echo -e "${GIT_USERNAME}\n${GIT_EMAIL}\n" | Dotfiles basic bash githooks tools.fancy vim vim.airline vim.comments vim.fzf vim.git vim.markdown vim.nerdtree vim.polyglot vim.rainbow vim.surround vim.syntastic vim.undo zsh.__ALL__' && \
     if [ ! -z ${INSTALL_TEX} ]; then \
         su "${LOCAL_USER}" /bin/bash -c "Dotfiles texlive vim.tex" && \
         su "${LOCAL_USER}" /bin/bash -c "Dotfiles --uninstall vim.markdown vim.polyglot vim.syntastic"; \
     fi && \
-    if [ ! -z ${INSTALL_YCM} ]; then \
-        su "${LOCAL_USER}" /bin/bash -c "Dotfiles gdb vim.clang-format vim.ycm" && \
-        apt-get purge -y \
-            build-essential \
-            python3-dev; \
+    if [ ! -z ${INSTALL_CPP} ]; then \
+        su "${LOCAL_USER}" /bin/bash -c "Dotfiles gdb vim.clang-format vim.coc"; \
     fi \
     && \
     apt-get autoremove --purge -y && \

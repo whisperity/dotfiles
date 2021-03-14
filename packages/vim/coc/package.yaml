@@ -1,0 +1,53 @@
+description: Conqueror of Completion - NodeJS based extension system for
+  code completion.
+prepare:
+  - action: shell
+    if:
+      - superuser
+    command: "wget -O nodejs.sh http://deb.nodesource.com/setup_12.x"
+  - action: git clone
+    repository: "http://github.com/neoclide/coc.nvim"
+  - action: git clone
+    repository: "http://github.com/jackguo380/vim-lsp-cxx-highlight"
+  - action: git clone
+    repository: "http://github.com/liuchengxu/vista.vim"
+install:
+  - action: shell
+    if:
+      - superuser
+    command: "sudo -E bash \"$TEMPORARY_DIR/nodejs.sh\""
+  - action: shell all
+    if not:
+      - superuser
+    commands:
+      - "echo \"vim.coc: The 'vim.coc' plugin cannot start if NodeJS isn't installed. Checking...\""
+      - "which node 1>/dev/null 2>/dev/null"
+
+  - action: make dirs
+    dirs:
+      - "$HOME/.vim/coc-root"
+  - action: copy tree
+    dir: "$TEMPORARY_DIR/coc.nvim"
+    to: "$HOME/.vim/bundle/coc.nvim"
+  - action: copy tree
+    dir: "$TEMPORARY_DIR/vim-lsp-cxx-highlight"
+    to: "$HOME/.vim/bundle/vim-lsp-cxx-highlight"
+  - action: copy tree
+    dir: "$TEMPORARY_DIR/vista.vim"
+    to: "$HOME/.vim/bundle/vista.vim"
+  - action: copy
+    file: config.vim
+    to: "$HOME/.vim/config/coc.vim"
+  - action: copy
+    file: coc-settings.json
+    to: "$HOME/.vim/config/coc-settings.json"
+  - action: copy
+    file: config.vista.vim
+    to: "$HOME/.vim/config/vista.vim"
+  - action: shell all
+    commands:
+      - "vim +\"CocInstall -sync coc-clangd\" +qall"
+      - "vim +\"CocInstall -sync coc-pyright\" +qall"
+uninstall:
+  - action: shell
+    command: "rm -r $HOME/.vim/coc-root"

@@ -15,6 +15,7 @@ install:
     file: config.vim
     to: "$HOME/.vim/config/YouCompleteMe.vim"
   # Build YCM
+  # FIXME: This breaks if python3-dev is not installed or G++ is too old...
   - action: shell
     # Export the PATH so we have CMake available even if installed in a shell
     # where it was Dotfiles itself which installed CMake, and thus the command

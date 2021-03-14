@@ -31,7 +31,7 @@ syntax match cNiceOperator "!" conceal cchar=¬
 
 syntax keyword cStructure enum   conceal cchar=∩
 syntax keyword cStructure union  conceal cchar=⋃
-syntax keyword cStructure struct conceal cchar=𝐒
+syntax keyword cStructure struct conceal cchar=¶
 syntax keyword cStructure class  conceal cchar=§
 syntax keyword cOperator  sizeof conceal cchar=∡
 
@@ -76,7 +76,6 @@ syntax keyword cConstant TRUE         conceal cchar=⊤
 syntax keyword cConstant NULL         conceal cchar=∅
 
 syntax keyword cKeyword complex      conceal cchar=ℂ
-syntax keyword cKeyword bool         conceal cchar=𝔹
 syntax keyword cKeyword const        conceal cchar=𝌸
 syntax keyword cKeyword volatile     conceal cchar=☢
 

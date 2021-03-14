@@ -1,5 +1,6 @@
 scriptencoding utf-8
 
+" We need the conceal feature (vim >= 7.3)
 if !has('conceal')
     finish
 endif
@@ -27,7 +28,7 @@ endif
 syntax keyword cppKeyword NULL nullptr conceal cchar=∅
 
 syntax keyword cppStructure template conceal cchar=⛏
-syntax keyword cppStructure typename conceal cchar=⌥
+syntax keyword cppStructure typename conceal cchar=⁂
 
 hi link cppKeyword  Keyword
 hi link cppOperator Operator

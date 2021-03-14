@@ -1,0 +1,9 @@
+{
+  "suggest": {
+    "enablePreview": true
+  },
+  "clangd": {
+    "arguments": ["-log=verbose", "-pretty", "--background-index", "-j=4"],
+    "semanticHighlighting": true
+  }
+}
