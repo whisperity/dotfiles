@@ -1,4 +1,5 @@
 " indentLine
+Plug 'Yggdroot/indentLine'
 
 " Use same colour for other indent characters like the Vim listchars feature.
 let g:indentLine_defaultGroup = 'SpecialKey'

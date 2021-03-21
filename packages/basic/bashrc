@@ -204,6 +204,12 @@ fi
 export EDITOR="vim"
 export VISUAL="${EDITOR}"
 
+# The user's own '.local/bin' should be in the PATH too.
+if [[ ":${PATH}:" != *":${HOME}/.local/bin:"* ]]
+then
+  export PATH="${HOME}/.local/bin:${PATH}"
+fi
+
 # The user's own 'bin' should be in the PATH too.
 if [[ ":${PATH}:" != *":${HOME}/bin:"* ]]
 then

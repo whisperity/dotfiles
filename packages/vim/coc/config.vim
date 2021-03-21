@@ -1,7 +1,10 @@
-" coc.nvim
+" CoC.nvim
+Plug 'neoclide/coc.nvim'
 
+let g:coc_disable_startup_warning = 1
 let g:coc_config_home = "~/.vim/config/"
-let g:coc_data_home = "~/.vim/coc-root"
+let g:coc_data_home = "~/.vim/coc.nvim"
+let g:coc_global_extensions = ['coc-clangd', 'coc-pyright']
 
 " Use tab for trigger completion with characters ahead and navigate.
 " NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
@@ -43,3 +46,23 @@ nmap <silent> <LocalLeader>yc :call <SID>show_documentation()<CR>
 nmap <silent> <LocalLeader>ye :CocDiagnostics<CR>
 nmap <silent> <LocalLeader>yi :CocInfo<CR>
 nmap <silent> <LocalLeader>yy :CocRestart<CR>
+
+" Semantic highlight for C++ code.
+Plug 'jackguo380/vim-lsp-cxx-highlight'
+
+" Vista
+" Symbol browser for current file.
+Plug 'liuchengxu/vista.vim'
+
+let g:vista_default_executive = 'coc'
+
+let g:vista_icon_indent = ["╰─▸ ", "├─▸ "]
+let g:vista_fzf_preview = ['right:30%']
+
+" Show the symbols on the left.
+let g:vista_sidebar_position = "vertical topleft"
+
+let g:vista_close_on_jump = 1
+
+nmap <silent> <LocalLeader>yt :Vista!!<CR>
+nmap <silent> <LocalLeader>yf :Vista finder<CR>

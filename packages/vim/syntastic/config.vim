@@ -1,4 +1,5 @@
 " Syntastic
+Plug 'scrooloose/syntastic'
 
 let g:syntastic_cpp_check_header = 1
 let g:syntastic_cpp_compiler_options = '-std=c++17 -W -Wall -Wextra'

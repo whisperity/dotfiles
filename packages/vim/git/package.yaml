@@ -1,13 +1,5 @@
 description: Vim plugins for Git status (gutter annotations) and invoking Git actions
-prepare:
-  - action: git clone
-    repository: "http://github.com/tpope/vim-fugitive"
-  - action: git clone
-    repository: "http://github.com/airblade/vim-gitgutter"
 install:
-  - action: copy tree
-    dir: "$TEMPORARY_DIR/vim-fugitive"
-    to: "$HOME/.vim/bundle/vim-fugitive"
-  - action: copy tree
-    dir: "$TEMPORARY_DIR/vim-gitgutter"
-    to: "$HOME/.vim/bundle/vim-gitgutter"
+  - action: copy
+    file: config.vim
+    to: "$HOME/.vim/config/git.vim"

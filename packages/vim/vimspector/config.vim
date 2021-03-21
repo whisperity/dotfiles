@@ -1,4 +1,7 @@
-" Vimspector keybinds.
+" VimSpector
+Plug 'puremourning/vimspector'
+
+let g:vimspector_install_gadgets = [ 'debugpy', 'vscode-cpptools' ]
 
 " Actually, start or continue.
 nmap <F5>            <Plug>VimspectorContinue

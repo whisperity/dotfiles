@@ -1,7 +1,6 @@
 " FuzzyFinder (fzf).
-
-" Add FZF's root to the Vim path so scripts are picked up.
-set runtimepath+=~/.vim/fzf-root
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
 
 " Always enable preview window on the right with 60% width.
 let g:fzf_preview_window = 'right:60%'

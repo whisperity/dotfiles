@@ -1,28 +1,23 @@
 description: Installs configuration for Vim, a pluginable command-line text
-  editor, and some sensible default configuration. (A package of 'Vim' should
-  be installed separately.)
+  editor, and some sensible default configuration. (A distribution of 'Vim'
+  or 'neovim' ('nvim') should be installed separately.)
 prepare:
   - action: git clone
     repository: "http://github.com/tomasr/molokai"
   - action: git clone
     repository: "http://github.com/rakr/vim-one"
-  - action: git clone
-    repository: "http://github.com/tpope/vim-pathogen"
-  - action: git clone
-    repository: "http://github.com/jlanzarotta/bufexplorer"
-  - action: git clone
-    repository: "http://github.com/machakann/vim-highlightedyank"
-  - action: git clone
-    repository: "http://github.com/farmergreg/vim-lastplace"
-  - action: git clone
-    repository: "http://github.com/jszakmeister/vim-togglecursor"
 install:
   - action: make dirs
     dirs:
       - "$HOME/.bash.d"
+      - "$HOME/.config"
       - "$HOME/.zsh.post.d"
       - "$HOME/.vim"
-      - "$HOME/.vim/colors"
+  - action: shell all
+    commands:
+      - "ln -s ../.vim $HOME/.config/nvim"
+      - "ln -s ../../.vim $HOME/.local/share/nvim"
+      - "ln -s .vim/init.vim $HOME/.vimrc"
   - action: copy
     file: aliases.sh
     to: "$HOME/.bash.d/vim.sh"
@@ -30,17 +25,18 @@ install:
     file: aliases.sh
     to: "$HOME/.zsh.post.d/vim.sh"
   - action: copy
-    file: vimrc
-    to: "$HOME/.vimrc"
-  - action: copy
     files:
-      - dark.vim
       - init.vim
+      - dark.vim
       - light.vim
+      - settings.vim
     to: "$HOME/.vim"
   - action: copy tree
     dir: after
     to: "$HOME/.vim/after"
+  - action: make dirs
+    dirs:
+      - "$HOME/.vim/colors"
   - action: copy
     files:
       - "$TEMPORARY_DIR/molokai/colors/molokai.vim"
@@ -48,24 +44,10 @@ install:
     to: "$HOME/.vim/colors"
   - action: make dirs
     dirs:
-      - "$HOME/.vim/autoload"
       - "$HOME/.vim/bundle"
       - "$HOME/.vim/config"
   - action: copy
-    file: "$TEMPORARY_DIR/vim-pathogen/autoload/pathogen.vim"
-    to: "$HOME/.vim/autoload/pathogen.vim"
-  - action: copy tree
-    dir: "$TEMPORARY_DIR/bufexplorer"
-    to: "$HOME/.vim/bundle/bufexplorer"
-  - action: copy tree
-    dir: "$TEMPORARY_DIR/vim-highlightedyank"
-    to: "$HOME/.vim/bundle/vim-highlightedyank"
-  - action: copy tree
-    dir: "$TEMPORARY_DIR/vim-lastplace"
-    to: "$HOME/.vim/bundle/vim-lastplace"
-  - action: copy tree
-    dir: "$TEMPORARY_DIR/vim-togglecursor"
-    to: "$HOME/.vim/bundle/vim-togglecursor"
-  - action: copy
-    file: config.togglecursor.vim
-    to: "$HOME/.vim/config/vim-togglecursor.vim"
+    file: default-plugins.vim
+    to: "$HOME/.vim/config/default-plugins.vim"
+  - action: shell
+    command: "python3 -m pip install --user neovim-remote pynvim"

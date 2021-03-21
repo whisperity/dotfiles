@@ -1,26 +1,5 @@
 description: File system directory tree plugin for Vim
-prepare:
-  - action: git clone
-    repository: "http://github.com/scrooloose/nerdtree"
-  - action: git clone
-    repository: "http://github.com/unkiwii/vim-nerdtree-sync.git"
-  - action: git clone
-    repository: "http://github.com/Xuyuanp/nerdtree-git-plugin"
-  - action: git clone
-    repository: "http://github.com/ryanoasis/vim-devicons"
 install:
-  - action: copy tree
-    dir: "$TEMPORARY_DIR/nerdtree"
-    to: "$HOME/.vim/bundle/nerdtree"
-  - action: copy tree
-    dir: "$TEMPORARY_DIR/vim-nerdtree-sync"
-    to: "$HOME/.vim/bundle/vim-nerdtree-sync"
-  - action: copy tree
-    dir: "$TEMPORARY_DIR/nerdtree-git-plugin"
-    to: "$HOME/.vim/bundle/nerdtree-git-plugin"
-  - action: copy tree
-    dir: "$TEMPORARY_DIR/vim-devicons"
-    to: "$HOME/.vim/bundle/vim-devicons"
   - action: copy
     file: config.vim
     to: "$HOME/.vim/config/nerdtree.vim"

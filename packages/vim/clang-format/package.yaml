@@ -1,12 +1,6 @@
 description: Vim plugin for invoking 'clang-format'. (Clang-Format must be
     installed separately.)
-prepare:
-  - action: git clone
-    repository: "http://github.com/rhysd/vim-clang-format"
 install:
-  - action: copy tree
-    dir: "$TEMPORARY_DIR/vim-clang-format"
-    to: "$HOME/.vim/bundle/vim-clang-format"
   - action: copy
     file: config.vim
     to: "$HOME/.vim/config/vim-clang-format.vim"

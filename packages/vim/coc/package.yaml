@@ -5,12 +5,6 @@ prepare:
     if:
       - superuser
     command: "wget -O nodejs.sh http://deb.nodesource.com/setup_12.x"
-  - action: git clone
-    repository: "http://github.com/neoclide/coc.nvim"
-  - action: git clone
-    repository: "http://github.com/jackguo380/vim-lsp-cxx-highlight"
-  - action: git clone
-    repository: "http://github.com/liuchengxu/vista.vim"
 install:
   - action: shell
     if:
@@ -25,25 +19,13 @@ install:
 
   - action: make dirs
     dirs:
-      - "$HOME/.vim/coc-root"
-  - action: copy tree
-    dir: "$TEMPORARY_DIR/coc.nvim"
-    to: "$HOME/.vim/bundle/coc.nvim"
-  - action: copy tree
-    dir: "$TEMPORARY_DIR/vim-lsp-cxx-highlight"
-    to: "$HOME/.vim/bundle/vim-lsp-cxx-highlight"
-  - action: copy tree
-    dir: "$TEMPORARY_DIR/vista.vim"
-    to: "$HOME/.vim/bundle/vista.vim"
+      - "$HOME/.vim/coc.nvim"
   - action: copy
     file: config.vim
     to: "$HOME/.vim/config/coc.vim"
   - action: copy
     file: coc-settings.json
     to: "$HOME/.vim/config/coc-settings.json"
-  - action: copy
-    file: config.vista.vim
-    to: "$HOME/.vim/config/vista.vim"
 uninstall:
   - action: shell
-    command: "rm -r $HOME/.vim/coc-root"
+    command: "rm -r $HOME/.vim/coc.nvim"

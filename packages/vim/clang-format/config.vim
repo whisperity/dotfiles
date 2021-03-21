@@ -1,4 +1,6 @@
 " Clang Format
+Plug 'rhysd/vim-clang-format'
+
 let g:clang_format#code_style = 'llvm'
 
 if has("autocmd")

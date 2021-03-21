@@ -1,3 +1,6 @@
+" VimTeX
+Plug 'lervag/vimtex'
+
 let g:tex_flavor = 'latex'
 
 " Allow -shell-escape to be passed, e.g. for "minted" highlighting.

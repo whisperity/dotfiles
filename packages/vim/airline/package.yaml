@@ -1,27 +1,16 @@
 description: Vim status line
 prepare:
   - action: git clone
-    repository: "http://github.com/vim-airline/vim-airline"
-  - action: git clone
     repository: "http://github.com/rakr/vim-one.git"
-  - action: git clone
-    repository: "http://github.com/lambdalisue/battery.vim"
 install:
-  - action: make dirs
-    dirs:
-      - "$HOME/.vim/autoload/airline/themes"
-  - action: copy tree
-    dir: "$TEMPORARY_DIR/vim-airline"
-    to: "$HOME/.vim/bundle/vim-airline"
-  - action: copy tree
-    dir: "$TEMPORARY_DIR/battery.vim"
-    to: "$HOME/.vim/bundle/battery.vim"
   - action: copy
     file: config.vim
     to: "$HOME/.vim/config/vim-airline.vim"
-  - action: copy
-    file: config.battery.vim
-    to: "$HOME/.vim/config/battery.vim"
+
+  # Need to also install the Airline theme for Vim-One.
+  - action: make dirs
+    dirs:
+      - "$HOME/.vim/autoload/airline/themes"
   - action: copy
     file: "$TEMPORARY_DIR/vim-one/autoload/airline/themes/one.vim"
     to: "$HOME/.vim/autoload/airline/themes"

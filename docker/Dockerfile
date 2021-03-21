@@ -1,6 +1,51 @@
+# Build and install NeoVim.
+FROM ubuntu:20.04 AS neovim_build
+RUN export DEBIAN_FRONTEND=noninteractive; \
+    apt-get update && \
+    apt-get install -y \
+        git \
+        liblua5.3-0 \
+        liblua5.3-dev \
+        luajit \
+        libluajit-5.1-dev \
+        wget \
+    && \
+    apt-get install -y \
+        autoconf \
+        automake \
+        build-essential \
+        cmake \
+        g++ \
+        gettext \
+        libtool \
+        libtool-bin \
+        ninja-build \
+        pkg-config \
+        unzip
+
+RUN mkdir neovim_install && \
+    git clone http://github.com/neovim/neovim.git --depth 1 && \
+    cd neovim && \
+    USERNAME="whisperity/dotfiles" HOSTNAME="docker" \
+        make CMAKE_INSTALL_PREFIX="/neovim_install" \
+            CMAKE_BUILD_TYPE=RelWithDebInfo && \
+    make install
+
+# Build and create the environment image.
 FROM ubuntu:20.04
 ARG INSTALL_CPP
 ARG INSTALL_TEX
+
+MAINTAINER "Whisperity <whisperity-packages@protonmail.com>"
+
+# Get our built Neovim installed here.
+COPY --from=neovim_build /neovim_install "/usr/local/"
+RUN update-alternatives --install /usr/bin/vi vi /usr/local/bin/nvim 60 && \
+    update-alternatives --config vi && \
+    update-alternatives --install /usr/bin/vim vim /usr/local/bin/nvim 60 && \
+    update-alternatives --config vim && \
+    update-alternatives --install /usr/bin/editor editor /usr/local/bin/nvim 60 && \
+    update-alternatives --config editor
 
 # We do not set DEBIAN_FRONTEND as an 'ENV' because the container will
 # evenually be used interactively.
@@ -13,7 +58,6 @@ RUN export DEBIAN_FRONTEND=noninteractive; \
         less \
         locales \
         man \
-        software-properties-common \
         sudo \
         tzdata \
         unzip \
@@ -28,9 +72,7 @@ RUN export DEBIAN_FRONTEND=noninteractive; \
         python3-tabulate \
         python3-yaml \
     && \
-    add-apt-repository -y ppa:jonathonf/vim && \
     apt-get install -y --no-install-recommends \
-        vim-nox \
         zsh \
     && \
     if [ ! -z ${INSTALL_CPP} ]; then \
@@ -86,23 +128,16 @@ RUN mkdir -p /home/${LOCAL_USER}/.config/Dotfiles && \
     chown -R ${LOCAL_USER}:${LOCAL_USER} /home/${LOCAL_USER}/.config && \
     chmod -R 0700 /home/${LOCAL_USER}/.config
 
-COPY sources.yaml /home/${LOCAL_USER}/.config/Dotfiles/sources.yaml
-RUN chown ${LOCAL_USER}:${LOCAL_USER} \
-        /home/${LOCAL_USER}/.config/Dotfiles/sources.yaml && \
-    chmod 0700 /home/${LOCAL_USER}/.config/Dotfiles/sources.yaml
+COPY --chown=${LOCAL_USER}:${LOCAL_USER} sources.yaml /home/${LOCAL_USER}/.config/Dotfiles/sources.yaml
+RUN chmod 0700 /home/${LOCAL_USER}/.config/Dotfiles/sources.yaml
 
-# Need to install Python libraries and a C++ compiler so vim.ycm builds.
-# But it is only needed for compiling these, so let's run in a shell for
-# root but wrapped in `su`.
-#
-# The packages not needed for *running* YCM will also be removed, but
-# everything else that was installed by Dotfiles shouldn't be.
 ENV PATH="/home/${LOCAL_USER}/bin:${PATH}"
 ARG GIT_USERNAME="Git User"
 ARG GIT_EMAIL="git-user@localhost"
 RUN export DEBIAN_FRONTEND=noninteractive; \
     apt-get update && \
-    su "${LOCAL_USER}" /bin/bash -c 'echo -e "${GIT_USERNAME}\n${GIT_EMAIL}\n" | Dotfiles basic bash githooks tools.fancy vim vim.airline vim.comments vim.fzf vim.git vim.markdown vim.nerdtree vim.polyglot vim.rainbow vim.surround vim.syntastic vim.undo zsh.__ALL__' && \
+    su "${LOCAL_USER}" /bin/bash -c 'echo -e "${GIT_USERNAME}\n${GIT_EMAIL}\n" | Dotfiles basic' && \
+    su "${LOCAL_USER}" /bin/bash -c 'Dotfiles bash githooks tools.fancy vim vim.airline vim.comments vim.fzf vim.git vim.markdown vim.nerdtree vim.polyglot vim.rainbow vim.surround vim.syntastic vim.undo zsh.__ALL__' && \
     if [ ! -z ${INSTALL_TEX} ]; then \
         su "${LOCAL_USER}" /bin/bash -c "Dotfiles texlive vim.tex" && \
         su "${LOCAL_USER}" /bin/bash -c "Dotfiles --uninstall vim.markdown vim.polyglot vim.syntastic"; \
@@ -110,7 +145,7 @@ RUN export DEBIAN_FRONTEND=noninteractive; \
     if [ ! -z ${INSTALL_CPP} ]; then \
         curl -sL http://deb.nodesource.com/setup_12.x | bash - && \
         apt-get install -y nodejs && \
-        su "${LOCAL_USER}" /bin/bash -c "Dotfiles gdb vim.clang-format vim.coc"; \
+        su "${LOCAL_USER}" /bin/bash -c "Dotfiles gdb vim.clang-format vim.coc vim.vimspector"; \
     fi \
     && \
     apt-get autoremove --purge -y && \

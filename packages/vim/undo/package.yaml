@@ -1,19 +1,5 @@
 description: Installs plugins that help manage the "undo" functionality in Vim
-prepare:
-  - action: git clone
-    repository: "http://github.com/mbbill/undotree"
-  - action: git clone
-    repository: "http://github.com/pixelastic/vim-undodir-tree"
 install:
-  - action: copy tree
-    dir: "$TEMPORARY_DIR/undotree"
-    to: "$HOME/.vim/bundle/undotree"
-  - action: copy tree
-    dir: "$TEMPORARY_DIR/vim-undodir-tree"
-    to: "$HOME/.vim/bundle/vim-undodir-tree"
   - action: copy
     file: config.vim
-    to: "$HOME/.vim/config/undotree.vim"
-  - action: copy
-    file: config.undodir-tree.vim
-    to: "$HOME/.vim/config/vim-undodir-tree.vim"
+    to: "$HOME/.vim/config/undo.vim"

@@ -1,14 +1,5 @@
 # Commands executed in ZSH before .zshrc is ran.
 
-export EDITOR='vim'
-export VISUAL='vim'
-
-# The user's own 'bin' should be in the PATH too.
-if [[ ":${PATH}:" != *":${HOME}/bin:"* ]]
-then
-  export PATH="${HOME}/bin:${PATH}"
-fi
-
 # For comaptibility, load the Bash aliases too!
 if [ -f ~/.bash_aliases ]; then
   source ~/.bash_aliases

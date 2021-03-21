@@ -1,8 +1,5 @@
 description: Vim Markdown support
-prepare:
-  - action: git clone
-    repository: "http://github.com/plasticboy/vim-markdown"
 install:
-  - action: copy tree
-    dir: "$TEMPORARY_DIR/vim-markdown"
-    to: "$HOME/.vim/bundle/vim-markdown"
+  - action: copy
+    file: config.vim
+    to: "$HOME/.vim/config/vim-markdown.vim"

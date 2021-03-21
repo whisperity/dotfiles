@@ -1,9 +1,6 @@
 description: Adds text object support for changing surroundings, not just the
   inner text.
-prepare:
-  - action: git clone
-    repository: "http://github.com/tpope/vim-surround"
 install:
-  - action: copy tree
-    dir: "$TEMPORARY_DIR/vim-surround"
-    to: "$HOME/.vim/bundle/vim-surround"
+  - action: copy
+    file: config.vim
+    to: "$HOME/.vim/config/vim-surround.vim"

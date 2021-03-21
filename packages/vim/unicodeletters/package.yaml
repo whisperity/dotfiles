@@ -1,11 +1,5 @@
 description: Vim support for entering LaTeX-named symbols and rendering them over to Unicode letters, similar to 'agda-input'
-prepare:
-  - action: git clone
-    repository: "http://github.com/joom/latex-unicoder.vim"
 install:
-  - action: copy tree
-    dir: "$TEMPORARY_DIR/latex-unicoder.vim"
-    to: "$HOME/.vim/bundle/latex-unicoder.vim"
   - action: copy
     file: config.vim
     to: "$HOME/.vim/config/latex-unicoder.vim"

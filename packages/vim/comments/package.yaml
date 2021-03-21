@@ -1,8 +1,5 @@
-description: tcomment allows toggling comments with gc motion.
-prepare:
-  - action: git clone
-    repository: "http://github.com/tomtom/tcomment_vim"
+description: tcomment allows toggling comments with 'gc' motion.
 install:
-  - action: copy tree
-    dir: "$TEMPORARY_DIR/tcomment_vim"
-    to: "$HOME/.vim/bundle/tcomment_vim"
+  - action: copy
+    file: config.vim
+    to: "$HOME/.vim/config/tcomment_vim.vim"

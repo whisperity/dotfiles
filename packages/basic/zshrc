@@ -1,5 +1,20 @@
+# Use the best editor possible :)
+export EDITOR="vim"
+export VISUAL="${EDITOR}"
+
 # If you come from bash you might have to change your $PATH.
-# export PATH=$HOME/bin:/usr/local/bin:$PATH
+# The user's own '.local/bin' should be in the PATH too.
+if [[ ":${PATH}:" != *":${HOME}/.local/bin:"* ]]
+then
+  export PATH="${HOME}/.local/bin:${PATH}"
+fi
+
+# The user's own 'bin' should be in the PATH too.
+if [[ ":${PATH}:" != *":${HOME}/bin:"* ]]
+then
+  export PATH="${HOME}/bin:${PATH}"
+fi
+
 
 # Source custom configuration details that should be loaded before ZSH
 # configures.
