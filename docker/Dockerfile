@@ -108,6 +108,8 @@ RUN export DEBIAN_FRONTEND=noninteractive; \
         su "${LOCAL_USER}" /bin/bash -c "Dotfiles --uninstall vim.markdown vim.polyglot vim.syntastic"; \
     fi && \
     if [ ! -z ${INSTALL_CPP} ]; then \
+        curl -sL http://deb.nodesource.com/setup_12.x | bash - && \
+        apt-get install -y nodejs && \
         su "${LOCAL_USER}" /bin/bash -c "Dotfiles gdb vim.clang-format vim.coc"; \
     fi \
     && \

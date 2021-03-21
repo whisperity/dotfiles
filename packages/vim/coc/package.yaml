@@ -44,10 +44,6 @@ install:
   - action: copy
     file: config.vista.vim
     to: "$HOME/.vim/config/vista.vim"
-  - action: shell all
-    commands:
-      - "vim +\"CocInstall -sync coc-clangd\" +qall"
-      - "vim +\"CocInstall -sync coc-pyright\" +qall"
 uninstall:
   - action: shell
     command: "rm -r $HOME/.vim/coc-root"
