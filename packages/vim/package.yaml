@@ -6,6 +6,11 @@ prepare:
     repository: "http://github.com/tomasr/molokai"
   - action: git clone
     repository: "http://github.com/rakr/vim-one"
+  - action: git clone
+    repository: "http://github.com/dracula/vim"
+  - action: shell
+    # Rename the stupid naming of the repository...
+    command: "mv vim dracula"
 install:
   - action: make dirs
     dirs:
@@ -31,17 +36,20 @@ install:
       - light.vim
       - settings.vim
     to: "$HOME/.vim"
-  - action: copy tree
-    dir: after
-    to: "$HOME/.vim/after"
   - action: make dirs
     dirs:
+      - "$HOME/.vim/autoload"
       - "$HOME/.vim/colors"
   - action: copy
     files:
+      - "$TEMPORARY_DIR/dracula/colors/dracula.vim"
       - "$TEMPORARY_DIR/molokai/colors/molokai.vim"
       - "$TEMPORARY_DIR/vim-one/colors/one.vim"
     to: "$HOME/.vim/colors"
+  - action: copy
+    files:
+      - "$TEMPORARY_DIR/dracula/autoload/dracula.vim"
+    to: "$HOME/.vim/autoload"
   - action: make dirs
     dirs:
       - "$HOME/.vim/bundle"
