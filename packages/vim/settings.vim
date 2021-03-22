@@ -2,7 +2,7 @@ let vimRootPath = expand($HOME . "/.vim")
 
 " Neovim
 if has('nvim')
-  tnoremap <Esc> <C-\><C-n>
+  tnoremap <C-c><C-c> <C-\><C-n>
 
   let &shadafile = vimRootPath . "/nvim.shada"
 else
