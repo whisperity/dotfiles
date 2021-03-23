@@ -1,9 +1,33 @@
 {
-  "suggest": {
-    "enablePreview": true
-  },
   "clangd": {
     "arguments": ["-log=verbose", "-pretty", "--background-index", "-j=4"],
     "semanticHighlighting": true
+  },
+  "explorer": {
+    "icon": {
+      "enableNerdfont": true,
+      "enableVimDevicons": true
+    }
+  },
+  "rpc": {
+    "workspaceElapsedTime": true,
+    "idleText": "Looking around...",
+    "detailsEditing": "{filename} ({problems})",
+    "detailsInExplorer": "Exploring {workspace}",
+    "detailsIdle": "Looking around...",
+    "detailsViewing": "{filename} ({totallines} LoC)",
+    "lowerDetailsEditing": "{workspace} ({totallines} LoC)",
+    "lowerDetailsInExplorer": "{null}",
+    "lowerDetailsIdle": "{null}",
+    "lowerDetailsViewing": "{workspace} ({problems})",
+    "largeImage": "{Lang}",
+    "largeImageInExplorer": "Exploring",
+    "largeImageIdle": "Looking around...",
+    "smallImage": "{appname}",
+    "problemsText": "{count} diagnostics",
+    "lowerDetailsNotFound": "Somewhere!"
+  },
+  "suggest": {
+    "enablePreview": true
   }
 }

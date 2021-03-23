@@ -1,10 +1,19 @@
 " CoC.nvim
 Plug 'neoclide/coc.nvim'
+Plug 'ryanoasis/vim-devicons'
 
 let g:coc_disable_startup_warning = 1
 let g:coc_config_home = "~/.vim/config/"
 let g:coc_data_home = "~/.vim/coc.nvim"
-let g:coc_global_extensions = ['coc-clangd', 'coc-pyright']
+
+" Load (and most importantly, install!) some useful extensions by default.
+let g:coc_global_extensions = [
+        \'coc-clangd',
+        \'coc-explorer',
+        \'coc-pyright'
+        \]
+
+nmap <silent> <C-n> :CocCommand explorer<CR>
 
 " Use tab for trigger completion with characters ahead and navigate.
 " NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
