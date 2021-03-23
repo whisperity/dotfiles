@@ -105,6 +105,14 @@ set splitright
 "set nowb
 "set noswapfile
 
+" Return to last edit position when opening files (You want this!)
+autocmd BufReadPost *
+     \ if line("'\"") > 0 && line("'\"") <= line("$") |
+     \   exe "normal! g`\"" |
+     \ endif
+" Remember info about open buffers on close
+set viminfo^=%
+
 " Put the swap file near the edited file.
 set directory=.
 
