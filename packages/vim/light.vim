@@ -15,8 +15,5 @@ if (empty($TMUX))
   endif
 endif
 
-" Airline theme should be matching.
-let g:airline_theme = 'iceberg'
-
 set background=light
-colorscheme iceberg
+colorscheme xcodelighthc

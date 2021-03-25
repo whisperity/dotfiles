@@ -15,8 +15,5 @@ if (empty($TMUX))
   endif
 endif
 
-" Airline theme should be matching.
-let g:airline_theme = 'iceberg'
-
 set background=dark
-colorscheme iceberg
+colorscheme gotham256
