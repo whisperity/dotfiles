@@ -2,11 +2,6 @@ description: Vim status line
 prepare:
   - action: git clone
     repository: "http://github.com/rakr/vim-one.git"
-  - action: git clone
-    repository: "http://github.com/dracula/vim"
-  - action: shell
-    # Rename the stupid naming of the repository...
-    command: "mv vim dracula"
 install:
   - action: copy
     file: config.vim
@@ -17,7 +12,5 @@ install:
     dirs:
       - "$HOME/.vim/autoload/airline/themes"
   - action: copy
-    files:
-      - "$TEMPORARY_DIR/dracula/autoload/airline/themes/dracula.vim"
-      - "$TEMPORARY_DIR/vim-one/autoload/airline/themes/one.vim"
+    file: "$TEMPORARY_DIR/vim-one/autoload/airline/themes/one.vim"
     to: "$HOME/.vim/autoload/airline/themes"
