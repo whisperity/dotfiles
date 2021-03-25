@@ -13,6 +13,8 @@ let g:coc_global_extensions = [
         \'coc-pyright'
         \]
 
+let g:coc_popup_conceal_disable = 1
+
 nmap <silent> <C-n> :CocCommand explorer<CR>
 
 " Use tab for trigger completion with characters ahead and navigate.
