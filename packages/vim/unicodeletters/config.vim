@@ -1,5 +1,5 @@
 " LaTeX -> Unicode letters
-Plug 'joom/latex-unicoder'
+Plug 'joom/latex-unicoder.vim'
 
 " Prevent throwing out the normal binds (especially C-l for the window switch)
 let g:unicoder_no_map = 1

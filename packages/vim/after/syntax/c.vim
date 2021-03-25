@@ -78,6 +78,7 @@ syntax keyword cConstant NULL         conceal cchar=∅
 syntax keyword cKeyword complex      conceal cchar=ℂ
 syntax keyword cKeyword const        conceal cchar=𝌸
 syntax keyword cKeyword volatile     conceal cchar=☢
+syntax keyword cKeyword static       conceal cchar=☥
 
 syntax keyword cKeyword assert       conceal cchar=‽
 

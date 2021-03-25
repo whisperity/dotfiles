@@ -1,11 +1,6 @@
 description: Installs configuration for Vim, a pluginable command-line text
   editor, and some sensible default configuration. (A distribution of 'Vim'
   or 'neovim' ('nvim') should be installed separately.)
-prepare:
-  - action: git clone
-    repository: "http://github.com/tomasr/molokai"
-  - action: git clone
-    repository: "http://github.com/rakr/vim-one"
 install:
   - action: make dirs
     dirs:
@@ -36,18 +31,12 @@ install:
     to: "$HOME/.vim/after"
   - action: make dirs
     dirs:
-      - "$HOME/.vim/colors"
-  - action: copy
-    files:
-      - "$TEMPORARY_DIR/molokai/colors/molokai.vim"
-      - "$TEMPORARY_DIR/vim-one/colors/one.vim"
-    to: "$HOME/.vim/colors"
-  - action: make dirs
-    dirs:
       - "$HOME/.vim/bundle"
       - "$HOME/.vim/config"
   - action: copy
-    file: default-plugins.vim
-    to: "$HOME/.vim/config/default-plugins.vim"
+    files:
+      - default-plugins.vim
+      - default-themes.vim
+    to: "$HOME/.vim/config"
   - action: shell
     command: "python3 -m pip install --user neovim-remote pynvim"

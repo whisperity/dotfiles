@@ -1,16 +1,5 @@
 description: Vim status line
-prepare:
-  - action: git clone
-    repository: "http://github.com/rakr/vim-one.git"
 install:
   - action: copy
     file: config.vim
     to: "$HOME/.vim/config/vim-airline.vim"
-
-  # Need to also install the Airline theme for Vim-One.
-  - action: make dirs
-    dirs:
-      - "$HOME/.vim/autoload/airline/themes"
-  - action: copy
-    file: "$TEMPORARY_DIR/vim-one/autoload/airline/themes/one.vim"
-    to: "$HOME/.vim/autoload/airline/themes"
