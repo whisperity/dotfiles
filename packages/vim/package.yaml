@@ -38,5 +38,6 @@ install:
       - default-plugins.vim
       - default-themes.vim
     to: "$HOME/.vim/config"
+    prefix: "00-"
   - action: shell
     command: "python3 -m pip install --user neovim-remote pynvim"

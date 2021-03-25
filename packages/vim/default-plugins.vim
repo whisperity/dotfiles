@@ -1,8 +1,14 @@
 " Install some Vim plugins that are mostly always needed.
 Plug 'jlanzarotta/bufexplorer'
+Plug 'bogado/file-line'
+Plug 'danro/rename.vim'
+Plug 'ntpeters/vim-better-whitespace'
 Plug 'machakann/vim-highlightedyank'
 Plug 'farmergreg/vim-lastplace'
 Plug 'jszakmeister/vim-togglecursor'
+
+Plug 'xolox/vim-misc'    " Needed by xolox/vim-reload.
+Plug 'xolox/vim-reload'
 
 " ToggleCursor configuration.
 if !has("nvim")
