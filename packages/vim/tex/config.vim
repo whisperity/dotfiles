@@ -13,3 +13,9 @@ let g:vimtex_compiler_latexmk = {
     \   '-interaction=nonstopmode',
     \ ],
     \}
+
+" Use emoji to conceal citations.
+let g:vimtex_syntax_conceal_cites = {
+    \ 'type': 'icon',
+    \ 'icon': '📖'
+    \}
