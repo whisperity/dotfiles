@@ -3,6 +3,27 @@ Plug 'mbbill/undotree'
 
 nmap <silent> <C-c><C-u> :UndotreeToggle<cr>
 
+
+" Style 2
+" +----------+------------------------+
+" |          |                        |
+" |          |                        |
+" | undotree |                        |
+" |          |                        |
+" |          |                        |
+" +----------+------------------------+
+" |                                   |
+" |   diff                            |
+" |                                   |
+" +-----------------------------------+
+let g:undotree_WindowLayout = 2
+
+" Using 'd' instead of 'days' to save some space.
+let g:undotree_ShortIndicators = 1
+
+" Show unified diff.
+let g:undotree_DiffCommand = "diff -au"
+
 " Undodir (full undo path instead of % separations)
 Plug 'pixelastic/vim-undodir-tree'
 
