@@ -10,7 +10,10 @@ let g:coc_data_home = "~/.vim/coc.nvim"
 let g:coc_global_extensions = [
         \'coc-clangd',
         \'coc-explorer',
-        \'coc-pyright'
+        \'coc-json',
+        \'coc-pyright',
+        \'coc-vimtex',
+        \'coc-yaml',
         \]
 
 let g:coc_popup_conceal_disable = 1
