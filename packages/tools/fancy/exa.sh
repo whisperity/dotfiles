@@ -5,6 +5,7 @@ ARCH=$(arch)
 curl -sL http://api.github.com/repos/ogham/exa/releases/latest \
   | grep "exa-linux-" \
   | grep "${ARCH}" \
+  | grep -v "musl" \
   | grep ".zip" \
   | grep "browser_download_url" \
   | cut -d ":" -f 2,3 \
