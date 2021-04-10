@@ -47,9 +47,6 @@
 	co = checkout
 	df = diff --stat --patch --raw
 	dc = diff --cached --stat --patch --raw
-	dfb = "!batdiff() { \
-			git diff --name-only --diff-filter=d 2>/dev/null | xargs bat --diff; \
-		}; batdiff" -
 	ls = ls-files
 	ign = ls-files -o -i --exclude-standard
 
@@ -82,15 +79,26 @@
 
 	# =========================================================
 	# Lieutenant work helpers.
-	recover = "!bash -c '~/bin/git-recover.sh $1'" -
-	rewrite = "!bash -c '~/bin/git-rewrite.sh $1 $2'" -
-	fall = fetch --verbose --all --prune
+	rawd = !bash -c 'git diff --raw -U9999999999 "${1:-HEAD^}" HEAD' -
+	fall = fetch --verbose --all --prune --tags
 	ffmerge = merge --ff-only
 	cbr = rev-parse --abbrev-ref HEAD
-	rbum = rebase -i upstream/master
+	# - rebase to upstream/master
+	rbum = "!rbum() { \
+		remote_master_branch=$(git branch --list --remote upstream/main); \
+		if [ ! -z \"$remote_master_branch\" ]; \
+		then \
+			echo \"Rebasing on top of upstream/main...\" >&2; \
+			git rebase -i upstream/main; \
+		else \
+			echo \"Rebasing on top of upstream/master...\" >&2; \
+			git rebase -i upstream/master; \
+		fi; \
+		}; rbum" -
 	conflicts = !echo $(git status --short | grep '^[DAU][DAU] ' | cut -d' ' -f2 | tr '\n' ' ')
+	# - fixed all, rebase continue!
 	farbc = "!fixall() { \
-			git status --short | cut -d' ' -f2 | xargs git add; \
+			git status --short --untracked-files=no | cut -d' ' -f2 | xargs git add; \
 			git rebase --continue; \
 		}; fixall" -
 
@@ -102,12 +110,28 @@
 	# Show all remote branches of the origin repository that has been merged
 	# into upstream/master, but exclude master, as it should trivially be merged:
 	# $ git upstreamed master upstream origin
-	upstreamed = !bash -c 'git branch --list --remotes --merged "${2:-upstream}/${1:-master}" | grep \"^[ \\t]*${3:-origin}/\" | grep -v "${1:-master}"' -
+	upstreamed = "!upstreamed() { \
+			upstream_name=${2:-upstream}; \
+			remote_branch_name=$1; \
+			if [ -z $remote_branch_name ]; \
+			then \
+				remote_master_branch=$(git branch --list --remote $upstream_name/main); \
+				if [ ! -z \"$remote_master_branch\" ]; \
+				then \
+					remote_branch_name=main; \
+				else \
+					remote_branch_name=master; \
+				fi; \
+				echo \"Using $upstream_name/$remote_branch_name as central branch.\" >&2; \
+			fi; \
+			git branch --list --remotes --merged \"$upstream_name/$remote_branch_name\" | grep \"^[ \\t]*${3:-origin}/\" | grep -v \"$remote_branch_name\"; \
+		}; upstreamed" $1 $2 $3
 
+	# =========================================================
 	# Assume (consider change as unchanged)
 	assume = update-index --assume-unchanged
 	unassume = update-index --no-assume-unchanged
-	assume-all = "!git st -s | awk {'print $2'} | xargs git assume"
+	assume-all = "!git status --short --untracked-files=no | awk '{ print $2; }' | xargs git assume"
 	assumeall = "!git assume-all"
 	unassume-all = "!git assumed | xargs git update-index --no-assume-unchanged"
 	unassumeall = "!git unassume-all"
@@ -125,4 +149,4 @@
 			GIT_DIR=$(git rev-parse --git-dir 2>/dev/null) && \
 			${EDITOR} \"${GIT_DIR}/info/exclude\"; \
 		}; eexclude" -
-	size = count-objects -vH
+	size = count-objects --verbose --human-readable
