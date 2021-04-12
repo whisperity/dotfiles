@@ -101,3 +101,12 @@ fzf-contour-hist-words-widget() {
 }
 zle     -N   fzf-contour-hist-words-widget
 bindkey '^P' fzf-contour-hist-words-widget
+
+# Select one line from Contour history.
+fzf-contour-hist-lines-widget() {
+  local filter_cmd='tr "\n" "\n"'
+  __fzf-contour-hist-base ${filter_cmd}
+  return $?
+}
+zle     -N   fzf-contour-hist-lines-widget
+bindkey '^L' fzf-contour-hist-lines-widget
