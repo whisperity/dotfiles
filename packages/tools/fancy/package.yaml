@@ -39,6 +39,9 @@ install:
     file: exa_aliases-override.sh
     to: "$HOME/.zsh.post.d/exa.sh"
   - action: copy
+    file: fd.plugin.zsh
+    to: "$HOME/.zsh.post.d/fd.plugin.zsh"
+  - action: copy
     file: "$TEMPORARY_DIR/dust"
     to: "$HOME/bin/dust"
 uninstall:

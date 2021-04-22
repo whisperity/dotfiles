@@ -96,8 +96,24 @@ HIST_STAMPS="yyyy-mm-dd"
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 plugins+=(
+  alias-finder
+  command-not-found
+  colored-man-pages
+  debian
+  docker
+  extract
+  fancy-ctrl-z
   git
   history
+  jsontools
+  python
+  safe-paste
+  systemadmin
+  thefuck
+  timer
+  ubuntu
+  web-search
+  z
 )
 
 source $ZSH/oh-my-zsh.sh
