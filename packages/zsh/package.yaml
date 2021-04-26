@@ -13,11 +13,7 @@ prepare:
       - touch $HOME/.zshrc
 install:
   - action: shell
-    command: sh -c 'ZSH=$HOME/.oh-my-zsh $TEMPORARY_DIR/install.sh --unattended'
-# Oh-my-ZSH overwrites the original .zshrc unconditionally...
-  - action: replace
-    at: $HOME/.zshrc
-    with file: $HOME/.zshrc.pre-oh-my-zsh
+    command: sh -c 'ZSH=$HOME/.oh-my-zsh $TEMPORARY_DIR/install.sh --keep-zshrc --unattended'
   - action: make dirs
     dirs:
       - $HOME/.zsh.pre.d
@@ -25,8 +21,10 @@ install:
   - action: shell
     command: ln -s .oh-my-zsh/custom $HOME/.zsh.d
   - action: copy
-    file: bash-aliases.zsh
-    to: $HOME/.zsh.d/bash-aliases.zsh
+    files:
+      - bash-aliases.zsh
+      - contour.zsh
+    to: $HOME/.zsh.d
 uninstall:
   - action: shell all
     commands:

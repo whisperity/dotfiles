@@ -59,7 +59,7 @@ __fselcontourhist() {
   local filter_cmd="$1"
   local tempfile=$(__getTempfileForContour)
 
-  contour capture logical lines 250 timeout 15 output "${tempfile}" >&2
+  contour capture logical lines 250 timeout 15 to "${tempfile}" >&2
   cat "${tempfile}" | eval "${filter_cmd}" | sort | uniq \
     | FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} --reverse $FZF_DEFAULT_OPTS" \
       $(__fzfcmd) --tac --query="$(__lastInLbuffer)"
