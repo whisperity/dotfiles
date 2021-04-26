@@ -23,8 +23,11 @@ install:
   - action: copy
     files:
       - bash-aliases.zsh
-      - contour.zsh
     to: $HOME/.zsh.d
+  - action: copy
+    files:
+      - contour.zsh
+    to: $HOME/.zsh.post.d
 uninstall:
   - action: shell all
     commands:
