@@ -57,6 +57,19 @@
 	rp = reset -p
 	cpf = checkout -p --
 
+	# - fetch upstream/master
+	fum = "!fum() { \
+		remote_master_branch=$(git branch --list --remote upstream/main); \
+		if [ ! -z \"$remote_master_branch\" ]; \
+		then \
+			echo \"Fetching upstream/main...\" >&2; \
+			git fetch upstream main; \
+		else \
+			echo \"Fetching upstream/master...\" >&2; \
+			git fetch upstream master; \
+		fi; \
+		}; fum" -
+
 	# =========================================================
 	# Different log views.
 	# - graph logs
