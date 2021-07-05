@@ -11,6 +11,8 @@ prepare:
       - wget http://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
       - chmod +x install.sh
       - touch $HOME/.zshrc
+  - action: git clone
+    repository: "http://github.com/zsh-users/zsh-syntax-highlighting.git"
 install:
   - action: shell
     command: sh -c 'ZSH=$HOME/.oh-my-zsh $TEMPORARY_DIR/install.sh --keep-zshrc --unattended'
@@ -24,6 +26,9 @@ install:
     files:
       - bash-aliases.zsh
     to: $HOME/.zsh.d
+  - action: copy tree
+    dir: "$TEMPORARY_DIR/zsh-syntax-highlighting"
+    to: "$HOME/.zsh.d/plugins"
   - action: copy
     files:
       - contour.zsh
