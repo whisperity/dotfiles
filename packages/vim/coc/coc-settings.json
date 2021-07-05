@@ -6,7 +6,7 @@
   "explorer": {
     "icon": {
       "enableNerdfont": true,
-      "enableVimDevicons": true
+      "source": "vim-devicons"
     }
   },
   "rpc": {
