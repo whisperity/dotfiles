@@ -1,6 +1,6 @@
 " Install the themes we use.
-Plug 'whatyouhide/vim-gotham'
 Plug 'arzg/vim-colors-xcode'
+Plug 'whatyouhide/vim-gotham'
 
 " ----------------------------------------------------------------------------
 " And some more.

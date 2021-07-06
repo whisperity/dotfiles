@@ -2,20 +2,23 @@
 Plug 'jlanzarotta/bufexplorer'
 Plug 'bogado/file-line'
 Plug 'danro/rename.vim'
-Plug '907th/vim-auto-save'
 Plug 'ntpeters/vim-better-whitespace'
 Plug 'machakann/vim-highlightedyank'
 Plug 'farmergreg/vim-lastplace'
-Plug 'jszakmeister/vim-togglecursor'
 
 Plug 'xolox/vim-misc'    " Needed by xolox/vim-reload.
 Plug 'xolox/vim-reload'
 
-" vim-auto-save configuration.
+
+" vim-auto-save.
+Plug '907th/vim-auto-save'
+
 " By default, keep auto-saving.
 let g:auto_save = 1
 
-" ToggleCursor configuration.
+
+" ToggleCursor.
+Plug 'jszakmeister/vim-togglecursor'
 if !has("nvim")
     " Do whatever is needed to detect your terminal.  Many times, this is
     " a simple check of the $TERM or $TERM_PROGRAM environment variables.
