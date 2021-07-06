@@ -2,6 +2,7 @@
 Plug 'jlanzarotta/bufexplorer'
 Plug 'bogado/file-line'
 Plug 'danro/rename.vim'
+Plug '907th/vim-auto-save'
 Plug 'ntpeters/vim-better-whitespace'
 Plug 'machakann/vim-highlightedyank'
 Plug 'farmergreg/vim-lastplace'
@@ -9,6 +10,10 @@ Plug 'jszakmeister/vim-togglecursor'
 
 Plug 'xolox/vim-misc'    " Needed by xolox/vim-reload.
 Plug 'xolox/vim-reload'
+
+" vim-auto-save configuration.
+" By default, keep auto-saving.
+let g:auto_save = 1
 
 " ToggleCursor configuration.
 if !has("nvim")
