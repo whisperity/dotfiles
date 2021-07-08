@@ -1,2 +1,2 @@
-# Use the Powerlevel9k theme.
-ZSH_THEME="powerlevel9k/powerlevel9k"
+# Use the Powerlevel10k theme.
+ZSH_THEME="powerlevel10k/powerlevel10k"

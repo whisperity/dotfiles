@@ -28,7 +28,7 @@ install:
     to: $HOME/.zsh.d
   - action: copy tree
     dir: "$TEMPORARY_DIR/zsh-syntax-highlighting"
-    to: "$HOME/.zsh.d/plugins"
+    to: "$HOME/.zsh.d/plugins/zsh-syntax-highlighting"
   - action: copy
     files:
       - contour.zsh

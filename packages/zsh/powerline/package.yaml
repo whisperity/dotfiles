@@ -1,22 +1,21 @@
 description: Installs a powerline-style (like Vim AirLine) prompt for zsh.
 prepare:
   - action: git clone
-    repository: "http://github.com/bhilburn/powerlevel9k.git"
+    repository: "http://github.com/romkatv/powerlevel10k.git"
   - action: copy resource
     path: config.zsh
 install:
   - action: substitute environment variables
     file: $TEMPORARY_DIR/config.zsh
   - action: copy tree
-    dir: $TEMPORARY_DIR/powerlevel9k
-    to: $HOME/.zsh.d/themes/powerlevel9k
+    dir: $TEMPORARY_DIR/powerlevel10k
+    to: $HOME/.zsh.d/themes/powerlevel10k
   - action: replace
     at: $HOME/.zsh.d/config.theme.zsh
     with file: config.theme.zsh
   - action: copy
-    file: powerlevel9k_mode.zsh
-    to: $HOME/.zsh.pre.d/powerlevel9k_mode.zsh
+    file: powerlevel10k_mode.zsh
+    to: $HOME/.zsh.pre.d/powerlevel10k_mode.zsh
   - action: copy
     file: $TEMPORARY_DIR/config.zsh
-    to: $HOME/.zsh.d/powerlevel9k.zsh
-
+    to: $HOME/.zsh.d/powerlevel10k.zsh
