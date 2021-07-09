@@ -1,14 +1,13 @@
 #!/bin/bash
 
-free_data="$(free)"
+free_data="$(free -k)"
 mem_data="$(echo "$free_data" | grep 'Mem:')"
 free_mem="$(echo "$mem_data" | awk '{print $4}')"
 buffers="$(echo "$mem_data" | awk '{print $6}')"
-cache="$(echo "$mem_data" | awk '{print $7}')"
-total_free=$((free_mem + buffers + cache))
+total_free=$((free_mem + buffers))
 used_swap="$(echo "$free_data" | grep 'Swap:' | awk '{print $3}')"
 
-echo -e "Free memory:\t$total_free kB ($((total_free / 1024)) MB)\nUsed swap:\t$used_swap kB ($((used_swap / 1024)) MB)"
+echo -e "Free memory:\t$total_free KiB ($((total_free / 1024)) MiB)\nUsed swap:\t$used_swap KiB ($((used_swap / 1024)) MiB)"
 if [[ $used_swap -eq 0 ]]; then
     echo "Congratulations! No swap is in use."
 elif [[ $used_swap -lt $total_free ]]; then
@@ -19,4 +18,3 @@ else
     echo "Not enough free memory. Exiting."
     exit 1
 fi
-
