@@ -36,6 +36,11 @@ install:
     to: "$HOME/.zsh.d/plugins/zsh-syntax-highlighting"
   - action: copy
     files:
+      - zsh-autosuggestions.zsh
+      - zsh-syntax-highlighting.zsh
+    to: $HOME/.zsh.pre.d
+  - action: copy
+    files:
       - contour.zsh
     to: $HOME/.zsh.post.d
 uninstall:
