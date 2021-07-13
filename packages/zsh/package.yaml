@@ -12,6 +12,8 @@ prepare:
       - chmod +x install.sh
       - touch $HOME/.zshrc
   - action: git clone
+    repository: "http://github.com/zsh-users/zsh-autosuggestions.git"
+  - action: git clone
     repository: "http://github.com/zsh-users/zsh-syntax-highlighting.git"
 install:
   - action: shell
@@ -26,6 +28,9 @@ install:
     files:
       - bash-aliases.zsh
     to: $HOME/.zsh.d
+  - action: copy tree
+    dir: "$TEMPORARY_DIR/zsh-autosuggestions"
+    to: "$HOME/.zsh.d/plugins/zsh-autosuggestions"
   - action: copy tree
     dir: "$TEMPORARY_DIR/zsh-syntax-highlighting"
     to: "$HOME/.zsh.d/plugins/zsh-syntax-highlighting"
