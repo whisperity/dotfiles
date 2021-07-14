@@ -7,4 +7,4 @@ curl -sL http://api.github.com/repos/theryangeary/choose/releases/latest \
   | sed -E 's/^ "(.*)",?$/\1/' \
   | wget -O choose -i -
 
-chmod +x ./choose
+chmod -v +x ./choose
