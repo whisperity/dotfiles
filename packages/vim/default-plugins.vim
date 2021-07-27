@@ -10,12 +10,6 @@ Plug 'xolox/vim-misc'    " Needed by xolox/vim-reload.
 Plug 'xolox/vim-reload'
 
 
-" vim-auto-save.
-Plug '907th/vim-auto-save'
-
-" By default, keep auto-saving.
-let g:auto_save = 1
-
 
 " ToggleCursor.
 Plug 'jszakmeister/vim-togglecursor'
