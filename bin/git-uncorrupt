@@ -1,0 +1,25 @@
+#!/bin/bash
+
+if [ "$1" == "--help" -o "$1" == "-h" ]
+then
+    echo "Usage: uncorrupt" >&2
+    echo "Uncorrupts the current branch if a stale pull happened due to filesystem-level corruption." >&2
+    exit
+fi
+
+IFS=$'\n'
+CORRUPTS=$(git fsck --full 2>&1 | grep "object corrupt or missing" | cut -d ":" -f 4 | cut -d " " -f 2)
+
+for CORRUPT in $CORRUPTS
+do
+    echo "Removing corrupt object $CORRUPT..."
+    rm -f -v "$CORRUPT"
+done
+
+BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+REMOTE_TRACKING=$(git branch --list -vv $(git rev-parse --abbrev-ref HEAD) | cut -d "[" -f2 | cut -d "]" -f1)
+
+echo "Uncorrupting branch \"$BRANCH\" to be the very same as \"$REMOTE_TRACKING\"..."
+git reset --hard "$REMOTE_TRACKING"
+
+echo "Now try 'git pull' again!" >&2

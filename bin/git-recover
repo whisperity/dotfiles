@@ -2,10 +2,10 @@
 
 if [ "$1" == "--help" -o "$1" == "-h" ]
 then
-    echo "Usage: recover [-p|--progress]"
-    echo "Recover git objects reported to be unreachable or dangling (not referenced) in the working copy"
-    echo
-    echo -e "\t-p | --progress\t\t\t\tShow every action taken or not taken"
+    echo "Usage: recover [-p|--progress]" >&2
+    echo "Recover git objects reported to be unreachable or dangling (not referenced) in the working copy" >&2
+    echo >&2
+    echo -e "\t-p | --progress\t\t\t\tShow every action taken or not taken" >&2
     exit
 fi
 
