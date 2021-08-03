@@ -11,6 +11,46 @@ Plug 'xolox/vim-reload'
 
 
 
+" Startscreen
+Plug 'mhinz/vim-startify'
+let g:startify_list_order = [
+      \ ['   My most recently used files in the current directory:'],
+      \ 'dir',
+      \ ['   My most recently used files:'],
+      \ 'files',
+      \ ['   These are my sessions:'],
+      \ 'sessions',
+      \ ['   These are my bookmarks:'],
+      \ 'bookmarks',
+      \ ]
+let g:startify_skiplist = [
+      \ 'COMMIT_EDITMSG',
+      \ escape(fnamemodify(resolve($VIMRUNTIME), ':p'), '\') .'doc',
+      \ 'bundle/.*/doc',
+      \ ]
+let g:startify_change_to_dir = 0
+let g:startify_change_to_vcs_root = 1
+let g:startify_update_oldfiles = 1
+
+
+
+" EditorConfig.
+Plug 'editorconfig/editorconfig-vim'
+let g:EditorConfig_exclude_patterns = ['fugitive://.*', 'scp://.*']
+
+
+
+" ChooseWin.
+Plug 't9md/vim-choosewin'
+
+" Invoke with '-'.
+nmap - <Plug>(choosewin)
+
+" Show the letters on the overlay.
+let g:choosewin_overlay_enable = 1
+let g:choosewin_overlay_shade = 1
+
+
 " ToggleCursor.
 Plug 'jszakmeister/vim-togglecursor'
 if !has("nvim")
