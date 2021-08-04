@@ -16,6 +16,7 @@ Keybinds
    - `gc`: Toggle **c**omments for selection
    - `gcc`: Toggle **c**omments for **c**urrent line
  * Navigation
+   - `-`: Jump to split/window based on next letter
    - `F2`: Buffer list
    - `F3`/`F4`: Previous/next buffer
    - `\tb`: **T**ab **b**ack

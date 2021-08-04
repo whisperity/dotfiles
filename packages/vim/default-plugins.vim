@@ -11,6 +11,30 @@ Plug 'xolox/vim-reload'
 
 
 
+" AutoPairs - automatically close paren-bracket sequences on opening.
+Plug 'jiangmiao/auto-pairs'
+let g:AutoPairsFlyMode = 1
+
+
+
+" ChooseWin.
+Plug 't9md/vim-choosewin'
+
+" Invoke with '-'.
+nmap - <Plug>(choosewin)
+
+" Show the letters on the overlay.
+let g:choosewin_overlay_enable = 1
+let g:choosewin_overlay_shade = 1
+
+
+
+" EditorConfig.
+Plug 'editorconfig/editorconfig-vim'
+let g:EditorConfig_exclude_patterns = ['fugitive://.*', 'scp://.*']
+
+
+
 " Startscreen
 Plug 'mhinz/vim-startify'
 let g:startify_list_order = [
@@ -32,23 +56,6 @@ let g:startify_change_to_dir = 0
 let g:startify_change_to_vcs_root = 1
 let g:startify_update_oldfiles = 1
 
-
-
-" EditorConfig.
-Plug 'editorconfig/editorconfig-vim'
-let g:EditorConfig_exclude_patterns = ['fugitive://.*', 'scp://.*']
-
-
-
-" ChooseWin.
-Plug 't9md/vim-choosewin'
-
-" Invoke with '-'.
-nmap - <Plug>(choosewin)
-
-" Show the letters on the overlay.
-let g:choosewin_overlay_enable = 1
-let g:choosewin_overlay_shade = 1
 
 
 " ToggleCursor.
