@@ -20,6 +20,7 @@ BRANCH="$(git rev-parse --abbrev-ref HEAD)"
 REMOTE_TRACKING=$(git branch --list -vv $(git rev-parse --abbrev-ref HEAD) | cut -d "[" -f2 | cut -d "]" -f1)
 
 echo "Uncorrupting branch \"$BRANCH\" to be the very same as \"$REMOTE_TRACKING\"..."
-git reset --hard "$REMOTE_TRACKING"
+GIT_DIR=$(git rev-parse --absolute-git-dir)
+cat "$GIT_DIR/refs/heads/$BRANCH" > "$GIT_DIR/refs/remotes/$REMOTE_TRACKING"
 
 echo "Now try 'git pull' again!" >&2
