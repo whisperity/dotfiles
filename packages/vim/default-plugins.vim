@@ -13,7 +13,7 @@ Plug 'xolox/vim-reload'
 
 " AutoPairs - automatically close paren-bracket sequences on opening.
 Plug 'jiangmiao/auto-pairs'
-let g:AutoPairsFlyMode = 1
+let g:AutoPairsFlyMode = 0
 
 
 

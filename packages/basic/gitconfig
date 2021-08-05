@@ -57,18 +57,19 @@
 	rp = reset -p
 	cpf = checkout -p --
 
-	# - fetch upstream/master
-	fum = "!fum() { \
+	# upstream/(master|main) selector
+	um = "!um() { \
 		remote_master_branch=$(git branch --list --remote upstream/main); \
 		if [ ! -z \"$remote_master_branch\" ]; \
 		then \
-			echo \"Fetching upstream/main...\" >&2; \
-			git fetch upstream main; \
+			echo "upstream/main"; \
 		else \
-			echo \"Fetching upstream/master...\" >&2; \
-			git fetch upstream master; \
+			echo "upstream/master"; \
 		fi; \
-		}; fum" -
+		}; um" -
+
+	# - fetch upstream/master
+	fum = "!sh -c 'git fetch $(git um | cut -d/ -f1) $(git um | cut -d/ -f2)'" -
 
 	# =========================================================
 	# Different log views.
@@ -76,13 +77,13 @@
 	lol = log --graph --decorate --pretty=oneline --abbrev-commit
 	lola = log --graph --decorate --pretty=oneline --abbrev-commit --all
 	log2 = log --graph --decorate --pretty=format:'------------------------------%n[%C(magenta)%h%Creset] %C(yellow)%cn <%ce>%Creset %C(cyan)%d%Creset %n%cd %n%Cgreen%s%Creset%n------------------------------' --abbrev-commit
-	# - patchlog
+	# - patchlog (shows the diff)
 	lg = log -p
 	# - date log (commit age oriented)
 	dlog = log --graph --decorate --abbrev-commit --date=short --date-order --pretty=format:'%Cred%h %C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%ad>%Creset'
 	# - changelog (user oriented)
 	clog = log --date-order --pretty=format:'<%C(cyan)%an%Creset> [%ad] (%C(yellow)%h%Creset) %s'
-	# - lieutenant changelog (author and committer)
+	# - lieutenant changelog (author and committer both shown)
 	lclog = log --date-order --pretty=format:'<%C(cyan)%an%Creset (%C(cyan)%ad%Creset)> [%C(bold blue)%cn%Creset (%C(bold blue)%cd%Creset)] (%C(yellow)%h%Creset) %s'
 
 	# =========================================================
@@ -96,19 +97,12 @@
 	fall = fetch --verbose --all --prune --tags
 	ffmerge = merge --ff-only
 	cbr = rev-parse --abbrev-ref HEAD
-	# - rebase to upstream/master
-	rbum = "!rbum() { \
-		remote_master_branch=$(git branch --list --remote upstream/main); \
-		if [ ! -z \"$remote_master_branch\" ]; \
-		then \
-			echo \"Rebasing on top of upstream/main...\" >&2; \
-			git rebase -i upstream/main; \
-		else \
-			echo \"Rebasing on top of upstream/master...\" >&2; \
-			git rebase -i upstream/master; \
-		fi; \
-		}; rbum" -
 	conflicts = !echo $(git status --short | grep '^[DAU][DAU] ' | cut -d' ' -f2 | tr '\n' ' ')
+	cum = "!sh -c 'git checkout $(git um)'" -
+
+	# - rebase to upstream/master
+	rbum = "!sh -c 'git rebase -i $(git um)'" -
+
 	# - fixed all, rebase continue!
 	farbc = "!fixall() { \
 			git status --short --untracked-files=no | cut -d' ' -f2 | xargs git add; \
@@ -125,23 +119,12 @@
 	# $ git upstreamed master upstream origin
 	upstreamed = "!upstreamed() { \
 			upstream_name=${2:-upstream}; \
-			remote_branch_name=$1; \
-			if [ -z $remote_branch_name ]; \
-			then \
-				remote_master_branch=$(git branch --list --remote $upstream_name/main); \
-				if [ ! -z \"$remote_master_branch\" ]; \
-				then \
-					remote_branch_name=main; \
-				else \
-					remote_branch_name=master; \
-				fi; \
-				echo \"Using $upstream_name/$remote_branch_name as central branch.\" >&2; \
-			fi; \
+			remote_branch_name=${1:-$(git um | cut -d/ -f2)}; \
 			git branch --list --remotes --merged \"$upstream_name/$remote_branch_name\" | grep \"^[ \\t]*${3:-origin}/\" | grep -v \"$remote_branch_name\"; \
 		}; upstreamed" $1 $2 $3
 
 	# =========================================================
-	# Assume (consider change as unchanged)
+	# Assume (consider changes as unchanged)
 	assume = update-index --assume-unchanged
 	unassume = update-index --no-assume-unchanged
 	assume-all = "!git status --short --untracked-files=no | awk '{ print $2; }' | xargs git assume"
