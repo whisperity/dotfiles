@@ -91,7 +91,7 @@ RUN export DEBIAN_FRONTEND=noninteractive; \
 ENV LANG en_US.UTF-8
 
 # Set the timezone.
-ARG TZ=Etc/UTC
+ARG TZ=Europe/Budapest
 RUN ln -snf /usr/share/zoneinfo/${TZ} /etc/localtime && \
     echo ${TZ} >/etc/timezone
 
@@ -137,15 +137,16 @@ ARG GIT_EMAIL="git-user@localhost"
 RUN export DEBIAN_FRONTEND=noninteractive; \
     apt-get update && \
     su "${LOCAL_USER}" /bin/bash -c 'echo -e "${GIT_USERNAME}\n${GIT_EMAIL}\n" | Dotfiles basic' && \
-    su "${LOCAL_USER}" /bin/bash -c 'Dotfiles bash githooks tools.fancy vim vim.airline vim.comments vim.fzf vim.git vim.markdown vim.nerdtree vim.polyglot vim.rainbow vim.surround vim.syntastic vim.undo zsh.__ALL__' && \
+    su "${LOCAL_USER}" /bin/bash -c 'Dotfiles direnv envprobe githooks tools.fancy vim vim.airline vim.comments vim.fzf vim.git vim.markdown vim.nerdtree vim.polyglot vim.rainbow vim.surround vim.syntastic vim.undo vim.workspace zsh.__ALL__' && \
     if [ ! -z ${INSTALL_TEX} ]; then \
         su "${LOCAL_USER}" /bin/bash -c "Dotfiles texlive vim.tex" && \
-        su "${LOCAL_USER}" /bin/bash -c "Dotfiles --uninstall vim.markdown vim.polyglot vim.syntastic"; \
+        su "${LOCAL_USER}" /bin/bash -c "Dotfiles --uninstall vim.polyglot vim.syntastic"; \
     fi && \
     if [ ! -z ${INSTALL_CPP} ]; then \
-        curl -sL http://deb.nodesource.com/setup_12.x | bash - && \
+        curl -sL http://deb.nodesource.com/setup_14.x | bash - && \
         apt-get install -y nodejs && \
-        su "${LOCAL_USER}" /bin/bash -c "Dotfiles gdb vim.clang-format vim.coc vim.vimspector"; \
+        su "${LOCAL_USER}" /bin/bash -c "Dotfiles cmake gdb ninja vim.clang-format vim.coc vim.vimspector" && \
+        su "${LOCAL_USER}" /bin/bash -c "Dotfiles --uninstall vim.nerdtree"; \
     fi \
     && \
     apt-get autoremove --purge -y && \

@@ -1,5 +1,5 @@
 " CoC.nvim
-Plug 'neoclide/coc.nvim'
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'ryanoasis/vim-devicons'
 
 let g:coc_disable_startup_warning = 1
