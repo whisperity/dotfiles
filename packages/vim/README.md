@@ -19,9 +19,7 @@ Keybinds
    - `-`: Jump to split/window based on next letter
    - `F2`: Buffer list
    - `F3`/`F4`: Previous/next buffer
-   - `\tb`: **T**ab **b**ack
    - `\tc`: **T**ab **c**lose
-   - `\tn`: **T**ab **n**ext
    - `\tt`: Window/Tab switcher
    - `\ff`: **F**uzzy **f**ind file contents
    - `C-f`: Fuzzy **f**ind in current file

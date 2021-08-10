@@ -126,14 +126,12 @@ noremap <buffer> <silent> gk k
 noremap <buffer> <silent> gj j
 
 " Buffer switch.
-nnoremap <F2> :buffers<CR>:buffer<Space>
+nnoremap <F2>          :buffers<CR>:buffer<Space>
 nnoremap <silent> <F3> :bprevious<CR>
 nnoremap <silent> <F4> :bnext<CR>
 
 " Tab switch.
 nnoremap <Leader>tt          :tabs<CR>:tabnext<Space>
-nnoremap <silent> <Leader>tb :tabprevious<CR>
-nnoremap <silent> <Leader>tn :tabnext<CR>
 nnoremap <silent> <Leader>tc :tabclose<CR>
 
 " Close the current buffer.
