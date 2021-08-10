@@ -1,5 +1,5 @@
 " VimTeX
-Plug 'lervag/vimtex'
+Plug 'lervag/vimtex', { 'for': ['tex', 'latex', 'context', 'plaintex'] }
 
 let g:tex_flavor = 'latex'
 

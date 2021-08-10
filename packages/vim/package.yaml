@@ -39,5 +39,9 @@ install:
       - default-themes.vim
     to: "$HOME/.vim/config"
     prefix: "00-"
+  - action: shell all
+    commands:
+      - "cat local-plugins.vim > $HOME/.vim/config/zzzzzz_local-plugins.vim"
+      - "cat local-themes.vim  > $HOME/.vim/config/zzzzzz_local-themes.vim"
   - action: shell
     command: "python3 -m pip install --user neovim-remote pynvim"

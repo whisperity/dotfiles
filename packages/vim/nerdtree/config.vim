@@ -1,18 +1,21 @@
 " NERDTree
-Plug 'scrooloose/nerdtree'
+Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
 
 " Autostart :
 " autocmd vimenter * NERDTree
 
-" Key to toggle Nerd Tree
-map <silent> <C-n> :NERDTreeToggle<CR>
+" Key to toggle NerdTREE
+if mapcheck('<C-n>', 'n') == ""
+  " (Only if <C-n> isn't bound to anything else, like coc-explorer!)
+  nmap <silent> <C-n> :NERDTreeToggle<CR>
+endif
 
 " Highlight the current file in the NERDTree window.
-Plug 'unkiwii/vim-nerdtree-sync'
+Plug 'unkiwii/vim-nerdtree-sync', { 'on': 'NERDTreeToggle' }
 let g:nerdtree_sync_cursorline = 1
 
 " Show Git status in NERDTree using the default configuration.
-Plug 'Xuyuanp/nerdtree-git-plugin'
+Plug 'Xuyuanp/nerdtree-git-plugin', { 'on': 'NERDTreeToggle' }
 let g:NERDTreeGitStatusUseNerdFonts = 1
 
 " Show file-type icons to various plugins, but most importantly NERDTree.

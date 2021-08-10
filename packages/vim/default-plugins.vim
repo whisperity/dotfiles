@@ -1,7 +1,7 @@
 " Install some Vim plugins that are mostly always needed.
-Plug 'jlanzarotta/bufexplorer'
+Plug 'jlanzarotta/bufexplorer', { 'on': ['BufExplorer', 'BufExplorerHorizontalSplit', 'BufExplorerVerticalSplit'] }
 Plug 'bogado/file-line'
-Plug 'danro/rename.vim'
+Plug 'danro/rename.vim', { 'on': 'Rename' }
 Plug 'ntpeters/vim-better-whitespace'
 Plug 'machakann/vim-highlightedyank'
 Plug 'farmergreg/vim-lastplace'
@@ -18,7 +18,7 @@ let g:AutoPairsFlyMode = 0
 
 
 " ChooseWin.
-Plug 't9md/vim-choosewin'
+Plug 't9md/vim-choosewin', { 'on': '<Plug>(choosewin)' }
 
 " Invoke with '-'.
 nmap - <Plug>(choosewin)
