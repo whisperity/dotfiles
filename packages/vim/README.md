@@ -24,7 +24,7 @@ Keybinds
    - `\ff`: **F**uzzy **f**ind file contents
    - `C-f`: Fuzzy **f**ind in current file
    - `C-g`: Fuzzy find **G**it versioned files
-   - `C-n`: Toggle explorer
+   - `C-n`: Toggle file explorer
    - `C-t`: Fuzzy find filenames
    - `C-x`: Close buffer
    - `q:`: Command history
