@@ -1,6 +1,5 @@
 " CoC.nvim
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
-Plug 'ryanoasis/vim-devicons'
 
 let g:coc_disable_startup_warning = 1
 let g:coc_config_home = "~/.vim/config/"
@@ -34,9 +33,19 @@ inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
 inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
                               \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
 
-"Echo signature help of current function.
-autocmd User CocJumpPlaceholder call
-                        \ CocActionAsync('showSignatureHelp')
+augroup CocGroup
+    " Delete existing autocommands in the group at config reload (as per
+    " :help augroup).
+    au!
+
+    " Echo signature help of current function.
+    autocmd User CocJumpPlaceholder call
+                            \ CocActionAsync('showSignatureHelp')
+
+    " Have the ability to jump between the source file and the associated
+    " header file.
+    autocmd FileType c,cpp,objc,objcpp,javascript nnoremap <silent><buffer> <LocalLeader>yh :CocCommand clangd.switchSourceHeader<CR>
+augroup END
 
 function! s:check_back_space() abort
   let col = col('.') - 1
@@ -53,6 +62,7 @@ function! s:show_documentation()
   endif
 endfunction
 
+
 nmap <silent> <LocalLeader>yd :call CocAction('jumpDefinition', v:false)<CR>
 nmap <silent> <LocalLeader>yr :call CocAction('jumpReferences', v:false)<CR>
 nmap <silent> <LocalLeader>yc :call <SID>show_documentation()<CR>
@@ -61,8 +71,19 @@ nmap <silent> <LocalLeader>ye :CocDiagnostics<CR>
 nmap <silent> <LocalLeader>yi :CocInfo<CR>
 nmap <silent> <LocalLeader>yy :CocRestart<CR>
 
+
+
+" Show file-type icons to various plugins, but most importantly CocExplorer.
+Plug 'ryanoasis/vim-devicons'
+
+
+
+
 " Semantic highlight for C++ code.
-Plug 'jackguo380/vim-lsp-cxx-highlight'
+Plug 'jackguo380/vim-lsp-cxx-highlight', { 'for': ['c', 'cpp', 'objc', 'objcpp'] }
+
+
+
 
 " Vista
 " Symbol browser for current file.

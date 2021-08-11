@@ -41,6 +41,7 @@ Keybinds
    - `\yd`: Jump to **d**efinition
    - `\ye`: Show **e**rrors
    - `\yf`: Symbol **f**inder
+   - `\yh`: Switch between **h**eader and source file (C++-only!)
    - `\yi`: System **i**nformation
    - `\yr`: Show **r**eferences
    - `\yt`: Browse **t**ags (symbol browser)

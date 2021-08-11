@@ -27,16 +27,13 @@ function! s:fzf_git_handler(lines) abort
   if empty(a:lines)
     return
   endif
-  echom a:lines
   let cmd = get({ 'ctrl-t': 'tabedit',
                 \ 'ctrl-x': 'split',
                 \ 'ctrl-v': 'vsplit' }, remove(a:lines, 0), 'e')
 
   for item in a:lines
-    echom "Processing element" item
     " Cut the Git status tags (first column)
     let item = s:git_status_cleanup(item)
-    echom "After split" item
     execute cmd escape(item, ' %#\')
   endfor
 endfunction
@@ -65,7 +62,7 @@ nnoremap <silent> <Leader>tt :Windows<CR>
 nnoremap <silent> q: :History:<CR>
 
 " Search in the contents of all files.
-nnoremap <silent> <localleader>ff :Ag<CR>
+nnoremap <silent> <LocalLeader>ff :Ag<CR>
 
 " Search in the contents of the current file. (Similar to ^f in Zsh.)
 nnoremap <silent> <C-f> :BLines<CR>
