@@ -1,4 +1,5 @@
 " ViM Rainbow
+Plug 'luochen1990/rainbow'
 
 let g:rainbow_conf = {
 \	'guifgs': ['royalblue3', 'darkorange3', 'seagreen3', 'firebrick'],
@@ -39,4 +40,4 @@ let g:rainbow_conf = {
 
 let g:rainbow_active = 1
 
-nnoremap coR :RainbowToggle<CR>
+nmap <C-c><C-r> :RainbowToggle<CR>

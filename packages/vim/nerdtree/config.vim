@@ -18,7 +18,4 @@ if mapcheck('<C-n>', 'n') == ""
     " Show Git status in NERDTree using the default configuration.
     Plug 'Xuyuanp/nerdtree-git-plugin', { 'on': 'NERDTreeToggle' }
     let g:NERDTreeGitStatusUseNerdFonts = 1
-
-    " Show file-type icons to various plugins, but most importantly NERDTree.
-    Plug 'ryanoasis/vim-devicons'
 endif

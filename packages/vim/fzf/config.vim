@@ -39,30 +39,33 @@ function! s:fzf_git_handler(lines) abort
 endfunction
 
 " Search all files. (Same as ^t in Zsh.)
-nnoremap <silent> <C-t> :call fzf#run({
+nmap <silent> <C-t> :call fzf#run({
   \ 'options': '--multi --expect=ctrl-t,ctrl-x,ctrl-v',
   \ 'window':  {'width': 0.9, 'height': 0.6},
   \ 'sink*':   function('<sid>fzf_files_handler')})<CR>
 
 " Search the files that changed in version control.
 " (Same as ^g in Zsh.)
-nnoremap <silent> <C-g> :call fzf#run({
+nmap <silent> <C-g> :call fzf#run({
   \ 'source': 'git status -s',
   \ 'options': '--multi --expect=ctrl-t,ctrl-x,ctrl-v',
   \ 'window':  {'width': 0.9, 'height': 0.6},
   \ 'sink*':   function('<sid>fzf_git_handler')})<CR>
 
 " Remap the buffer searcher if this plugin is loaded.
-nnoremap <silent> <F2> :Buffers<CR>
+nmap <silent> <F2> :Buffers<CR>
 
 " Remap the tab switcher if this plugin is loaded.
-nnoremap <silent> <Leader>tt :Windows<CR>
+nmap <silent> <Leader>tt :Windows<CR>
 
 " Remap the default Vim command search sequence.
-nnoremap <silent> q: :History:<CR>
+nmap <silent> q: :History:<CR>
 
 " Search in the contents of all files.
-nnoremap <silent> <LocalLeader>ff :Ag<CR>
+nmap <silent> <Leader>ff :Ag<CR>
+
+" Search the saved markers.
+nmap <silent> <Leader>fm :Marks<CR>
 
 " Search in the contents of the current file. (Similar to ^f in Zsh.)
-nnoremap <silent> <C-f> :BLines<CR>
+nmap <silent> <C-f> :BLines<CR>

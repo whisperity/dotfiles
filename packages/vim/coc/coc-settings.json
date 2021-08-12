@@ -1,4 +1,13 @@
 {
+  "codeLens": {
+    "enable": true
+  },
+  "diagnostic": {
+    "errorSign": "⛔️",
+    "warningSign": "⚠️",
+    "infoSign": "ℹ️",
+    "hintSign": "💡",
+  },
   "clangd": {
     "arguments": ["--log=verbose",
                   "--pretty",

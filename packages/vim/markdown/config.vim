@@ -1,4 +1,5 @@
-Plug 'godlygeek/tabular'  " Required dependency.
+" Required dependency.
+Plug 'godlygeek/tabular', { 'for': ['markdown'] }
 
 " Vim-Markdown
 Plug 'plasticboy/vim-markdown', { 'for': ['markdown'] }

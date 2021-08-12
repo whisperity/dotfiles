@@ -1,12 +1,18 @@
 " VimSpector
-Plug 'puremourning/vimspector'
+Plug 'puremourning/vimspector', { 'on': [
+            \ 'VimspectorContinue',
+            \ 'VimspectorToggleBreakpoint',
+            \ 'VimspectorToggleConditionalBreakpoint',
+            \ 'VimspectorReset',
+            \ 'VimspectorRestart'
+            \ ] }
 
 let g:vimspector_install_gadgets = [ 'debugpy', 'vscode-cpptools' ]
 
 " Actually, start or continue.
 nmap <F5>            <Plug>VimspectorContinue
 nmap <C-F5>          <Plug>VimspectorStop
-nmap <LocalLeader>dx :VimspectorReset <CR>
+nmap <LocalLeader>dx :VimspectorReset<CR>
 nmap <LocalLeader>dr <Plug>VimspectorRestart
 nmap <LocalLeader>dp <Plug>VimspectorPause
 

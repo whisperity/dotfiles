@@ -7,13 +7,15 @@ let g:coc_data_home = "~/.vim/coc.nvim"
 
 " Load (and most importantly, install!) some useful extensions by default.
 let g:coc_global_extensions = [
-        \'coc-clangd',
-        \'coc-explorer',
-        \'coc-json',
-        \'coc-pyright',
-        \'coc-vimtex',
-        \'coc-yaml',
-        \]
+        \ 'coc-cmake',
+        \ 'coc-clangd',
+        \ 'coc-explorer',
+        \ 'coc-highlight',
+        \ 'coc-json',
+        \ 'coc-pyright',
+        \ 'coc-vimtex',
+        \ 'coc-yaml',
+        \ ]
 
 let g:coc_popup_conceal_disable = 1
 
@@ -43,9 +45,17 @@ if has("autocmd")
         autocmd User CocJumpPlaceholder call
                                 \ CocActionAsync('showSignatureHelp')
 
+        " Highlight the symbol and its references when holding the cursor.
+        autocmd CursorHold * silent call CocActionAsync('highlight')
+
+        autocmd ColorScheme *
+                 \   highlight CocErrorHighlight   ctermfg=Red                        guibg=#ff0000
+                 \ | highlight CocWarningHighlight ctermfg=DarkYellow cterm=underline guifg=#edb443 gui=underline
+                 \ | highlight CocHighlightText    ctermbg=Blue                       guibg=#005599
+
         " Have the ability to jump between the source file and the associated
         " header file.
-        autocmd FileType c,cpp,objc,objcpp,javascript nnoremap <silent><buffer> <LocalLeader>yh :CocCommand clangd.switchSourceHeader<CR>
+        autocmd FileType c,cpp,objc,objcpp,javascript nmap <silent><buffer> <LocalLeader>yh :CocCommand clangd.switchSourceHeader<CR>
     augroup END
 endif
 
@@ -69,20 +79,39 @@ nmap <silent> <LocalLeader>yd :call CocAction('jumpDefinition', v:false)<CR>
 nmap <silent> <LocalLeader>yr :call CocAction('jumpReferences', v:false)<CR>
 nmap <silent> <LocalLeader>yc :call <SID>show_documentation()<CR>
 
+nmap <silent> <LocalLeader>ya <Plug>(coc-codeaction)
+nmap <silent> <LocalLeader>ys <Plug>(coc-rename)
+
 nmap <silent> <LocalLeader>ye :CocDiagnostics<CR>
+nmap <silent> <LocalLeader>yx <Plug>(coc-fix-current)
+nmap <silent> <LocalLeader>yn <Plug>(coc-diagnostic-next)
+nmap <silent> <LocalLeader>yp <Plug>(coc-diagnostic-prev)
+
 nmap <silent> <LocalLeader>yi :CocInfo<CR>
 nmap <silent> <LocalLeader>yy :CocRestart<CR>
 
 
 
-" Show file-type icons to various plugins, but most importantly CocExplorer.
-Plug 'ryanoasis/vim-devicons'
-
+" Map function and class text objects
+" NOTE: Requires 'textDocument.documentSymbol' support from the language server.
+xmap if <Plug>(coc-funcobj-i)
+omap if <Plug>(coc-funcobj-i)
+xmap af <Plug>(coc-funcobj-a)
+omap af <Plug>(coc-funcobj-a)
+xmap ic <Plug>(coc-classobj-i)
+omap ic <Plug>(coc-classobj-i)
+xmap ac <Plug>(coc-classobj-a)
+omap ac <Plug>(coc-classobj-a)
 
 
 
 " Semantic highlight for C++ code.
-Plug 'jackguo380/vim-lsp-cxx-highlight', { 'for': ['c', 'cpp', 'objc', 'objcpp'] }
+Plug 'jackguo380/vim-lsp-cxx-highlight', { 'for': [
+            \ 'c',
+            \ 'cpp',
+            \ 'objc',
+            \ 'objcpp'
+            \ ] }
 
 
 

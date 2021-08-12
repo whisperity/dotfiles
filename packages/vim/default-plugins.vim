@@ -1,13 +1,16 @@
 " Install some Vim plugins that are mostly always needed.
-Plug 'jlanzarotta/bufexplorer', { 'on': ['BufExplorer', 'BufExplorerHorizontalSplit', 'BufExplorerVerticalSplit'] }
+Plug 'jlanzarotta/bufexplorer', { 'on': [
+            \ 'BufExplorer',
+            \ 'BufExplorerHorizontalSplit',
+            \ 'BufExplorerVerticalSplit'
+            \ ] }
 Plug 'bogado/file-line'
 Plug 'danro/rename.vim', { 'on': 'Rename' }
 Plug 'ntpeters/vim-better-whitespace'
 Plug 'machakann/vim-highlightedyank'
 Plug 'farmergreg/vim-lastplace'
 
-Plug 'xolox/vim-misc'    " Needed by xolox/vim-reload.
-Plug 'xolox/vim-reload'
+Plug 'xolox/vim-misc' | Plug 'xolox/vim-reload'
 
 
 
@@ -70,8 +73,8 @@ if !has("nvim")
         " and 'iterm'.
         let g:togglecursor_force = "xterm"
     elseif !empty("$KONSOLE_DBUS_SERVICE")
-        " Konsole is stupid, and will mess up profiles from the escape sequences
-        " emitted by the plugin.
+        " Konsole is stupid, and will mess up profiles from the escape
+        " sequences emitted by the plugin.
 
         " Make-belive that the plugin has already loaded.
         let g:loaded_togglecursor = 2

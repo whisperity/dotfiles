@@ -2,8 +2,11 @@
 " This file should contain only the configuration options that are supported
 " by **stock** (n)vim. Individual plugins should be configured in their own
 " configuration files.
-
 let vimRootPath = expand($HOME . "/.vim")
+
+" '\' for Leader and LocalLeader are tedious on huHU layout.
+let mapleader = ","
+let maplocalleader = ","
 
 " Neovim
 if has('nvim')
@@ -146,9 +149,18 @@ nnoremap <silent> <C-x> :Bc<CR>
 " Clear highlighted searches.
 command! C let @/=""
 
+" Auto-apply the macro stored in 'q' (created by pressing qq).
+nmap <silent> <Space> @q
+
 " Quickly turn paste mode on or off
-command! Pon set paste
-command! Poff set nopaste
+function! TogglePasteEnable()
+    if &paste == 1
+        setlocal nopaste
+    else
+        setlocal paste
+    endif
+endfunction
+nnoremap <C-c><C-p> :call TogglePasteEnable()<CR>
 
 " Folding control.
 if has('folding')
@@ -159,16 +171,15 @@ if has('folding')
           setlocal nofoldenable
           setlocal foldmethod=manual
 
-          unmap <buffer> <Space>
+          unmap <buffer> <S-f>
       else
           setlocal foldenable
           setlocal foldmethod=syntax
 
-          " Use SPACE to toggle folds.
-          nnoremap <buffer> <silent> <Space> za
+          nnoremap <buffer> <silent> <S-f> za
       endif
   endfunction
-  nnoremap <silent> <C-c><C-f> :call ToggleFoldingEnable()<CR>
+  nnoremap <C-c><C-f> :call ToggleFoldingEnable()<CR>
 endif
 
 " Concealment of symbols.
@@ -183,7 +194,7 @@ if has('conceal')
           setlocal conceallevel=0
       endif
   endfunction
-  nnoremap <silent> <C-c><C-y> :call ToggleConcealLevel()<CR>
+  nnoremap <C-c><C-y> :call ToggleConcealLevel()<CR>
 endif
 
 " Only do this part when compiled with support for autocommands.
@@ -225,6 +236,15 @@ call plug#begin('~/.vim/bundle')
 for f in split(glob('~/.vim/config/*.vim'), '\n')
     exe 'source' f
 endfor
+
+
+
+" Show file-type icons to various plugins, like statusline, NERDTree,
+" Explorer, etc.
+" This plugin is expected to **ALWAYS** be loaded last, unfortunately.
+Plug 'ryanoasis/vim-devicons'
+
+
 
 " Initialize plugin system.
 call plug#end()
