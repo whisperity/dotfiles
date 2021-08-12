@@ -4,5 +4,11 @@ Plug 'rhysd/vim-clang-format', { 'for': ['c', 'cpp', 'objc', 'objcpp', 'javascri
 let g:clang_format#code_style = 'llvm'
 
 if has("autocmd")
-  autocmd FileType c,cpp,objc,objcpp,javascript vnoremap <buffer><C-f> :ClangFormat<CR>
+    augroup ClangFormat
+        " Remove old commands and add the current ones to the group only.
+        " As per the documentation, see `:help augroup`.
+        au!
+
+        autocmd FileType c,cpp,objc,objcpp,javascript vnoremap <buffer><C-f> :ClangFormat<CR>
+    augroup END
 endif

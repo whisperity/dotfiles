@@ -1,3 +1,8 @@
+" Main Vim/Neovim configuration file.
+" This file should contain only the configuration options that are supported
+" by **stock** (n)vim. Individual plugins should be configured in their own
+" configuration files.
+
 let vimRootPath = expand($HOME . "/.vim")
 
 " Neovim
@@ -186,12 +191,18 @@ if has("autocmd")
     " Use filetype detection and file-based automatic indenting.
     filetype plugin indent on
 
-    " Use actual <Tab> chars in Makefiles. They mess up when spaces are used!
-    autocmd FileType make setlocal tabstop=8 shiftwidth=8 softtabstop=0 noexpandtab
+    augroup FiletypeDefaults
+        " Remove old commands and add the current ones to the group only.
+        " As per the documentation, see `:help augroup`.
+        au!
 
-    " Spell checking for papers and various human text things.
-    autocmd FileType tex,latex,context,plaintex,bib setlocal spell spelllang=en_gb
-    autocmd FileType markdown,rst setlocal spell spelllang=en_gb
+        " Use actual <Tab> chars in Makefiles. They mess up when spaces are used!
+        autocmd FileType make setlocal tabstop=8 shiftwidth=8 softtabstop=0 noexpandtab
+
+        " Spell checking for papers and various human text things.
+        autocmd FileType tex,latex,context,plaintex,bib setlocal spell spelllang=en_gb
+        autocmd FileType markdown,rst setlocal spell spelllang=en_gb
+    augroup END
 endif
 
 

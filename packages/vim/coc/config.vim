@@ -33,19 +33,21 @@ inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
 inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
                               \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
 
-augroup CocGroup
-    " Delete existing autocommands in the group at config reload (as per
-    " :help augroup).
-    au!
+if has("autocmd")
+    augroup CocGroup
+        " Delete existing autocommands in the group at config reload (as per
+        " `:help augroup`).
+        au!
 
-    " Echo signature help of current function.
-    autocmd User CocJumpPlaceholder call
-                            \ CocActionAsync('showSignatureHelp')
+        " Echo signature help of current function.
+        autocmd User CocJumpPlaceholder call
+                                \ CocActionAsync('showSignatureHelp')
 
-    " Have the ability to jump between the source file and the associated
-    " header file.
-    autocmd FileType c,cpp,objc,objcpp,javascript nnoremap <silent><buffer> <LocalLeader>yh :CocCommand clangd.switchSourceHeader<CR>
-augroup END
+        " Have the ability to jump between the source file and the associated
+        " header file.
+        autocmd FileType c,cpp,objc,objcpp,javascript nnoremap <silent><buffer> <LocalLeader>yh :CocCommand clangd.switchSourceHeader<CR>
+    augroup END
+endif
 
 function! s:check_back_space() abort
   let col = col('.') - 1
