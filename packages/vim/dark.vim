@@ -16,4 +16,4 @@ if (empty($TMUX))
 endif
 
 set background=dark
-colorscheme gotham256
+colorscheme dracula

@@ -4,18 +4,36 @@
 Plug 'arzg/vim-colors-xcode'
 
 " Used for Dark theme.
-Plug 'whatyouhide/vim-gotham'
+Plug 'dracula/vim', {'as': 'dracula'}
+
 
 " ----------------------------------------------------------------------------
 " And some more.
 " Note: These themes are *reasonably* okay, but not the best.
 "       Keeping them here for an eventual retry.
 
-" Plug 'dracula/vim', {'as': 'dracula'}
+" Plug 'whatyouhide/vim-gotham'
 " Plug 'cocopon/iceberg.vim'
 " Plug 'nanotech/jellybeans.vim'
-" Plug 'co1ncidence/mountaineer.vim'
+
+" Superseded by 'arzg/vim-colors-xcode'...
 " Plug 'rakr/vim-one'
 
-" I wish Spaceduck's comments were more readable...
+" The good old default dark theme.
+" Plug 'tomasr/molokai'
+" augroup MolokaiFix
+"     " Fixing the Conceal colours manually kind of patches it, but it's not a
+"     " real good fix...
+"     autocmd!
+"     autocmd ColorScheme molokai hi! link Conceal Comment
+" augroup END
+
+" Plug 'bluz71/vim-nightfly-guicolors'
+" augroup NightflyFix
+"     autocmd!
+"     autocmd ColorScheme nightfly hi! link Conceal Comment
+" augroup END
+
+" These have UNREADABLE comments in Dark mode.
+" Plug 'TheNiteCoder/mountaineer.vim'
 " Plug 'pineapplegiant/spaceduck'
