@@ -51,7 +51,7 @@ if has("autocmd")
         autocmd ColorScheme *
                  \   highlight CocErrorHighlight   ctermfg=Red                        guibg=#ff0000
                  \ | highlight CocWarningHighlight ctermfg=DarkYellow cterm=underline guifg=#edb443 gui=underline
-                 \ | highlight CocHighlightText    ctermbg=Blue                       guibg=#005599
+                 \ | highlight CocHighlightText    ctermbg=Blue                       guibg=#005599 gui=bold
 
         " Have the ability to jump between the source file and the associated
         " header file.

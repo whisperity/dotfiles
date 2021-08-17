@@ -32,6 +32,3 @@ install:
   - action: make dirs
     dirs:
       - $HOME/.ssh
-  - action: copy
-    file: ssh/unlock-all
-    to: $HOME/.ssh/unlock-all
