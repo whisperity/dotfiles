@@ -1,11 +1,5 @@
 " VimSpector
-Plug 'puremourning/vimspector', { 'on': [
-            \ 'VimspectorContinue',
-            \ 'VimspectorToggleBreakpoint',
-            \ 'VimspectorToggleConditionalBreakpoint',
-            \ 'VimspectorReset',
-            \ 'VimspectorRestart'
-            \ ] }
+Plug 'puremourning/vimspector'
 
 let g:vimspector_install_gadgets = [ 'debugpy', 'vscode-cpptools' ]
 
