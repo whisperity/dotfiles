@@ -13,6 +13,7 @@ let g:coc_global_extensions = [
         \ 'coc-highlight',
         \ 'coc-json',
         \ 'coc-pyright',
+        \ 'coc-snippets',
         \ 'coc-vimtex',
         \ 'coc-yaml',
         \ ]
@@ -21,14 +22,31 @@ let g:coc_popup_conceal_disable = 1
 
 nmap <silent> <C-n> :CocCommand explorer<CR>
 
-" Use tab for trigger completion with characters ahead and navigate.
+" Use Tab for trigger completion with characters ahead and navigate.
+"
 " NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
 " other plugin before putting this into your config.
+"
+" When a snippet with multiple placeholders is already inserted (e.g. function
+" calls), use Tab and Shift-Tab to navigate between the placeholders back and
+" forth.
 inoremap <silent><expr> <TAB>
       \ pumvisible() ? "\<C-n>" :
+      \ coc#expandableOrJumpable() ?
+      \ "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
       \ <SID>check_back_space() ? "\<TAB>" :
       \ coc#refresh()
+
 inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+
+let g:coc_snippet_next = '<Tab>'
+let g:coc_snippet_prev = '<S-Tab>'
+
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
 
 " Make <CR> auto-select the first completion item and notify coc.nvim to
 " format on enter, <cr> could be remapped by other vim plugin
@@ -58,11 +76,6 @@ if has("autocmd")
         autocmd FileType c,cpp,objc,objcpp,javascript nmap <silent><buffer> <LocalLeader>yh :CocCommand clangd.switchSourceHeader<CR>
     augroup END
 endif
-
-function! s:check_back_space() abort
-  let col = col('.') - 1
-  return !col || getline('.')[col - 1]  =~# '\s'
-endfunction
 
 function! s:show_documentation()
   if (index(['vim','help'], &filetype) >= 0)
