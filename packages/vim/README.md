@@ -46,6 +46,7 @@ Keybinds
    - `,ye`: Show **e**rrors
    - `,yf`: Symbol **f**inder
    - `,yh`: Switch between **h**eader and source file (C++-only!)
+   - `,yH`: Switch between **h**eader and source file _in new split_ (C++-only!)
    - `,yi`: System **i**nformation
    - `,yn`: **N**ext diagnostic
    - `,yp`: **P**revious diagnostic

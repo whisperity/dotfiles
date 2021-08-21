@@ -74,6 +74,7 @@ if has("autocmd")
         " Have the ability to jump between the source file and the associated
         " header file.
         autocmd FileType c,cpp,objc,objcpp,javascript nmap <silent><buffer> <LocalLeader>yh :CocCommand clangd.switchSourceHeader<CR>
+                    \ | nmap <silent><buffer> <LocalLeader>yH :CocCommand clangd.switchSourceHeader vsplit<CR>
     augroup END
 endif
 
