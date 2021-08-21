@@ -82,6 +82,8 @@ syntax keyword cKeyword static       conceal cchar=☥
 
 syntax keyword cKeyword assert       conceal cchar=‽
 
+syntax keyword cTodo    contained    QUESTION HACK
+
 hi link cNiceOperator Operator
 hi link cKeyword      Keyword
 hi link cBoolean      Boolean
