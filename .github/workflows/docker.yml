@@ -1,0 +1,27 @@
+name: Test Docker image
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  build:
+    name: Test Docker image
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.x
+      - name: Prepare the image build command
+        run: |
+          set -x
+          cd docker
+          echo -e "\nY\nN\ngithub-actions\n\n" | ./build.py
+          cat build.sh
+      - name: Build the Docker image
+        run: cd docker; ./build.sh
+

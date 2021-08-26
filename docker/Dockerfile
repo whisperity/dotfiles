@@ -23,6 +23,7 @@ RUN export DEBIAN_FRONTEND=noninteractive; \
         pkg-config \
         unzip
 
+ARG __CACHEBREAKER__NEOVIM
 RUN mkdir neovim_install && \
     git clone http://github.com/neovim/neovim.git --depth 1 && \
     cd neovim && \
@@ -96,6 +97,7 @@ RUN ln -snf /usr/share/zoneinfo/${TZ} /etc/localtime && \
     echo ${TZ} >/etc/timezone
 
 # Install Dotfiles inside the image, together with a wrapper.
+ARG __CACHEBREAKER__DOTFILES_FRAMEWORK
 RUN cd /opt && \
     git clone http://github.com/whisperity/Dotfiles-Framework.git \
         --depth 1 \
@@ -134,6 +136,7 @@ RUN chmod 0700 /home/${LOCAL_USER}/.config/Dotfiles/sources.yaml
 ENV PATH="/home/${LOCAL_USER}/bin:${PATH}"
 ARG GIT_USERNAME="Git User"
 ARG GIT_EMAIL="git-user@localhost"
+ARG __CACHEBREAKER__DOTFILES
 RUN export DEBIAN_FRONTEND=noninteractive; \
     apt-get update && \
     su "${LOCAL_USER}" /bin/bash -c 'echo -e "${GIT_USERNAME}\n${GIT_EMAIL}\n" | Dotfiles basic' && \
