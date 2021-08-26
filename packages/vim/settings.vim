@@ -160,7 +160,7 @@ function! TogglePasteEnable()
         setlocal paste
     endif
 endfunction
-nnoremap <C-c><C-p> :call TogglePasteEnable()<CR>
+nnoremap <silent> <C-c><C-p> :call TogglePasteEnable()<CR>
 
 " Folding control.
 if has('folding')
@@ -179,7 +179,7 @@ if has('folding')
           nnoremap <buffer> <silent> <S-f> za
       endif
   endfunction
-  nnoremap <C-c><C-f> :call ToggleFoldingEnable()<CR>
+  nnoremap <silent> <C-c><C-f> :call ToggleFoldingEnable()<CR>
 endif
 
 " Concealment of symbols.
@@ -194,8 +194,19 @@ if has('conceal')
           setlocal conceallevel=0
       endif
   endfunction
-  nnoremap <C-c><C-y> :call ToggleConcealLevel()<CR>
+  nnoremap <silent> <C-c><C-y> :call ToggleConcealLevel()<CR>
 endif
+
+" Crosshair
+set nocursorcolumn nocursorline
+function! ToggleCrosshair()
+    if &cursorcolumn == 0
+        setlocal cursorcolumn cursorline
+    else
+        setlocal nocursorcolumn nocursorline
+    endif
+endfunction
+nnoremap <silent> <C-c><C-x> :call ToggleCrosshair()<CR>
 
 " Only do this part when compiled with support for autocommands.
 if has("autocmd")

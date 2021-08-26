@@ -12,64 +12,110 @@ Starting Vim
 Keybinds
 --------
 
- * Navigation
-   - `-`: Jump to split/window based on next letter
-   - `F2`: Buffer list
-   - `F3`/`F4`: Previous/next buffer
-   - `,tc`: **T**ab **c**lose
-   - `,tt`: Window/Tab switcher
-   - `,ff`: **F**uzzy **f**ind file contents
-   - `,fm`: **F**uzzy find **m**arks
-   - `C-f`: Fuzzy **f**ind in current file
-   - `C-g`: Fuzzy find **G**it versioned files
-   - `C-n`: Toggle file explorer
-   - `C-t`: Fuzzy find filenames
-   - `C-x`: Close buffer
-   - `q:`: Command history
- * Vim configuration (`C-c`)
-   - `C-c C-c`: Exit Terminal back to vim (NeoVim only)
-   - `C-c C-f`: Toggle **f**olding
-   - `C-c C-p`: Toggle **p**aste mode
-   - `C-c C-r`: Toggle **r**ainbow-brackets
-   - `C-c C-u`: **U**ndo-history
-   - `C-c C-y`: Toggle conceal
- * **Normal** `Space`: Apply the contents of the **macro** in register **`q`** (the macro recording started by `qq`).
- * Programming
-   - `gc`: Toggle **c**omments for selection
-   - `gcc`: Toggle **c**omments for **c**urrent line
- * C/C++
-   - **Selection** `C-f`: `clang-format` selected text
- * [coc.nvim](http://github.com/neoclide/coc.nvim) (formerly **Y**ouCompleteMe): `<LocalLeader>y`
-   - `,ya`: **A**pply suggested actions
-   - `,yc`: Documentation for **c**ode
-   - `,yd`: Jump to **d**efinition
-   - `,ye`: Show **e**rrors
-   - `,yf`: Symbol **f**inder
-   - `,yh`: Switch between **h**eader and source file (C++-only!)
-   - `,yH`: Switch between **h**eader and source file _in new split_ (C++-only!)
-   - `,yi`: System **i**nformation
-   - `,yn`: **N**ext diagnostic
-   - `,yp`: **P**revious diagnostic
-   - `,yr`: Show **r**eferences
-   - `,ys`: Rename **s**ymbol
-   - `,yt`: Browse **t**ags (symbol browser)
-   - `,yx`: Fi**x** current diagnostic
-   - `,yy`: Restart server
- * [vimTeX](http://github.com/lervag/vimtex/): `<LocalLeader>l`
-   - `,le`: Show **e**rrors
-   - `,li`: System **i**nformation
-   - `,ll`: Compi**l**e and view
-   - `,lt`: Browse **t**ags (document layout)
-   - `,lv`: **V**iew
-   - `C-l`: Unicodify LaTeX sequence
- * [Vimspector](http://github.com/puremourning/vimspector): `<LocalLeader>d` - **d**ebugger
-   - `F5`: Continue
-   - `C-F5`: Stop
-   - `F11`: Step into
-   - `S-F11`: Step out
-   - `,di`: Popup **i**nformation (balloon)
-   - `,dp`: **P**ause
-   - `,dr`: **R**estart
-   - `,dx`: Reset *Vimspector*
-   - `C-b`: Toggle **b**reakpoint
-   - `C-S-b`: Toggle condtional breakpoint
+### Navigation
+
+| Key       | Action                               | Comments            |
+|:---------:|:-------------------------------------|:--------------------|
+| `-`       | Jump to split/window visually        |                     |
+| `F2`      | Select buffer                        |                     |
+| `F3`/`F4` | Go to previous/next buffer           |                     |
+| `,tc`     | **T**ab **c**lose                    |                     |
+| `,tt`     | **T**ab selector                     |                     |
+| `,ff`     | **F**uzzy find **f**ile contents     |                     |
+| `,fm`     | **F**uzzy find **m**arks             |                     |
+| `C-f`     | Fuzzy find in current **f**ile       | mirrors Zsh keybind |
+| `C-g`     | Fuzzy find **G**it versioned files   | mirrors Zsh keybind |
+| `C-n`     | Toggle file **n**avigator (explorer) |                     |
+| `C-t`     | Fuzzy find in file **t**ree          | mirrors Zsh keybind |
+| `C-x`     | Close buffer                         |                     |
+| `q:`      | Command history                      |                     |
+
+### Vim _c_onfiguration (`C-c`)
+
+
+| Key       | Action                                    | Comments     |
+|:---------:|:------------------------------------------|:-------------|
+| `C-c C-c` | Exit _Terminal_ mode and return to Normal | Neovim-only! |
+| `C-c C-f` | Toggle **f**olding                        |              |
+| `C-c C-p` | Toggle **p**aste-mode                     |              |
+| `C-c C-r` | Toggle **r**ainbow highlight of brackets  |              |
+| `C-c C-u` | Toggle **u**ndo history                   |              |
+| `C-c C-x` | Toggle crosshair (**x**hair)              |              |
+| `C-c C-y` | Toggle conceal                            |              |
+
+### Generic things
+
+| Key       | Action                                       | Comments                                                 |
+|:---------:|:---------------------------------------------|:---------------------------------------------------------|
+| `<Space>` | Apply recorded **macro** in register **`q`** | **Normal** mode. The macro recording is started by `qq`. |
+
+### Programming
+
+| Key   | Action                                    | Comments |
+|:-----:|:------------------------------------------|:---------|
+| `gc`  | Toggle **c**ommenting of selection        |          |
+| `gcc` | Toggle **c**ommenting of **c**urrent line |          |
+
+#### C/C++
+
+| Key   | Action                                   | Comments |
+|:-----:|:-----------------------------------------|:---------|
+| `C-f` | Call `clang-format` on the selected text |          |
+
+
+#### Markdown
+| Key   | Action                              | Comments |
+|:-----:|:------------------------------------|:---------|
+| `,mt` | Format the *table* under the cursor |          |
+
+#### Code completion ([coc.nvim](http://github.com/neoclide/coc.nvim)): `<LocalLeader>y`
+
+| Key   | Action                                                   | Comments    |
+|:-----:|:---------------------------------------------------------|:------------|
+| `,ya` | **A**pply suggested actions                              |             |
+| `,yc` | Documentation for **c**ode under cursor                  |             |
+| `,yd` | Jump to **d**efinition                                   |             |
+| `,ye` | Show **e**rrors                                          |             |
+| `,yf` | Symbol **f**inder                                        |             |
+| `,yh` | Swutch between **h**eader and source file                | C/C++-only! |
+| `,yH` | Switch between **h**eader and source file _in new split_ | C/C++-only! |
+| `,yi` | System **i**nformation                                   |             |
+| `,yn` | **N**ext diagnostic                                      |             |
+| `,yp` | **P**revious diagnostic                                  |             |
+| `,yr` | Show **r**eferences                                      |             |
+| `,ys` | Rename **s**ymbol                                        |             |
+| `,yt` | Browse symbol **t**ree (tags)                            |             |
+| `,yx` | Fi**x** current diagnostic                               |             |
+| `,yy` | Restart server                                           |             |
+
+#### Debugging ([vimspector](http://github.com/puremourning/vimspector)): `<LocalLeader>d`
+
+| Key     | Action                              | Comments     |
+|:-------:|:------------------------------------|:-------------|
+| `F5`    | Start or continue debugging         |              |
+| `,dS`   | **S**top debugger                   |              |
+| `C-F5`  | Stop debugger                       | Neovim-only! |
+| `F11`   | Step into                           |              |
+| `,dso`  | **S**tep **o**ut                    |              |
+| `C-F11` | Step out                            | Neovim-only! |
+| `,dsr`  | **S**tep ove**r**                   |              |
+| `S-F11` | Step over                           | Neovim-only! |
+| `,db`   | Toggle **b**reakpoint               |              |
+| `,dB`   | Toggle _conditional_ **b**reakpoint |              |
+| `,di`   | **I**nspect expression              |              |
+| `,dj`   | Move _down_ the stack               |              |
+| `,dk`   | Move _up_ the stack                 |              |
+| `,dp`   | **P**ause debugger                  |              |
+| `,dr`   | **R**estart debugger                |              |
+| `,dx`   | E**x**it Vimspector                 |              |
+
+### LaTeX ([vimtex](http://github.com/lervag/vimtex)): `<LocalLeader>l`
+
+| Key   | Action                                         | Comments |
+|:-----:|:-----------------------------------------------|:---------|
+| `,le` | Show **e**rrors                                |          |
+| `,li` | System **i**nformation                         |          |
+| `,ll` | Compi**l**e document and open viewer           |          |
+| `,lt` | Browse **t**ags (document layout)              |          |
+| `,lv` | **V**iew document                              |          |
+| `C-l` | Turn **L**aTeX sequence into Unicode character |          |
