@@ -1,5 +1,11 @@
 # Commands executed in ZSH before .zshrc is ran.
 
+# load the contents of the file created by .ssh/rc
+if [ -f "$HOME/.ssh/.ephemeral-rcprofile" ]; then
+    . "$HOME/.ssh/.ephemeral-rcprofile"
+    rm $HOME/.ssh/.ephemeral-rcprofile
+fi
+
 # For comaptibility, load the Bash aliases too!
 if [ -f ~/.bash_aliases ]; then
   source ~/.bash_aliases

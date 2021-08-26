@@ -1,9 +1,9 @@
-# Don't show username for the local user.
-DEFAULT_USER=$<USER>
+# Don't show username or context for the local user.
+DEFAULT_USER="$<USER>"
 
 POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
    status
-   user
+   context
    dir
    vcs
    virtualenv
