@@ -10,6 +10,6 @@ if has("autocmd")
         " As per the documentation, see `:help augroup`.
         au!
 
-        autocmd FileType markdown nnoremap <buffer> <LocalLeader>,mt :TableFormat<CR>
+        autocmd FileType markdown nnoremap <buffer> <LocalLeader>mt :TableFormat<CR>
     augroup END
 endif

@@ -2,12 +2,12 @@
   "codeLens": {
     "enable": true
   },
-  "diagnostic": {
-    "errorSign": "⛔️",
-    "warningSign": "⚠️",
-    "infoSign": "ℹ️",
-    "hintSign": "💡",
-  },
+  /* "diagnostic": { */
+  /*   "errorSign": "⛔️", */
+  /*   "warningSign": "⚠️", */
+  /*   "infoSign": "ℹ️", */
+  /*   "hintSign": "💡" */
+  /* }, */
   "clangd": {
     "arguments": ["--log=verbose",
                   "--pretty",
@@ -23,17 +23,33 @@
     }
   },
   "rpc": {
-    "workspaceElapsedTime": true,
-    "idleText": "Looking around...",
-    "detailsInExplorer": "Exploring {workspace}",
+    /* "buttonEnabled": true, */
+    /* "buttonActiveLabel": "View Repository", */
+    /* "buttonInactiveLabel": null, */
+    /* "buttonInactiveUrl": null, */
+    /* "checkIdle": true, */
+    /* "enabled": true, */
+    "detailsEditing": "Working on {workspace_folder}",
     "detailsIdle": "Looking around...",
-    "lowerDetailsInExplorer": "{null}",
-    "lowerDetailsIdle": "{null}",
-    "largeImage": "{Lang}",
-    "largeImageInExplorer": "Exploring",
-    "largeImageIdle": "Looking around...",
-    "smallImage": "{appname}",
-    "problemsText": "{count} diagnostics"
+    "detailsInExplorer": "Exploring {workspace_folder}",
+    "detailsNotFound": "Hic sunt dracones...",
+    "detailsViewing": "Viewing {workspace_folder} {problems}",
+    "idleText": "(Idle)",
+    "idleTimeout": 600,
+    /* "largeImage": "⠀{Lang}", /* U+2800 as space! */
+    "largeImage": "\u200b\u200b{Lang}",
+    "largeImageIdle": "(Idle)",
+    "largeImageInExplorer": "coc-explorer",
+    "lowerDetailsEditing": "{file_name}@{current_line} (/{total_lines})",
+    "lowerDetailsIdle": "{empty}",
+    "lowerDetailsInExplorer": "{empty}",
+    "lowerDetailsNotFound": "Out-of-bounds",
+    "lowerDetailsViewing": "{file_name} ({total_lines} LoC)",
+    "problemsText": "- {count} diagnostics",
+    /* "showProblems": true, */
+    "smallImage": "{app_name}",
+    "suppressNotifications": false,
+    "workspaceElapsedTime": true
   },
   "suggest": {
     "enablePreview": true

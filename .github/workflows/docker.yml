@@ -2,8 +2,20 @@ name: Test Docker image
 on:
   push:
     branches: [master]
+    paths:
+      - '.github/workflows/docker.yml'
+      - 'docker/**'
+      - 'packages/**/package.yaml'
+      - 'packages/**/*.z?sh'
+      - 'packages/**/*.py'
   pull_request:
     branches: [master]
+    paths:
+      - '.github/workflows/docker.yml'
+      - 'docker/**'
+      - 'packages/**/package.yaml'
+      - 'packages/**/*.z?sh'
+      - 'packages/**/*.py'
 
 jobs:
   build:

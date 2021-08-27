@@ -146,8 +146,20 @@ nnoremap <silent> <Leader>tc :tabclose<CR>
 command! Bc bp|bd#
 nnoremap <silent> <C-x> :Bc<CR>
 
+" Destroy all buffers that are not currently visible anywhere and don't
+" contain changes.
+function! DeleteOldBuffers()
+    let l:buffers = filter(getbufinfo(), {_, v -> (!v.loaded || v.hidden) && (!v.changed)})
+    if !empty(l:buffers)
+        exec 'bwipeout' join(map(l:buffers, {_, v -> v.bufnr}))
+    endif
+endfunction
+nnoremap <silent> <C-c><C-x> :call DeleteOldBuffers()<CR>
+
 " Clear highlighted searches.
 command! C let @/=""
+" <Ctrl-AltGr-g>
+nmap <C-]> :noh<CR>
 
 " Auto-apply the macro stored in 'q' (created by pressing qq).
 nmap <silent> <Space> @q
@@ -206,7 +218,7 @@ function! ToggleCrosshair()
         setlocal nocursorcolumn nocursorline
     endif
 endfunction
-nnoremap <silent> <C-c><C-x> :call ToggleCrosshair()<CR>
+nnoremap <silent> <C-c><C-v> :call ToggleCrosshair()<CR>
 
 " Only do this part when compiled with support for autocommands.
 if has("autocmd")
@@ -226,6 +238,7 @@ if has("autocmd")
         autocmd FileType markdown,rst setlocal spell spelllang=en_gb
     augroup END
 endif
+
 
 
 " Install vim-plug if not found...

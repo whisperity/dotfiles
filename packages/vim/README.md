@@ -14,21 +14,22 @@ Keybinds
 
 ### Navigation
 
-| Key       | Action                               | Comments            |
-|:---------:|:-------------------------------------|:--------------------|
-| `-`       | Jump to split/window visually        |                     |
-| `F2`      | Select buffer                        |                     |
-| `F3`/`F4` | Go to previous/next buffer           |                     |
-| `,tc`     | **T**ab **c**lose                    |                     |
-| `,tt`     | **T**ab selector                     |                     |
-| `,ff`     | **F**uzzy find **f**ile contents     |                     |
-| `,fm`     | **F**uzzy find **m**arks             |                     |
-| `C-f`     | Fuzzy find in current **f**ile       | mirrors Zsh keybind |
-| `C-g`     | Fuzzy find **G**it versioned files   | mirrors Zsh keybind |
-| `C-n`     | Toggle file **n**avigator (explorer) |                     |
-| `C-t`     | Fuzzy find in file **t**ree          | mirrors Zsh keybind |
-| `C-x`     | Close buffer                         |                     |
-| `q:`      | Command history                      |                     |
+| Key       | Action                                      | Comments            |
+|:---------:|:--------------------------------------------|:--------------------|
+| `-`       | Jump to split/window visually               |                     |
+| `F2`      | Select buffer                               |                     |
+| `F3`/`F4` | Go to previous/next buffer                  |                     |
+| `,tc`     | **T**ab **c**lose                           |                     |
+| `,tt`     | **T**ab selector                            |                     |
+| `,ff`     | **F**uzzy find **f**ile contents            |                     |
+| `,fm`     | **F**uzzy find **m**arks                    |                     |
+| `C-f`     | Fuzzy find in current **f**ile              | mirrors Zsh keybind |
+| `C-g`     | Fuzzy find **G**it versioned files          | mirrors Zsh keybind |
+| `C-n`     | Toggle file **n**avigator (explorer)        |                     |
+| `C-t`     | Fuzzy find in file **t**ree                 | mirrors Zsh keybind |
+| `C-x`     | Close buffer                                |                     |
+| `C-c C-x` | Close old buffers, e.g. files in background |                     |
+| `q:`      | Command history                             |                     |
 
 ### Vim _c_onfiguration (`C-c`)
 
@@ -40,7 +41,7 @@ Keybinds
 | `C-c C-p` | Toggle **p**aste-mode                     |              |
 | `C-c C-r` | Toggle **r**ainbow highlight of brackets  |              |
 | `C-c C-u` | Toggle **u**ndo history                   |              |
-| `C-c C-x` | Toggle crosshair (**x**hair)              |              |
+| `C-c C-v` | Toggle **v**isual location (crosshair)    |              |
 | `C-c C-y` | Toggle conceal                            |              |
 
 ### Generic things
@@ -48,6 +49,7 @@ Keybinds
 | Key       | Action                                       | Comments                                                 |
 |:---------:|:---------------------------------------------|:---------------------------------------------------------|
 | `<Space>` | Apply recorded **macro** in register **`q`** | **Normal** mode. The macro recording is started by `qq`. |
+| `C-]`     | Unhighlight search results                   |                                                          |
 
 ### Programming
 
