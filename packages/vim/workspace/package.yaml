@@ -1,5 +1,0 @@
-description: Persist the list of open files in a directory tree, and some more fancy features
-install:
-  - action: copy
-    file: config.vim
-    to: "$HOME/.vim/config/vim-workspace.vim"

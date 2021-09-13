@@ -4,6 +4,7 @@ Plug 'jlanzarotta/bufexplorer', { 'on': [
             \ 'BufExplorerHorizontalSplit',
             \ 'BufExplorerVerticalSplit'
             \ ] }
+Plug 'wellle/context.vim'
 Plug 'bogado/file-line'
 Plug 'danro/rename.vim', { 'on': 'Rename' }
 Plug 'ntpeters/vim-better-whitespace'
@@ -50,7 +51,7 @@ let g:EditorConfig_exclude_patterns = ['fugitive://.*', 'scp://.*']
 
 
 
-" Startscreen
+" Startscreen and session handler.
 Plug 'mhinz/vim-startify'
 let g:startify_list_order = [
       \ ['   My most recently used files in the current directory:'],
@@ -70,6 +71,73 @@ let g:startify_skiplist = [
 let g:startify_change_to_dir = 0
 let g:startify_change_to_vcs_root = 1
 let g:startify_update_oldfiles = 1
+
+" Save the session information in the Vim directory.
+let workspaceSessionPath = expand($HOME . "/.vim/session/")
+silent execute '!mkdir -p ' . workspaceSessionPath
+
+set sessionoptions=buffers,curdir,folds,localoptions,options,tabpages,winpos,winsize
+
+" Settings for Startify's session handling.
+let g:startify_session_autoload = 1
+let g:startify_session_dir = workspaceSessionPath
+" let g:startify_session_keep_options = 1
+let g:startify_session_persistence = 1
+let g:startify_session_sort = 0
+
+" vim-context has to be disabled so the saved buffers don't get messed up.
+let g:startify_session_before_save = [
+      \ "ContextDisable"
+      \ ]
+
+" (Needed dependency for fetching Git branch information.)
+Plug 'itchyny/vim-gitbranch'
+
+" Save the session with the branch name annotated to it.
+function! s:GetUniqueSessionName()
+  let path = fnamemodify(getcwd(), ':p')
+  let path = empty(path) ? 'UNKNOWN_PATH' : path
+  let path = substitute(path, '/$', '', 'g')
+  let branch = gitbranch#name()
+  let branch = empty(branch) ? '' : '@' . branch
+  return substitute(path . branch, '/', '%', 'g')
+endfunction
+
+function! s:IsCwdIgnoredForSession()
+  if fnamemodify(getcwd(), ':~') ==# "~/"
+    " Don't do anything if the user just starts a Vim in their Terminal. :)
+    return 1
+  endif
+  if filereadable("Session.vim")
+    return 1
+  endif
+
+  return 0
+endfunction
+
+function! s:LoadSession()
+  if s:IsCwdIgnoredForSession()
+    return
+  endif
+
+  " Load the crafted session name.
+  execute 'SLoad ' . s:GetUniqueSessionName()
+endfunction
+
+function! s:SaveSession()
+  if s:IsCwdIgnoredForSession()
+    return
+  endif
+
+  " Save with the crafted session name.
+  execute 'SSave! ' . s:GetUniqueSessionName()
+endfunction
+
+augroup Startify
+  autocmd!
+  autocmd User        StartifyReady call s:LoadSession()
+  autocmd VimLeavePre *             call s:SaveSession()
+augroup END
 
 
 
