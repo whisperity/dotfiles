@@ -67,13 +67,22 @@ if has("autocmd")
         autocmd CursorHold * silent call CocActionAsync('highlight')
 
         autocmd ColorScheme *
-                 \   highlight CocErrorHighlight   ctermfg=Red                        guibg=#ff0000
+                 \   highlight CocErrorHighlight   ctermfg=Red                        guibg=#dd0000 gui=bold
                  \ | highlight CocWarningHighlight ctermfg=DarkYellow cterm=underline guifg=#edb443 gui=underline
+                 \ | highlight CocInfoHighlight    ctermfg=Blue       cterm=underline guifg=#005599 gui=underline
                  \ | highlight CocHighlightText    ctermbg=Blue                       guibg=#005599 gui=bold
+        " \ | highlight! link Error         CocErrorHighlight
+
+        if $TERM ==? "contour-latest"
+          " Contour supports undercurlies
+          autocmd ColorScheme *
+                 \   highlight CocErrorHighlight   ctermfg=Red                        guibg=NONE guifg=#ee4400 guisp=#dd0000 gui=undercurl
+        endif
 
         " Have the ability to jump between the source file and the associated
         " header file.
-        autocmd FileType c,cpp,objc,objcpp,javascript nmap <silent><buffer> <LocalLeader>yh :CocCommand clangd.switchSourceHeader<CR>
+        autocmd FileType c,cpp,objc,objcpp,javascript
+                    \   nmap <silent><buffer> <LocalLeader>yh :CocCommand clangd.switchSourceHeader<CR>
                     \ | nmap <silent><buffer> <LocalLeader>yH :CocCommand clangd.switchSourceHeader vsplit<CR>
     augroup END
 endif
