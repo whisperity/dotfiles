@@ -51,6 +51,14 @@ Keybinds
 | `<Space>` | Apply recorded **macro** in register **`q`** | **Normal** mode. The macro recording is started by `qq`. |
 | `C-]`     | Unhighlight search results                   |                                                          |
 
+
+### Version control ([fugitive](http://github.com/tpope/vim-fugitive)): `<LocalLeader>g`
+
+| Key   | Action                                          | Comments |
+|:-----:|:------------------------------------------------|:---------|
+| `,gg` | Show the Fugitive status and management window  |          |
+| `,gb` | Show the `git blame` view of the current buffer |          |
+
 ### Programming
 
 | Key   | Action                                    | Comments |
@@ -64,8 +72,8 @@ Keybinds
 |:-----:|:-----------------------------------------|:---------|
 | `C-f` | Call `clang-format` on the selected text |          |
 
-
 #### Markdown
+
 | Key   | Action                              | Comments |
 |:-----:|:------------------------------------|:---------|
 | `,mt` | Format the *table* under the cursor |          |
