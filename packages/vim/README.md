@@ -58,6 +58,7 @@ Keybinds
 |:-----:|:------------------------------------------------|:---------|
 | `,gg` | Show the Fugitive status and management window  |          |
 | `,gb` | Show the `git blame` view of the current buffer |          |
+| `,gm` | Show the commit which changed the current line  |          |
 
 ### Programming
 

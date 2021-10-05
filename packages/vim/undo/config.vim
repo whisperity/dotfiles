@@ -24,9 +24,6 @@ let g:undotree_ShortIndicators = 1
 " Show unified diff.
 let g:undotree_DiffCommand = "diff -au"
 
-" Undodir (full undo path instead of % separations)
-Plug 'pixelastic/vim-undodir-tree'
-
 " Do not lose undo history.
 " Unfortunately only works for Vim >= 7.3.
 if has("persistent_undo")
@@ -35,4 +32,13 @@ if has("persistent_undo")
     let &undodir = undoDirPath
 
     set undofile
+    augroup StartifyUndoFix
+        " Clear at reload as per convention.
+        au!
+
+        autocmd SessionLoadPost * doautoall BufReadPost
+    augroup END
 endif
+
+" Undodir (full undo path instead of % separations)
+Plug 'pixelastic/vim-undodir-tree'
