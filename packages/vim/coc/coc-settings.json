@@ -1,4 +1,9 @@
 {
+  "coc": {
+    "preferences": {
+      "semanticTokensHighlight": false
+    }
+  },
   "codeLens": {
     "enable": true
   },
@@ -38,7 +43,7 @@
     "idleTimeout": 600,
     /* "largeImage": "⠀{Lang}", /* U+2800 as space! */
     "largeImage": "\u200b\u200b{Lang}",
-    "largeImageIdle": "(Idle)",
+    /* "largeImageIdle": "(Idle)", */
     "largeImageInExplorer": "coc-explorer",
     "lowerDetailsEditing": "{file_name}@{current_line} (/{total_lines})",
     "lowerDetailsIdle": "{empty}",
