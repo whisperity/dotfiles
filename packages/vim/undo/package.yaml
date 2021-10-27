@@ -1,5 +1,5 @@
-description: Installs plugins that help manage the "undo" functionality in Vim
+description: Additional plugins to enhance the "undo" features
 install:
   - action: copy
-    file: config.vim
+    file: undo.vim
     to: "$HOME/.vim/config/undo.vim"

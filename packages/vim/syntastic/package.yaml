@@ -1,5 +1,5 @@
 description: Vim syntax checking extension
 install:
   - action: copy
-    file: config.vim
+    file: syntastic.vim
     to: "$HOME/.vim/config/syntastic.vim"

@@ -1,5 +1,5 @@
 description: Vim Markdown support
 install:
   - action: copy
-    file: config.vim
+    file: vim-markdown.vim
     to: "$HOME/.vim/config/vim-markdown.vim"

@@ -21,7 +21,7 @@ install:
     dirs:
       - "$HOME/.vim/coc.nvim"
   - action: copy
-    file: config.vim
+    file: coc.vim
     to: "$HOME/.vim/config/coc.vim"
   - action: copy
     file: coc-settings.json

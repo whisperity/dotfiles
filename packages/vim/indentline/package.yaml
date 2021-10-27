@@ -1,5 +1,5 @@
 description: Show indentation levels in code with vertical characters.
 install:
   - action: copy
-    file: config.vim
+    file: indentLine.vim
     to: "$HOME/.vim/config/indentLine.vim"

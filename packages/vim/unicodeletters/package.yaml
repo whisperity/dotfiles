@@ -1,5 +1,5 @@
 description: Vim support for entering LaTeX-named symbols and rendering them over to Unicode letters, similar to 'agda-input'
 install:
   - action: copy
-    file: config.vim
+    file: latex-unicoder.vim
     to: "$HOME/.vim/config/latex-unicoder.vim"

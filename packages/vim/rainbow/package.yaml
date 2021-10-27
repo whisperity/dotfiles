@@ -1,5 +1,5 @@
 description: Adds rainbow-coloured bracket matching
 install:
   - action: copy
-    file: config.vim
+    file: rainbow.vim
     to: "$HOME/.vim/config/rainbow.vim"

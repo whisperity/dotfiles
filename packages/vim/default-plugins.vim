@@ -5,6 +5,7 @@ Plug 'jlanzarotta/bufexplorer', { 'on': [
             \ 'BufExplorerVerticalSplit'
             \ ] }
 Plug 'wellle/context.vim'
+Plug 'Raimondi/delimitMate'
 Plug 'bogado/file-line'
 Plug 'danro/rename.vim', { 'on': 'Rename' }
 Plug 'ntpeters/vim-better-whitespace'
@@ -16,8 +17,8 @@ Plug 'xolox/vim-misc' | Plug 'xolox/vim-reload'
 
 
 " AutoPairs - automatically close paren-bracket sequences on opening.
-Plug 'jiangmiao/auto-pairs'
-let g:AutoPairsFlyMode = 0
+" Plug 'jiangmiao/auto-pairs'
+" let g:AutoPairsFlyMode = 0
 
 
 

@@ -1,5 +1,5 @@
 description: tcomment allows toggling comments with 'gc' motion.
 install:
   - action: copy
-    file: config.vim
+    file: tcomment_vim.vim
     to: "$HOME/.vim/config/tcomment_vim.vim"

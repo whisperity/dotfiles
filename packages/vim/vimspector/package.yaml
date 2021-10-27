@@ -1,5 +1,5 @@
 description: Vimspector is an interactive debugger running inside Vim.
 install:
   - action: copy
-    file: config.vim
+    file: vimspector.vim
     to: "$HOME/.vim/config/vimspector.vim"

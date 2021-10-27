@@ -1,5 +1,5 @@
 description: Vim support for (La)TeX code editing
 install:
   - action: copy
-    file: config.vim
+    file: vimtex.vim
     to: "$HOME/.vim/config/vimtex.vim"

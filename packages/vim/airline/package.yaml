@@ -1,5 +1,5 @@
 description: Vim status line
 install:
   - action: copy
-    file: config.vim
+    file: vim-airline.vim
     to: "$HOME/.vim/config/vim-airline.vim"

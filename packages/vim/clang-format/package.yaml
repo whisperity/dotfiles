@@ -2,5 +2,5 @@ description: Vim plugin for invoking 'clang-format'. (Clang-Format must be
     installed separately.)
 install:
   - action: copy
-    file: config.vim
+    file: vim-clang-format.vim
     to: "$HOME/.vim/config/vim-clang-format.vim"

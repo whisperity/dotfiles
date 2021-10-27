@@ -2,5 +2,5 @@ description: Adds text object support for changing surroundings, not just the
   inner text.
 install:
   - action: copy
-    file: config.vim
+    file: vim-surround.vim
     to: "$HOME/.vim/config/vim-surround.vim"

@@ -13,5 +13,5 @@ install:
       - "echo vim.fzf: The 'vim.fzf' plugin depends on The Silver Searcher (ag) binary. Please install it!"
 
   - action: copy
-    file: config.vim
+    file: fzf.vim
     to: "$HOME/.vim/config/fzf.vim"
