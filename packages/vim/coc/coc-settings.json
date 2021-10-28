@@ -1,7 +1,7 @@
 {
   "coc": {
     "preferences": {
-      "semanticTokensHighlight": false
+      "semanticTokensHighlights": false
     }
   },
   "codeLens": {
@@ -17,7 +17,7 @@
     "arguments": ["--log=verbose",
                   "--pretty",
                   "--background-index",
-                  "--recovery-ast",
+                  "--malloc-trim",
                   "-j=4"],
     "semanticHighlighting": true
   },
