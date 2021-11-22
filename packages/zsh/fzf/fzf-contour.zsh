@@ -1,4 +1,4 @@
-if [[ $TERMINAL_NAME != "contour" ]]
+if [[ ! $TERM =~ "contour*" ]]
 then
   return
 fi

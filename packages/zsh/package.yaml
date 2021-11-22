@@ -41,7 +41,7 @@ install:
     to: $HOME/.zsh.pre.d
   - action: copy
     files:
-      - contour.zsh
+      - contour.integration.zsh
     to: $HOME/.zsh.post.d
 uninstall:
   - action: shell all
