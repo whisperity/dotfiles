@@ -1,5 +1,5 @@
 description: Vim plugins for Git status (gutter annotations) and invoking Git actions
 install:
   - action: copy
-    file: config.vim
+    file: git.vim
     to: "$HOME/.vim/config/git.vim"
