@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [ -z "$VIM_ALIAS_EXPANDED" ]
+if [[ "$(command -v vim)" != *"darkvim"* && "$(command -v vim)" != *"lightvim"* ]]
 then
     export VIM_THEME=dark
 
@@ -8,7 +8,4 @@ then
     alias lightvim="VIM_THEME=light $(command -v vim) "
 
     alias vim="darkvim"
-
-    export VIM_ALIAS_EXPANDED=1
 fi
-
