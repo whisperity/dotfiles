@@ -99,10 +99,16 @@ command = ["docker", "build", ".", "-t", image,
 command = list(map(shlex.quote, filter(lambda x: x, command)))
 
 with open("build.sh", "w") as handle:
-    print("#!/bin/bash", file=handle)
-    print(" ".join(command), file=handle)
-    print("rm build.sh", file=handle)
+    print("""#!/bin/bash
+echo "Building Docker image..."
+{0}
+
+if [[ $? -eq 0 ]]
+then
+    rm build.sh
+fi
+""".format(" ".join(command)), file=handle)
 
 os.chmod("build.sh", 0o755)
 
-print("Execute build.sh")
+print("Prepare done! Please execute build.sh now...")

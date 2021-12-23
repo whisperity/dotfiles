@@ -140,7 +140,7 @@ ARG __CACHEBREAKER__DOTFILES
 RUN export DEBIAN_FRONTEND=noninteractive; \
     apt-get update && \
     su "${LOCAL_USER}" /bin/bash -c 'echo -e "${GIT_USERNAME}\n${GIT_EMAIL}\n" | Dotfiles basic' && \
-    su "${LOCAL_USER}" /bin/bash -c 'Dotfiles direnv envprobe githooks tools.fancy vim vim.airline vim.comments vim.fzf vim.git vim.markdown vim.nerdtree vim.polyglot vim.rainbow vim.surround vim.syntastic vim.undo vim.workspace zsh.__ALL__' && \
+    su "${LOCAL_USER}" /bin/bash -c 'Dotfiles direnv envprobe githooks tools.fancy vim vim.airline vim.comments vim.fzf vim.git vim.markdown vim.nerdtree vim.polyglot vim.rainbow vim.surround vim.syntastic vim.undo zsh.__ALL__' && \
     if [ ! -z ${INSTALL_TEX} ]; then \
         su "${LOCAL_USER}" /bin/bash -c "Dotfiles texlive vim.tex" && \
         su "${LOCAL_USER}" /bin/bash -c "Dotfiles --uninstall vim.polyglot vim.syntastic"; \

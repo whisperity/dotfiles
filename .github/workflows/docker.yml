@@ -35,5 +35,9 @@ jobs:
           echo -e "\nY\nN\ngithub-actions\n\n" | ./build.py
           cat build.sh
       - name: Build the Docker image
-        run: cd docker; ./build.sh
+        run: |
+          set -ex
+          cd docker
+          ls -alh
+          ./build.sh
 
