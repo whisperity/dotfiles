@@ -1,0 +1,5 @@
+description: Vim plugins to increase development focus on the current context
+install:
+  - action: copy
+    file: focus.vim
+    to: "$HOME/.vim/config/focus.vim"

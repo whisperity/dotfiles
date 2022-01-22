@@ -8,14 +8,6 @@ on:
       - 'packages/**/package.yaml'
       - 'packages/**/*.z?sh'
       - 'packages/**/*.py'
-  pull_request:
-    branches: [master]
-    paths:
-      - '.github/workflows/docker.yml'
-      - 'docker/**'
-      - 'packages/**/package.yaml'
-      - 'packages/**/*.z?sh'
-      - 'packages/**/*.py'
 
 jobs:
   build:
