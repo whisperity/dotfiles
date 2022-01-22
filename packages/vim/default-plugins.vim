@@ -4,21 +4,28 @@ Plug 'jlanzarotta/bufexplorer', { 'on': [
             \ 'BufExplorerHorizontalSplit',
             \ 'BufExplorerVerticalSplit'
             \ ] }
-Plug 'wellle/context.vim'
-Plug 'Raimondi/delimitMate'
 Plug 'bogado/file-line'
 Plug 'danro/rename.vim', { 'on': 'Rename' }
 Plug 'ntpeters/vim-better-whitespace'
 Plug 'machakann/vim-highlightedyank'
 Plug 'farmergreg/vim-lastplace'
+Plug 'matze/vim-move'
 
 Plug 'xolox/vim-misc' | Plug 'xolox/vim-reload'
+
+
+
+" Code context.
+Plug 'wellle/context.vim'
+let g:context_nvim_no_redraw = 1
 
 
 
 " AutoPairs - automatically close paren-bracket sequences on opening.
 " Plug 'jiangmiao/auto-pairs'
 " let g:AutoPairsFlyMode = 0
+"
+" Plug 'Raimondi/delimitMate'
 
 
 

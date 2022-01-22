@@ -12,6 +12,7 @@ let g:coc_global_extensions = [
         \ 'coc-explorer',
         \ 'coc-highlight',
         \ 'coc-json',
+        \ 'coc-pairs',
         \ 'coc-pyright',
         \ 'coc-snippets',
         \ 'coc-vimtex',
