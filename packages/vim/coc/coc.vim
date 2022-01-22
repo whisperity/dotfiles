@@ -7,8 +7,8 @@ let g:coc_data_home = "~/.vim/coc.nvim"
 
 " Load (and most importantly, install!) some useful extensions by default.
 let g:coc_global_extensions = [
-        \ 'coc-cmake',
         \ 'coc-clangd',
+        \ 'coc-cmake',
         \ 'coc-explorer',
         \ 'coc-highlight',
         \ 'coc-json',
@@ -125,17 +125,6 @@ xmap ic <Plug>(coc-classobj-i)
 omap ic <Plug>(coc-classobj-i)
 xmap ac <Plug>(coc-classobj-a)
 omap ac <Plug>(coc-classobj-a)
-
-
-
-" Semantic highlight for C++ code.
-Plug 'jackguo380/vim-lsp-cxx-highlight', { 'for': [
-            \ 'c',
-            \ 'cpp',
-            \ 'objc',
-            \ 'objcpp'
-            \ ] }
-
 
 
 

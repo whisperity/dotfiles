@@ -14,7 +14,7 @@ if has('nvim')
 
   let &shadafile = vimRootPath . "/nvim.shada"
 else
-  let &viminfofile = vimRootPath . "/vim.viminfo"
+  let &viminfofile = vimRootPath . "/viminfo/vim.viminfo"
 endif
 
 " Performance for Raspberry or other low end systems.

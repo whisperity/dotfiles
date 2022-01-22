@@ -1,9 +1,4 @@
 {
-  "coc": {
-    "preferences": {
-      "semanticTokensHighlights": false
-    }
-  },
   "codeLens": {
     "enable": true
   },
@@ -14,12 +9,16 @@
   /*   "hintSign": "💡" */
   /* }, */
   "clangd": {
-    "arguments": ["--log=verbose",
-                  "--pretty",
-                  "--background-index",
+    "arguments": ["--background-index",
+                  "--clang-tidy",
+                  "--completion-style=bundled",
+                  "--header-insertion-decorators",
+
                   "--malloc-trim",
-                  "-j=4"],
-    "semanticHighlighting": true
+                  "--pch-storage=disk",
+
+                  "--log=verbose",
+                  "--pretty"]
   },
   "explorer": {
     "icon": {
@@ -55,6 +54,9 @@
     "smallImage": "{app_name}",
     "suppressNotifications": false,
     "workspaceElapsedTime": true
+  },
+  "semanticTokens": {
+    "filetypes": ["*"]
   },
   "suggest": {
     "enablePreview": true
