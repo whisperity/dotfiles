@@ -110,6 +110,7 @@ Keybinds
 | `C-F5`  | Stop debugger                       | Neovim-only! |
 | `F11`   | Step into                           |              |
 | `,dso`  | **S**tep **o**ut                    |              |
+| `F10`   | Step out                            |              |
 | `C-F11` | Step out                            | Neovim-only! |
 | `,dsr`  | **S**tep ove**r**                   |              |
 | `S-F11` | Step over                           | Neovim-only! |

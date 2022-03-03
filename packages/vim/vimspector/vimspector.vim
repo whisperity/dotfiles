@@ -20,6 +20,7 @@ xmap <LocalLeader>di  <Plug>VimspectorBalloonEval
 nmap <LocalLeader>db  <Plug>VimspectorToggleBreakpoint
 nmap <LocalLeader>dB  <Plug>VimspectorToggleConditionalBreakpoint
 
+nmap <F10>            <Plug>VimspectorStepOver
 nmap <F11>            <Plug>VimspectorStepInto
 nmap <LocalLeader>dso <Plug>VimspectorStepOut
 nmap <LocalLeader>dsr <Plug>VimspectorStepOver
