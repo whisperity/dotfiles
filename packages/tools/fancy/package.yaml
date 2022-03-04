@@ -16,17 +16,9 @@ install:
   - action: shell all
     commands:
       - "sudo dpkg --install $TEMPORARY_DIR/bat.deb"
-      - "sudo dpkg --install $TEMPORARY_DIR/delta.deb"
       - "sudo dpkg --install $TEMPORARY_DIR/duf.deb"
       - "sudo dpkg --install $TEMPORARY_DIR/fd.deb"
       - "sudo dpkg --install $TEMPORARY_DIR/hexyl.deb"
-  - action: shell all
-    commands:
-      - "git config --global core.pager delta"
-      - "git config --global delta.line-numbers true"
-      - "git config --global delta.side-by-side false"
-      - "git config --global alias.dsbs \"config --global delta.side-by-side true\""
-      - "git config --global alias.duni \"config --global delta.side-by-side false\""
   - action: make dirs
     dirs:
       - "$HOME/.bash.d"
@@ -34,6 +26,7 @@ install:
       - "$HOME/bin"
   - action: copy
     files:
+      - "$TEMPORARY_DIR/delta"
       - "$TEMPORARY_DIR/exa"
       - "$TEMPORARY_DIR/choose"
     to: "$HOME/bin"
@@ -49,9 +42,16 @@ install:
   - action: copy
     file: "$TEMPORARY_DIR/dust"
     to: "$HOME/bin/dust"
+  - action: shell all
+    commands:
+      - "git config --global core.pager delta"
+      - "git config --global delta.line-numbers true"
+      - "git config --global delta.side-by-side false"
+      - "git config --global alias.dsbs \"config --global delta.side-by-side true\""
+      - "git config --global alias.duni \"config --global delta.side-by-side false\""
 uninstall:
   - action: shell
-    command: "sudo apt-get purge -y bat delta duf fd hexyl"
+    command: "sudo apt-get purge -y bat duf fd hexyl"
   - action: shell any
     commands:
       - "git config --global --unset core.pager"

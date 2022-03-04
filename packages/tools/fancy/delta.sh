@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# ARCH=$(arch)
+ARCH=$(arch)
 # if [[ $ARCH == "x86_64" ]]
 # then
 #   ARCH="amd64"
@@ -16,5 +16,15 @@
 #   | sed -E 's/^ "(.*)",?$/\1/' \
 #   | wget -O delta.deb -i -
 
-wget -O delta.deb \
-  http://github.com/dandavison/delta/releases/download/0.4.0/git-delta_0.4.0_amd64.deb
+curl -sL http://api.github.com/repos/dandavison/delta/releases/latest \
+  | grep "delta-" \
+  | grep "${ARCH}" \
+  | grep "unknown-linux-gnu" \
+  | grep ".tar.gz" \
+  | grep "browser_download_url" \
+  | cut -d ":" -f 2,3 \
+  | sed -E 's/^ "(.*)",?$/\1/' \
+  | wget -O delta.tar.gz -i -
+
+tar xvfz delta.tar.gz
+mv -v ./delta-*/delta ./delta
