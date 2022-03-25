@@ -104,7 +104,7 @@ bindkey '^P' fzf-contour-hist-words-widget
 
 # Select one line from Contour history.
 fzf-contour-hist-lines-widget() {
-  local filter_cmd='tr "\n" "\n"'
+  local filter_cmd='tr "\r\n" "\n"'
   __fzf-contour-hist-base ${filter_cmd}
   return $?
 }
