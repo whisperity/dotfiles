@@ -1,5 +1,7 @@
 description: Conqueror of Completion - NodeJS based extension system for
   code completion.
+dependencies:
+  - clangd
 prepare:
   - action: shell
     if:

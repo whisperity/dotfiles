@@ -1,0 +1,9 @@
+description: Installs ClangD (Clang LSP Server) configuration that cannot be
+  configured from the command line...
+install:
+  - action: make dirs
+    dirs:
+      - "$HOME/.config/clangd"
+  - action: copy
+    file: config.yml
+    to: "$HOME/.config/clangd/config.yml"

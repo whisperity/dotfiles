@@ -1,0 +1,10 @@
+Index:
+  # Use background indexing, we mostly work on slow-ish machines, sadly.
+  Background: Build
+InlayHints:
+  # This is a really annoying feature IMHO, so disable it...
+  Enabled: No
+  ParameterNames: No
+  DeducedTypes: No
+Hover:
+  ShowAKA: Yes

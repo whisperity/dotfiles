@@ -9,12 +9,12 @@
   /*   "hintSign": "💡" */
   /* }, */
   "clangd": {
-    "arguments": ["--background-index",
-                  "--clang-tidy",
+    "arguments": ["--clang-tidy",
                   "--completion-style=detailed",
                   "--header-insertion-decorators",
 
-                  "--malloc-trim",
+                  "--enable-config",
+                  "-j=12",
                   "--pch-storage=disk",
 
                   "--log=verbose",

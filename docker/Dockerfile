@@ -152,7 +152,7 @@ RUN export DEBIAN_FRONTEND=noninteractive; \
     if [ ! -z ${INSTALL_CPP} ]; then \
         curl -sL http://deb.nodesource.com/setup_14.x | bash - && \
         apt-get install -y nodejs && \
-        su "${LOCAL_USER}" /bin/bash -c "Dotfiles cmake gdb ninja vim.clang-format vim.coc vim.vimspector" && \
+        su "${LOCAL_USER}" /bin/bash -c "Dotfiles clangd cmake gdb ninja vim.clang-format vim.coc vim.vimspector" && \
         su "${LOCAL_USER}" /bin/bash -c "Dotfiles --uninstall vim.nerdtree vim.syntastic"; \
     fi \
     && \
