@@ -5,5 +5,5 @@ install:
     dirs:
       - "$HOME/.config/clangd"
   - action: copy
-    file: config.yml
-    to: "$HOME/.config/clangd/config.yml"
+    file: config.yaml
+    to: "$HOME/.config/clangd/config.yaml"
