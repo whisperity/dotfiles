@@ -23,3 +23,7 @@ alias wd2path='export PATH="$(pwd):$PATH"'
 # Shortcut for VCS.
 alias s='svn'
 alias g='git'
+
+# Shortcut for turning line-by-line output into term-by-term command-line
+# argument input: find . -name "foo*" | pst
+alias pst='paste -s -d " " -'

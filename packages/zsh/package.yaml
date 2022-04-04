@@ -24,10 +24,8 @@ install:
       - $HOME/.zsh.post.d
   - action: shell
     command: ln -s .oh-my-zsh/custom $HOME/.zsh.d
-  - action: copy
-    files:
-      - bash-aliases.zsh
-    to: $HOME/.zsh.d
+  - action: shell
+    command: ln -s $HOME/.bash_aliases $HOME/.zsh.d/bash_aliases.zsh
   - action: copy tree
     dir: "$TEMPORARY_DIR/zsh-autosuggestions"
     to: "$HOME/.zsh.d/plugins/zsh-autosuggestions"
