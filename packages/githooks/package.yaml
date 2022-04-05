@@ -13,6 +13,8 @@ install:
     command: "$TEMPORARY_DIR/githooks/install.sh --non-interactive --skip-install-into-existing"
   - action: shell
     command: "git hooks update disable"
+  - action: shell
+    command: "git hooks shared add --global http://github.com/whisperity/git-hooks.git"
   - action: make dirs
     dirs:
       - $HOME/.githooks/templates/info
