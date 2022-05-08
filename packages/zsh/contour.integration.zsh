@@ -8,9 +8,9 @@ fi
 local TEMPFILE=$(mktemp --suffix=".zsh")
 chmod +x ${TEMPFILE}
 
-local CONTOUR_WHERE="$(which contour)"
-local CAT_WHERE="$(which cat)"
-local RM_WHERE="$(which rm)"
+local CONTOUR_WHERE="$(whence -p contour)"
+local CAT_WHERE="$(whence -p cat)"
+local RM_WHERE="$(whence -p rm)"
 local OLD_PATH="${PATH}"
 unset PATH
 
