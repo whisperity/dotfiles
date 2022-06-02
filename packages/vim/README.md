@@ -69,12 +69,6 @@ Keybinds
 | `gc`  | Toggle **c**ommenting of selection        |          |
 | `gcc` | Toggle **c**ommenting of **c**urrent line |          |
 
-#### C/C++
-
-| Key   | Action                                   | Comments         |
-|:-----:|:-----------------------------------------|:-----------------|
-| `C-f` | Call `clang-format` on the selected text | **Visual** mode. |
-
 #### Markdown
 
 | Key   | Action                              | Comments |
@@ -90,6 +84,7 @@ Keybinds
 | `,yd` | Jump to **d**efinition                                   |             |
 | `,ye` | Show **e**rrors                                          |             |
 | `,yf` | Symbol **f**inder                                        |             |
+| `,yF` | **F**ormat file, or selected code                        |             |
 | `,yh` | Swutch between **h**eader and source file                | C/C++-only! |
 | `,yH` | Switch between **h**eader and source file _in new split_ | C/C++-only! |
 | `,yi` | System **i**nformation                                   |             |

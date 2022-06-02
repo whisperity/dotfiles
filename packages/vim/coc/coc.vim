@@ -111,6 +111,9 @@ nmap <silent> <LocalLeader>yx <Plug>(coc-fix-current)
 nmap <silent> <LocalLeader>yn <Plug>(coc-diagnostic-next)
 nmap <silent> <LocalLeader>yp <Plug>(coc-diagnostic-prev)
 
+nmap <silent> <LocalLeader>yF  <Plug>(coc-format-selected)
+xmap <silent> <LocalLeader>yF  <Plug>(coc-format-selected)
+
 nmap <silent> <LocalLeader>yi :CocInfo<CR>
 nmap <silent> <LocalLeader>yy :CocRestart<CR>
 
