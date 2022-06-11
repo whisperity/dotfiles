@@ -1,3 +1,3 @@
 # Use epic fonts.
-POWERLEVEL9K_MODE="awesome-fontconfig"
+POWERLEVEL9K_MODE="nerdfont-complete"
 
