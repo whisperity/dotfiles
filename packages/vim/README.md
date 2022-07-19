@@ -71,9 +71,10 @@ Keybinds
 
 #### Markdown
 
-| Key   | Action                              | Comments |
-|:-----:|:------------------------------------|:---------|
-| `C-f` | Format the *table* under the cursor |          |
+| Key   | Action                                          | Comments                        |
+|:-----:|:------------------------------------------------|:--------------------------------|
+| `C-f` | Format the *table* under the cursor             |                                 |
+| `,mm` | Render a preview of the document in the browser | Requires graphical environment. |
 
 #### Code completion ([coc.nvim](http://github.com/neoclide/coc.nvim)): `<LocalLeader>y`
 
