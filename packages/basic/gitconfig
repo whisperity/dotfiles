@@ -57,14 +57,19 @@
 	rp = reset -p
 	cpf = checkout -p --
 
-	# upstream/(master|main) selector
+	# (upstream|origin)/(main|master) selector
 	um = "!um() { \
-		remote_master_branch=$(git branch --list --remote upstream/main); \
+		remote_name=$(git remote | grep -x \"upstream\" 2>/dev/null); \
+		if [ -z \"$remote_name\" ]; \
+		then \
+			remote_name=\"origin\"; \
+		fi; \
+		remote_master_branch=$(git branch --list --remote \"$remote_name/main\"); \
 		if [ ! -z \"$remote_master_branch\" ]; \
 		then \
-			echo "upstream/main"; \
+			echo "$remote_name/main"; \
 		else \
-			echo "upstream/master"; \
+			echo "$remote_name/master"; \
 		fi; \
 		}; um" -
 
