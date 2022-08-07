@@ -27,3 +27,6 @@ alias g='git'
 # Shortcut for turning line-by-line output into term-by-term command-line
 # argument input: find . -name "foo*" | pst
 alias pst='paste -s -d " " -'
+
+# Force XTerm mode in MC. (It's fixed in http://midnight-commander.org/ticket/4396 but it will take a while to appear in distributions...)
+alias mc='mc --xterm'
