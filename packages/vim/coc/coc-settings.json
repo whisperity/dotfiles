@@ -2,12 +2,16 @@
   "codeLens": {
     "enable": true
   },
-  /* "diagnostic": { */
-  /*   "errorSign": "⛔️", */
-  /*   "warningSign": "⚠️", */
-  /*   "infoSign": "ℹ️", */
-  /*   "hintSign": "💡" */
-  /* }, */
+  "diagnostic": {
+    "messageTarget": "float",
+    "virtualText": true,
+    "virtualTextCurrentLineOnly": true,
+    "virtualTextLevel": "warning",
+    "errorSign": "⛔️",
+    "warningSign": "⚠️",
+    "infoSign": "ℹ️",
+    "hintSign": "💡"
+  },
   "clangd": {
     "arguments": ["--clang-tidy",
                   "--completion-style=detailed",
@@ -59,6 +63,7 @@
     "filetypes": ["*"]
   },
   "suggest": {
-    "enablePreview": true
-  }
+    "enablePreview": true,
+    "virtualText": true
+  },
 }
