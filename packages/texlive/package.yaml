@@ -34,6 +34,10 @@ install:
   - action: copy
     file: texlive.zsh
     to: "$HOME/.zsh.post.d/tex-live.zsh"
+  # A few packages need to be installed separately as they are not part of the default install profile configured.
+  - action: shell
+    command: "bash -c 'source $HOME/.bash.d/tex-live.sh; tlmgr install babel-english babel-hungarian glossaries-english glossaries-magyar latexmk texliveonfly'"
+
 uninstall:
   - action: remove tree
     dir: $HOME/opt/texlive
