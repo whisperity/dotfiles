@@ -14,11 +14,8 @@ install:
     file: config.zsh
     to: $HOME/.zsh.pre.d/fzf.zsh
   - action: copy
-    file: fzf-contour.zsh
-    to: $HOME/.zsh.d/fzf-contour.zsh
-  - action: copy
-    file: fzf-git.zsh
-    to: $HOME/.zsh.d/fzf-git.zsh
-  - action: copy
-    file: fzf-tmux.zsh
-    to: $HOME/.zsh.d/fzf-tmux.zsh
+    files:
+      - fzf-contour.zsh
+      - fzf-git.zsh
+      - fzf-tmux.zsh
+    to: "$HOME/.zsh.d"

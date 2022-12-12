@@ -1,11 +1,11 @@
 description: Installs ccache, the compiler result cacher
 install:
   - action: shell
-    if:
+    $if:
       - superuser
     command: "sudo apt-get install -y --no-install-recommends ccache"
   - action: shell any
-    if not:
+    $if not:
       - superuser
     commands:
       - "which ccache 1>/dev/null 2>/dev/null"

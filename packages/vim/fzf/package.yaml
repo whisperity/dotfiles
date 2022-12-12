@@ -2,11 +2,11 @@ description: Fuzzy-finder (fzf) for Vim. Also allows searching in file contents
   with The Silver Searcher.
 install:
   - action: shell
-    if:
+    $if:
       - superuser
     command: "sudo apt-get install -y --no-install-recommends silversearcher-ag"
   - action: shell any
-    if not:
+    $if not:
       - superuser
     commands:
       - "which ag 1>/dev/null 2>/dev/null"

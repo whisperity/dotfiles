@@ -20,8 +20,13 @@ install:
   - action: copy tree
     dir: $TEMPORARY_DIR/cmake
     to: $HOME/opt/cmake
-  - action: shell
-    command: "cd $HOME/bin; ln -s ../opt/cmake/bin/* ."
-uninstall:
-  - action: shell
-    command: "cd $HOME/bin; for sl in $(ls ../opt/cmake/bin); do rm -f ${sl}; done"
+  - action: symlink
+    from: $HOME/opt/cmake/bin
+    files:
+      - ccmake
+      - cmake
+      - cmake-gui
+      - cpack
+      - ctest
+    to: $HOME/bin
+    relative: true

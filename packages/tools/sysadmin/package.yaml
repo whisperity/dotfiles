@@ -1,6 +1,7 @@
 description: Installs some common and most wanted system administration and maintenance
   tools.
-superuser: true
+if:
+  - superuser
 install:
   - action: shell
     command: "sudo apt-get install -y --no-install-recommends aptitude finger iotop lynx smartmontools traceroute"

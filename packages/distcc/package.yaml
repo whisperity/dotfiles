@@ -1,5 +1,6 @@
 description: Installs distcc, the distributed C family compiler system
-superuser: true
+if:
+  - superuser
 dependencies:
   - ccache
 install:

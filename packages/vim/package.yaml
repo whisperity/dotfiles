@@ -8,11 +8,18 @@ install:
       - "$HOME/.config"
       - "$HOME/.zsh.post.d"
       - "$HOME/.vim"
-  - action: shell all
-    commands:
-      - "ln -s ../.vim $HOME/.config/nvim"
-      - "ln -s ../../.vim $HOME/.local/share/nvim"
-      - "ln -s .vim/init.vim $HOME/.vimrc"
+  - action: symlink
+    file: "$HOME/.vim"
+    to: "$HOME/.config/nvim"
+    relative: true
+  - action: symlink
+    file: "$HOME/.vim"
+    to: "$HOME/.local/share/nvim"
+    relative: true
+  - action: symlink
+    file: "$HOME/.vim/init.vim"
+    to: "$HOME/.vimrc"
+    relative: true
   - action: copy
     file: aliases.sh
     to: "$HOME/.bash.d/vim.sh"
@@ -39,9 +46,13 @@ install:
       - default-themes.vim
     to: "$HOME/.vim/config"
     prefix: "00-"
-  - action: shell all
-    commands:
-      - "cat local-plugins.vim > $HOME/.vim/config/zzzzzz_local-plugins.vim"
-      - "cat local-themes.vim  > $HOME/.vim/config/zzzzzz_local-themes.vim"
+  - action: copy
+    files:
+      - local-plugins.vim
+      - local-themes.vim
+    to: "$HOME/.vim/config"
+    prefix: "zzzzzz_"
+    $transform:
+      copies as symlinks: false
   - action: shell
     command: "python3 -m pip install --user neovim-remote pynvim"
