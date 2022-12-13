@@ -18,4 +18,4 @@ install:
       - fzf-contour.zsh
       - fzf-git.zsh
       - fzf-tmux.zsh
-    to: "$HOME/.zsh.d"
+    to: "$HOME/.oh-my-zsh/custom"
