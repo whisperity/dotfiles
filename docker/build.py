@@ -102,11 +102,14 @@ with open("build.sh", "w") as handle:
     print("""#!/bin/bash
 echo "Building Docker image..."
 {0}
+EXIT_CODE=$?
 
-if [[ $? -eq 0 ]]
+if [[ $EXIT_CODE -eq 0 ]]
 then
     rm build.sh
 fi
+
+exit $EXIT_CODE
 """.format(" ".join(command)), file=handle)
 
 os.chmod("build.sh", 0o755)
