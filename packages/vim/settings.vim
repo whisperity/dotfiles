@@ -75,6 +75,10 @@ set confirm
 
 " Enable use of the mouse for all modes
 set mouse=a
+" Just simply do not use the Right-click menu idiocity...
+if has('nvim')
+  set mousemodel=extend
+endif
 
 " Set the command window height to 2 lines, to avoid many cases of having
 " to "press <Enter> to continue"
@@ -94,7 +98,7 @@ set showmatch
 set matchpairs+=<:>
 
 " Ignore compiled files
-set wildignore=*.o,*~,*.pyc
+set wildignore=*.o,*.out,*.so,*~,*.pyc
 
 " Show surrounding whitespaces.
 set list

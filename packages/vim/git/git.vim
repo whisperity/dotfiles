@@ -26,3 +26,8 @@ Plug 'rhysd/git-messenger.vim'
 " let g:blamer_relative_time = 0
 "
 " nmap <silent> <LocalLeader>gm :BlamerToggle<CR>
+
+
+
+" Merge conflict handling.
+Plug 'rhysd/conflict-marker.vim'
