@@ -84,6 +84,10 @@ local_user = read_value("Username", str, "username")
 git_user = read_value("Git user.name", str, local_user)
 git_email = read_value("Git user.email", str,
                        "{}@localhost".format(local_user))
+use_symlinks = "--X-copies-as-symlinks" \
+    if read_value("Set up {}'s dot-files with symbolic links"
+                  .format(local_user), bool, True) \
+    else ''
 
 command = ["docker", "build", ".", "-t", image,
            "--build-arg=INSTALL_CPP=YES" if install_cpp else "",
@@ -91,6 +95,8 @@ command = ["docker", "build", ".", "-t", image,
            "--build-arg=LOCAL_USER={}".format(local_user),
            "--build-arg=GIT_USERNAME={}".format(git_user),
            "--build-arg=GIT_EMAIL={}".format(git_email),
+           "--build-arg=DOTFILES_USE_SYMLINKS_INSTEAD_OF_COPIES={}"
+           .format(use_symlinks),
            "--build-arg=__CACHEBREAKER__NEOVIM={}".format(neovim_sha),
            "--build-arg=__CACHEBREAKER__DOTFILES_FRAMEWORK={}".format(
                dotfiles_manager_sha),

@@ -140,19 +140,20 @@ RUN chmod 0700 /home/${LOCAL_USER}/.config/Dotfiles/sources.yaml
 ENV PATH="/home/${LOCAL_USER}/bin:${PATH}"
 ARG GIT_USERNAME="Git User"
 ARG GIT_EMAIL="git-user@localhost"
+ARG DOTFILES_USE_SYMLINKS_INSTEAD_OF_COPIES
 ARG __CACHEBREAKER__DOTFILES
 RUN export DEBIAN_FRONTEND=noninteractive; \
     apt-get update && \
-    su "${LOCAL_USER}" /bin/bash -c 'echo -e "${GIT_USERNAME}\n${GIT_EMAIL}\n" | Dotfiles basic' && \
-    su "${LOCAL_USER}" /bin/bash -c 'Dotfiles direnv envprobe githooks tools.fancy vim vim.airline vim.comments vim.focus vim.fzf vim.git vim.markdown vim.nerdtree vim.polyglot vim.rainbow vim.surround vim.syntastic vim.undo zsh.__ALL__' && \
+    su "${LOCAL_USER}" /bin/bash -c 'echo -e "${GIT_USERNAME}\n${GIT_EMAIL}\n" | Dotfiles ${DOTFILES_USE_SYMLINKS_INSTEAD_OF_COPIES} basic' && \
+    su "${LOCAL_USER}" /bin/bash -c 'Dotfiles ${DOTFILES_USE_SYMLINKS_INSTEAD_OF_COPIES} direnv envprobe githooks tools.fancy vim vim.airline vim.comments vim.focus vim.fzf vim.git vim.markdown vim.nerdtree vim.polyglot vim.rainbow vim.surround vim.syntastic vim.undo zsh.__ALL__' && \
     if [ ! -z ${INSTALL_TEX} ]; then \
-        su "${LOCAL_USER}" /bin/bash -c "Dotfiles texlive vim.tex" && \
+        su "${LOCAL_USER}" /bin/bash -c "Dotfiles ${DOTFILES_USE_SYMLINKS_INSTEAD_OF_COPIES} texlive vim.tex" && \
         su "${LOCAL_USER}" /bin/bash -c "Dotfiles --uninstall vim.syntastic"; \
     fi && \
     if [ ! -z ${INSTALL_CPP} ]; then \
         curl -sL http://deb.nodesource.com/setup_14.x | bash - && \
         apt-get install -y nodejs && \
-        su "${LOCAL_USER}" /bin/bash -c "Dotfiles clangd cmake gdb ninja vim.coc vim.vimspector" && \
+        su "${LOCAL_USER}" /bin/bash -c "Dotfiles ${DOTFILES_USE_SYMLINKS_INSTEAD_OF_COPIES} clangd cmake gdb ninja vim.coc vim.vimspector" && \
         su "${LOCAL_USER}" /bin/bash -c "Dotfiles --uninstall vim.nerdtree vim.syntastic"; \
     fi \
     && \

@@ -21,6 +21,14 @@ install:
   - action: copy
     file: exclude
     to: "$HOME/.githooks/templates/info/exclude"
+    $transform:
+      # Using the original template as a symbolic link will break other
+      # installers that fetch Git repositories because of ordering problems.
+      #
+      # In general, the local(!) exclude is always project-specific, so it is
+      # no use to version it globally, the shipped exclude file is just a
+      # good enough initial template.
+      copies as symlinks: false
 uninstall:
   - action: shell
     command: "$HOME/.githooks/bin/githooks uninstall --global"

@@ -24,7 +24,7 @@ jobs:
         run: |
           set -x
           cd docker
-          echo -e "\nY\nN\ngithub-actions\n\n" | ./build.py
+          echo -e "dotfiles-test\nY\nN\ngithub-actions\ngithub\ngithub@localhost\nY\n" | ./build.py
           cat build.sh
       - name: Build the Docker image
         run: |
