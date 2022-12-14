@@ -11,11 +11,11 @@ prepare:
     path: texlive.profile
 install:
   - action: shell
-    if:
+    $if:
       - superuser
     command: "sudo apt-get install -y --no-install-recommends python3-pygments"
   - action: print
-    if not:
+    $if not:
       - superuser
     text: "echo texlive: Syntax highlighting with Minted needs the Python library Pygments!"
 

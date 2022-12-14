@@ -1,6 +1,7 @@
 description: Installs some fancy utilities that make Shell-usage experience
   better and quicker.
-superuser: true
+if:
+  - superuser
 prepare:
   - action: shell all
     commands:
@@ -25,10 +26,12 @@ install:
       - "$HOME/.zsh.post.d"
       - "$HOME/bin"
   - action: copy
+    from: $TEMPORARY_DIR
     files:
-      - "$TEMPORARY_DIR/delta"
-      - "$TEMPORARY_DIR/exa"
-      - "$TEMPORARY_DIR/choose"
+      - delta
+      - dust
+      - exa
+      - choose
     to: "$HOME/bin"
   - action: copy
     file: exa_aliases-override.sh
@@ -39,9 +42,6 @@ install:
   - action: copy
     file: fd.plugin.zsh
     to: "$HOME/.zsh.post.d/fd.plugin.zsh"
-  - action: copy
-    file: "$TEMPORARY_DIR/dust"
-    to: "$HOME/bin/dust"
   - action: shell all
     commands:
       - "git config --global core.pager delta"

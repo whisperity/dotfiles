@@ -4,16 +4,16 @@ dependencies:
   - clangd
 prepare:
   - action: shell
-    if:
+    $if:
       - superuser
     command: "wget -O nodejs.sh http://deb.nodesource.com/setup_12.x"
 install:
   - action: shell
-    if:
+    $if:
       - superuser
     command: "sudo -E bash \"$TEMPORARY_DIR/nodejs.sh\""
   - action: shell all
-    if not:
+    $if not:
       - superuser
     commands:
       - "echo \"vim.coc: The 'vim.coc' plugin cannot start if NodeJS isn't installed. Checking...\""
@@ -23,11 +23,10 @@ install:
     dirs:
       - "$HOME/.vim/coc.nvim"
   - action: copy
-    file: coc.vim
-    to: "$HOME/.vim/config/coc.vim"
-  - action: copy
-    file: coc-settings.json
-    to: "$HOME/.vim/config/coc-settings.json"
+    files:
+      - coc.vim
+      - coc-settings.json
+    to: "$HOME/.vim/config"
 uninstall:
   - action: shell
     command: "rm -r $HOME/.vim/coc.nvim"

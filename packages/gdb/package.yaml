@@ -10,5 +10,5 @@ install:
     dirs:
       - "$HOME/.gdbinit.d"
   - action: copy
-    file: "$PACKAGE_DIR/layout"
+    file: layout
     to: "$HOME/.gdbinit.d/layout"

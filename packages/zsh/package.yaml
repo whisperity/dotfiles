@@ -22,10 +22,14 @@ install:
     dirs:
       - $HOME/.zsh.pre.d
       - $HOME/.zsh.post.d
-  - action: shell
-    command: ln -s .oh-my-zsh/custom $HOME/.zsh.d
-  - action: shell
-    command: ln -s $HOME/.bash_aliases $HOME/.zsh.d/bash_aliases.zsh
+  - action: symlink
+    file: "$HOME/.oh-my-zsh/custom"
+    to: "$HOME/.zsh.d"
+    relative: true
+  - action: symlink
+    file: "$HOME/.bash_aliases"
+    to: "$HOME/.oh-my-zsh/custom/bash_aliases.zsh"
+    relative: true
   - action: copy tree
     dir: "$TEMPORARY_DIR/zsh-autosuggestions"
     to: "$HOME/.zsh.d/plugins/zsh-autosuggestions"
@@ -46,7 +50,3 @@ uninstall:
     commands:
       - chmod +x "$HOME/.oh-my-zsh/tools/uninstall.sh"
       - bash -c 'echo "y" | $HOME/.oh-my-zsh/tools/uninstall.sh'
-  - action: shell all
-    commands:
-      - rm $HOME/.zsh.d
-      - rm -rf $HOME/.oh-my-zsh
