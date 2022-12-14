@@ -56,11 +56,13 @@ Keybinds
 
 ### Version control ([fugitive](http://github.com/tpope/vim-fugitive)): `<LocalLeader>g`
 
-| Key   | Action                                          | Comments |
-|:-----:|:------------------------------------------------|:---------|
-| `,gg` | Show the Fugitive status and management window  |          |
-| `,gb` | Show the `git blame` view of the current buffer |          |
-| `,gm` | Show the commit which changed the current line  |          |
+| Key   | Action                                          | Comments                                                                         |
+|:-----:|:------------------------------------------------|:---------------------------------------------------------------------------------|
+| `,gg` | Show the Fugitive status and management window  |                                                                                  |
+| `,gb` | Show the `git blame` view of the current buffer |                                                                                  |
+| `,gm` | Show the commit which changed the current line  |                                                                                  |
+| `]x`  | Go to next conflicting hunk                     | If file contains [conflict markers](http://github.com/rhysd/conflict-marker.vim) |
+| `[x`  | Go to next conflicting hunk                     | If file contains [conflict markers](http://github.com/rhysd/conflict-marker.vim) |
 
 ### Programming
 

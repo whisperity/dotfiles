@@ -21,5 +21,6 @@ let g:airline_exclude_preview = 1
 Plug 'lambdalisue/battery.vim'
 
 let g:airline#extensions#battery#enabled = 1
-let g:battery#symbol_charging = '⏼'
+" let g:battery#symbol_charging = '⏼'
+let g:battery#symbol_charging = '⏻'
 let g:battery#symbol_discharging = '⏚'

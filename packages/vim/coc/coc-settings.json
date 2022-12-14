@@ -28,11 +28,16 @@
     "icon": {
       "enableNerdfont": true,
       "source": "vim-devicons"
+    },
+    "file": {
+      "reveal": {
+        "whenOpen": true
+      }
     }
   },
   "rpc": {
-    /* "buttonEnabled": true, */
-    /* "buttonActiveLabel": "View Repository", */
+    "buttonEnabled": false,
+    "buttonActiveLabel": "View Project",
     /* "buttonInactiveLabel": null, */
     /* "buttonInactiveUrl": null, */
     /* "checkIdle": true, */
@@ -51,12 +56,13 @@
     "lowerDetailsEditing": "{file_name}@{current_line} (/{total_lines})",
     "lowerDetailsIdle": "{empty}",
     "lowerDetailsInExplorer": "{empty}",
-    "lowerDetailsNotFound": "Out-of-bounds",
+    "lowerDetailsNotFound": "Out-of-Bounds",
     "lowerDetailsViewing": "{file_name} ({total_lines} LoC)",
     "problemsText": "- {count} diagnostics",
     /* "showProblems": true, */
     "smallImage": "{app_name}",
     "suppressNotifications": false,
+    "useCWDAsFallback": false,
     "workspaceElapsedTime": true
   },
   "semanticTokens": {

@@ -11,7 +11,7 @@ install:
     dir: $TEMPORARY_DIR/powerlevel10k
     to: $HOME/.zsh.d/themes/powerlevel10k
   - action: replace
-    at: $HOME/.zsh.d/config.theme.zsh
+    at: $HOME/.oh-my-zsh/custom/config.theme.zsh
     with file: config.theme.zsh
   - action: copy
     file: powerlevel10k_mode.zsh
