@@ -1,9 +1,12 @@
-description: This package sets up a Python virtual environment to be used by
-  other installers who need some custom tools *for the installation* to be
-  available.
-dependencies:
-  - python.virtualenv
+description: This package sets up a Python virtual environment (venv) to be
+  used by other installers who need some custom tools *for the installation*
+  to be available.
 support: true
 install:
   - action: shell
-    command: "$HOME/opt/virtualenv/virtualenv_s.py --python $(which python3) $SESSION_DIR/dotfiles-venv"
+    $if:
+      - superuser
+    command: "sudo apt-get install -y --no-install-recommends python3-venv"
+
+  - action: shell
+    command: "$PACKAGE_DIR/virtualenv.sh \"$SESSION_DIR/dotfiles-venv\" --prompt \"[[Dotfiles (session)]]\""
