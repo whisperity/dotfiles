@@ -1,11 +1,18 @@
-description: Installs distcc, the distributed C family compiler system
-if:
-  - superuser
+description: Installs tooling for distcc, the distributed C family compiler system
 dependencies:
   - ccache
 install:
   - action: shell
+    $if:
+      - superuser
     command: "sudo apt-get install -y --no-install-recommends distcc distccmon-gnome"
+  - action: shell any
+    $if not:
+      - superuser
+    commands:
+      - "which distcc 1>/dev/null 2>/dev/null"
+      - "echo distcc: Hooks will be installed, but no 'distcc' binary on system."
+
   - action: make dirs
     dirs:
       - $HOME/.bash.d

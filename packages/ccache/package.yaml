@@ -1,4 +1,4 @@
-description: Installs ccache, the compiler result cacher
+description: Installs tooling for ccache, the compiler result cacher
 install:
   - action: shell
     $if:
