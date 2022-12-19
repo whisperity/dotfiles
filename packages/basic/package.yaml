@@ -13,6 +13,7 @@ install:
   - action: make dirs
     dirs:
       - $HOME/.bash.d
+      - $HOME/.profile.d
       - $HOME/.zsh.pre.d
       - $HOME/.zsh.post.d
   - action: replace

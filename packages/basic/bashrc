@@ -227,10 +227,11 @@ fi
 # Load additional tools maybe installed by the user.
 if [ -d ~/.bash.d ]; then
   for e in ~/.bash.d/*; do
-    if [ -f $e ]; then
+    if [ -f "$e" -a -r "$e" ]; then
       . $e
     fi
   done
+  unset e
 fi
 
 # enable programmable completion features (you don't need to enable

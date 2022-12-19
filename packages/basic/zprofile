@@ -6,6 +6,15 @@ if [ -f "$HOME/.ssh/.ephemeral-rcprofile" ]; then
     rm $HOME/.ssh/.ephemeral-rcprofile
 fi
 
+if [ -d "$HOME/.profile.d" ]; then
+  for e in $HOME/.profile.d/*; do
+    if [ -f "$e" -a -r "$e" ]; then
+      . $e
+    fi
+  done
+  unset e
+fi
+
 # For comaptibility, load the Bash aliases too!
 if [ -f ~/.bash_aliases ]; then
   source ~/.bash_aliases

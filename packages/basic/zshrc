@@ -21,10 +21,11 @@ fi
 setopt +o nomatch
 if [[ -d ~/.zsh.pre.d ]]; then
   for e in ~/.zsh.pre.d/*; do
-    if [[ -f "$e" ]]; then
+    if [[ -r "$e" ]]; then
       source $e
     fi
   done
+  unset e
 fi
 setopt -o nomatch
 
@@ -152,10 +153,11 @@ SAVEHIST=$HISTSIZE
 setopt +o nomatch
 if [[ -d ~/.zsh.post.d ]]; then
   for e in ~/.zsh.post.d/*; do
-    if [[ -f "$e" ]]; then
+    if [[ -f "$e" && -r "$e" ]]; then
       source $e
     fi
   done
+  unset e
 fi
 setopt -o nomatch
 
