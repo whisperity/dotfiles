@@ -12,12 +12,12 @@ install:
     $if:
       - superuser
     command: "sudo -E bash \"$TEMPORARY_DIR/nodejs.sh\""
-  - action: shell all
+  - action: shell any
     $if not:
       - superuser
     commands:
-      - "echo \"vim.coc: The 'vim.coc' plugin cannot start if NodeJS isn't installed. Checking...\""
       - "which node 1>/dev/null 2>/dev/null"
+      - "echo \"vim.coc: NodeJS is not installed. 'vim.coc' will not be able to start if you do not install it from a recent enough source!\""
 
   - action: make dirs
     dirs:
