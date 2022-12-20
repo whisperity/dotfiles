@@ -1,12 +1,14 @@
 docker stop distcc-worker
 docker rm distcc-worker
 
-# Allow 4G mount under /tmp.
+MEMORY=$(expr $(expr $(free -g | head -n 2 | tail -n 1 | awk '{print $2;}') + 1) / 2)
+echo "Spawned image will use ${MEMORY} GiB of /tmp for execution..."
+
 docker run \
 	--name distcc-worker \
 	-d \
-	-p 15166:3632 \
+	-p 3632:3632 \
 	--restart unless-stopped \
-	--mount type=tmpfs,destination=/tmp,tmpfs-size=4294967295,tmpfs-mode=1770 \
+	--mount type=tmpfs,destination=/tmp,tmpfs-size=${MEMORY}G,tmpfs-mode=1770 \
 	distcc \
-		-j 12
+		-j $(expr $(nproc) - 2)
