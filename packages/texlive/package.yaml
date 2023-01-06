@@ -3,7 +3,7 @@ description: Install the TeXLive (La)TeX typesetting environment's latest
 prepare:
   - action: shell all
     commands:
-      - "wget http://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz"
+      - "wget https://mirror.easyname.at/ctan/systems/texlive/tlnet/install-tl-unx.tar.gz"
       - "tar xvfz install-tl-unx.tar.gz"
       - "rm install-tl-unx.tar.gz"
       - "mv install-tl-* install-tl"
@@ -27,7 +27,7 @@ install:
       - $HOME/.zsh.post.d
       - $HOME/opt
   - action: shell
-    command: "$TEMPORARY_DIR/install-tl/install-tl --profile=$TEMPORARY_DIR/texlive.profile"
+    command: "$TEMPORARY_DIR/install-tl/install-tl --repository=\"https://mirror.easyname.at/ctan/systems/texlive/tlnet/\" --profile=$TEMPORARY_DIR/texlive.profile"
   - action: copy
     file: texlive.sh
     to: "$HOME/.bash.d/tex-live.sh"

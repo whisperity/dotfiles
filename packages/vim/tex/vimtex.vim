@@ -9,9 +9,9 @@ Plug 'lervag/vimtex', { 'for': [
 let g:tex_flavor = 'latex'
 
 " Use XeLaTeX or LuaLaTeX as the engine.
-let g:vimtex_compiler_latexmk_engines = {
-    \ '_'                : '-xelatex',
-    \}
+" let g:vimtex_compiler_latexmk_engines = {
+"     \ '_'                : '-xelatex',
+"     \}
 
 
 " Allow -shell-escape to be passed, e.g. for "minted" highlighting.
