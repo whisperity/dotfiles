@@ -259,6 +259,7 @@ autocmd VimEnter * if len(filter(values(g:plugs), '!isdirectory(v:val.dir)'))
 
 " Start loading the packages with VimPlug!
 call plug#begin('~/.vim/bundle')
+autocmd! User PlugPostSetup
 
 " Load configuration files and install directives for plugins.
 for f in split(glob('~/.vim/config/*.vim'), '\n')
@@ -275,4 +276,15 @@ Plug 'ryanoasis/vim-devicons'
 
 
 " Initialize plugin system.
+" This is the call that actually starts downloading the plugins and hits the
+" load calls...
 call plug#end()
+
+" Execute the post-load hooks for every plugin.
+" We are rolling a custom implementation here because VimPlug, by itself, only
+" offers the hook if Vim-Plug is loading something on-demand, which means it
+" is not usable for always-loaded (or by-VimPlug-not-loadable, e.g.,
+" Lua-based) plugins...
+"
+" See http://github.com/junegunn/vim-plug/issues/1134
+doautoall <nomodeline> User PlugPostSetup

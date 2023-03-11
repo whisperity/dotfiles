@@ -84,7 +84,7 @@ let g:startify_update_oldfiles = 1
 let workspaceSessionPath = expand($HOME . "/.vim/session/")
 silent execute '!mkdir -p ' . workspaceSessionPath
 
-set sessionoptions=buffers,curdir,folds,localoptions,options,tabpages,winpos,winsize
+set sessionoptions=buffers,curdir,folds,localoptions,options,tabpages
 
 " Settings for Startify's session handling.
 let g:startify_session_autoload = 1
@@ -92,11 +92,16 @@ let g:startify_session_dir = workspaceSessionPath
 " let g:startify_session_keep_options = 1
 let g:startify_session_persistence = 1
 let g:startify_session_sort = 0
+let g:startify_session_remove_lines = []
+let g:startify_session_savecmds = [
+      \ "set cmdheight=2"
+      \ ]
 
 " vim-context has to be disabled so the saved buffers don't get messed up.
 let g:startify_session_before_save = [
       \ "ContextDisable"
       \ ]
+
 
 " (Needed dependency for fetching Git branch information.)
 Plug 'itchyny/vim-gitbranch'
