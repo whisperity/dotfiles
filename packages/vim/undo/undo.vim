@@ -1,7 +1,7 @@
 " UndoTREE
 Plug 'mbbill/undotree', { 'on': 'UndotreeToggle' }
 
-nmap <C-c><C-u> :UndotreeToggle<cr>
+nnoremap <silent> <C-c><C-u> :UndotreeToggle<cr>
 
 
 " Style 2

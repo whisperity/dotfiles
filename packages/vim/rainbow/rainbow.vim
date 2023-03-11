@@ -40,4 +40,4 @@ let g:rainbow_conf = {
 
 let g:rainbow_active = 1
 
-nmap <C-c><C-r> :RainbowToggle<CR>
+nnoremap <silent> <C-c><C-r> :RainbowToggle<CR>

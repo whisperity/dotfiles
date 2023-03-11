@@ -47,10 +47,8 @@ if has('nvim')
     call add(g:startify_session_remove_lines, "set winheight")
     call add(g:startify_session_remove_lines, "set winwidth")
 
-
     " Reset the size of the windows when exiting, so the reload of the session
     " does not cause errors.
-    call add(g:startify_session_before_save, "FocusEqualise")
     call add(g:startify_session_before_save, "FocusDisable")
   endfunction
 
@@ -63,4 +61,6 @@ if has('nvim')
     " unfortunately.
     autocmd User PlugPostSetup call s:loadFocusNvim()
   augroup END
+
+  nnoremap <silent> <C-c><C-b> :FocusToggle<CR>
 endif

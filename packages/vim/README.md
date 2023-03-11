@@ -34,17 +34,18 @@ Keybinds
 ### Vim _c_onfiguration (`C-c`)
 
 
-| Key       | Action                                                                       | Comments                                                  |
-|:---------:|:-----------------------------------------------------------------------------|:----------------------------------------------------------|
-| `C-c C-c` | Exit _Terminal_ mode and return to Normal                                    | Neovim-only!                                              |
-| `C-c C-f` | Toggle **f**olding                                                           |                                                           |
-| `C-c C-g` | Toggle **G**oyo mode - centred total focus                                   | [goyo.vim](http://github.com/junegunn/goyo.vim)           |
-| `C-c C-l` | Toggle **l**imelight - darken out everything except currently edited context | [limelight.vim](http://github.com/junegunn/limelight.vim) |
-| `C-c C-p` | Toggle **p**aste-mode                                                        |                                                           |
-| `C-c C-r` | Toggle **r**ainbow highlight of brackets                                     |                                                           |
-| `C-c C-u` | Toggle **u**ndo history                                                      |                                                           |
-| `C-c C-v` | Toggle **v**isual location (crosshair)                                       |                                                           |
-| `C-c C-y` | Toggle conceal                                                               |                                                           |
+| Key       | Action                                                                       | Comments                                                             |
+|:---------:|:-----------------------------------------------------------------------------|:---------------------------------------------------------------------|
+| `C-c C-b` | Toggle automatic focus **b**alance of splits                                 | Neovim-only! [focus.nvim](http://github.com/beauwilliams/focus.nvim) |
+| `C-c C-c` | Exit _Terminal_ mode and return to Normal mode                               | Neovim-only!                                                         |
+| `C-c C-f` | Toggle **f**olding                                                           |                                                                      |
+| `C-c C-g` | Toggle **G**oyo mode - centred total focus                                   | [goyo.vim](http://github.com/junegunn/goyo.vim)                      |
+| `C-c C-l` | Toggle **l**imelight - darken out everything except currently edited context | [limelight.vim](http://github.com/junegunn/limelight.vim)            |
+| `C-c C-p` | Toggle **p**aste-mode                                                        |                                                                      |
+| `C-c C-r` | Toggle **r**ainbow highlight of brackets                                     |                                                                      |
+| `C-c C-u` | Toggle **u**ndo history                                                      |                                                                      |
+| `C-c C-v` | Toggle **v**isual location (crosshair)                                       |                                                                      |
+| `C-c C-y` | Toggle conceal                                                               |                                                                      |
 
 ### Generic things
 
