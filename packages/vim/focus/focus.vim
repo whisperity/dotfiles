@@ -37,13 +37,16 @@ if has('nvim')
           \ relativenumber = false,
           \ hybridnumber = false,
           \ })
-    call add(g:startify_session_savecmds, "FocusEnable")
+    " Start with resizing focus mode enabled.
+    " execute "FocusEnable"
+    " call add(g:startify_session_savecmds, "FocusEnable")
+
+    " Do not start with resizing focus mode enabled.
+    execute "FocusDisable"
+    call add(g:startify_session_savecmds, "FocusDisable")
 
     " Silence some errors related to calculation when loading a session.
     " focus.nvim will take control over anyway.
-    " call add(g:startify_session_remove_lines, "winheight")
-    " call add(g:startify_session_remove_lines, "winminheight")
-    " call add(g:startify_session_remove_lines, "winminwidth")
     call add(g:startify_session_remove_lines, "set winheight")
     call add(g:startify_session_remove_lines, "set winwidth")
 
