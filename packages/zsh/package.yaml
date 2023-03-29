@@ -12,6 +12,8 @@ prepare:
       - chmod +x install.sh
       - touch $HOME/.zshrc
   - action: git clone
+    repository: "http://github.com/djui/alias-tips"
+  - action: git clone
     repository: "http://github.com/zsh-users/zsh-autosuggestions.git"
   - action: git clone
     repository: "http://github.com/zsh-users/zsh-syntax-highlighting.git"
@@ -31,6 +33,9 @@ install:
     to: "$HOME/.oh-my-zsh/custom/bash_aliases.zsh"
     relative: true
   - action: copy tree
+    dir: "$TEMPORARY_DIR/alias-tips"
+    to: "$HOME/.zsh.d/plugins/alias-tips"
+  - action: copy tree
     dir: "$TEMPORARY_DIR/zsh-autosuggestions"
     to: "$HOME/.zsh.d/plugins/zsh-autosuggestions"
   - action: copy tree
@@ -38,6 +43,7 @@ install:
     to: "$HOME/.zsh.d/plugins/zsh-syntax-highlighting"
   - action: copy
     files:
+      - alias-tips.zsh
       - zsh-autosuggestions.zsh
       - zsh-syntax-highlighting.zsh
     to: $HOME/.zsh.pre.d
