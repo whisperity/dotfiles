@@ -87,6 +87,9 @@ local anchor_files=(
 )
 POWERLEVEL9K_SHORTEN_FOLDER_MARKER="(${(j:|:)anchor_files})"
 
+# These colours are by default set for a dark themed environment.
+# FIXME: Create some colour profiles that are appropriate for light background.
+
 POWERLEVEL9K_HIDE_BRANCH_ICON=true
 POWERLEVEL9K_VCS_BACKENDS=(git svn)
 POWERLEVEL9K_VCS_SHORTEN_LENGTH=16

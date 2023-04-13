@@ -2,10 +2,20 @@
 
 if [[ "$(command -v vim)" != *"darkvim"* && "$(command -v vim)" != *"lightvim"* ]]
 then
-    export VIM_THEME=dark
+    if [[ -z "${VIM_THEME}" || ("${VIM_THEME}" != "dark" && "${VIM_THEME}" != "light") ]]
+    then
+        echo "env/vim: VIM_THEME set to unrecognised \"${VIM_THEME}\", defaulting to \"dark\" instead." >&2
+        export VIM_THEME=dark
+    fi
 
     alias darkvim="VIM_THEME=dark $(command -v vim) "
     alias lightvim="VIM_THEME=light $(command -v vim) "
 
-    alias vim="darkvim"
+    if [[ "${VIM_THEME}" == "dark" ]]
+    then
+        alias vim="darkvim"
+    elif [[ "${VIM_THEME}" == "light" ]]
+    then
+        alias vim="lightvim"
+    fi
 fi
