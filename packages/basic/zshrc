@@ -112,7 +112,7 @@ plugins+=(
   # extract
   fancy-ctrl-z
   git
-  globalias
+  # globalias
   history
   jsontools
   python
