@@ -28,5 +28,9 @@ alias g='git'
 # argument input: find . -name "foo*" | pst
 alias pst='paste -s -d " " -'
 
+# Emit as a single line the common prefix of each lines in the input.
+# (via http://unix.stackexchange.com/a/67121)
+alias common_prefix="sed -e '1{h;d;}' -e 'G;s,\(.*\).*\n\1.*,\1,;h;\$!d' "
+
 # Force XTerm mode in MC. (It's fixed in http://midnight-commander.org/ticket/4396 but it will take a while to appear in distributions...)
 alias mc='mc --xterm'
