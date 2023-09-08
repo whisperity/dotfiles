@@ -27,14 +27,14 @@ RUN echo "deb http://archive.ubuntu.com/ubuntu/ focal main restricted universe m
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-COPY start-distcc.sh /sbin/start-distcc.sh
-COPY cleartemp.sh /etc/cron.hourly/cleartemp
+COPY srv/distcc-server /srv/distcc-server
+COPY etc/cron.hourly/clear-temp /etc/cron.hourly/clear-temp
 
-RUN chmod +x /sbin/start-distcc.sh /sbin/tini && \
-    chmod +x /etc/cron.hourly/cleartemp && \
+RUN chmod +x /srv/distcc-server /sbin/tini && \
+    chmod +x /etc/cron.hourly/clear-temp && \
     touch /var/log/cron.log
 
 # DistCC listens on a TCP socket.
 EXPOSE 3632/tcp
 
-ENTRYPOINT ["/sbin/tini", "--", "/sbin/start-distcc.sh"]
+ENTRYPOINT ["/sbin/tini", "--", "/srv/distcc-server"]

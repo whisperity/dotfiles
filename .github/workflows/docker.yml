@@ -4,7 +4,7 @@ on:
     branches: [master]
     paths:
       - '.github/workflows/docker.yml'
-      - 'docker/**'
+      - 'Docker/**'
       - 'packages/**/package.yaml'
       - 'packages/**/*.z?sh'
       - 'packages/**/*.py'
@@ -23,13 +23,13 @@ jobs:
       - name: Prepare the image build command
         run: |
           set -x
-          cd docker
+          cd Docker
           echo -e "dotfiles-test\nY\nN\ngithub-actions\ngithub\ngithub@localhost\nY\n" | ./build.py
           cat build.sh
       - name: Build the Docker image
         run: |
           set -ex
-          cd docker
+          cd Docker
           ls -alh
           ./build.sh
 

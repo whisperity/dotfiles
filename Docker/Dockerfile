@@ -107,14 +107,14 @@ RUN cd /opt && \
     && \
     cd ./Dotfiles && \
     ./bootstrap.sh
-COPY Dotfiles /usr/local/sbin/Dotfiles
+COPY usr/local/sbin/Dotfiles /usr/local/sbin/Dotfiles
 RUN chmod +x /usr/local/sbin/Dotfiles
 
 # Copy some of the helper stuff into the image too. For example, we might want
 # to be able to observe websites (e.g. rendered documentation HTML) from outside
 # the container.
-COPY start-server.sh /usr/local/sbin/start-webserver
-RUN chmod +x /usr/local/sbin/start-webserver
+COPY usr/local/sbin/http-server /usr/local/sbin/http-server
+RUN chmod +x /usr/local/sbin/http-server
 
 # Create a new user that isn't root, but is able to unconditionally `sudo`.
 ARG LOCAL_USER="username"
@@ -134,8 +134,9 @@ RUN mkdir -p /home/${LOCAL_USER}/.config/Dotfiles && \
     chown -R ${LOCAL_USER}:${LOCAL_USER} /home/${LOCAL_USER}/.config && \
     chmod -R 0700 /home/${LOCAL_USER}/.config
 
-COPY --chown=${LOCAL_USER}:${LOCAL_USER} sources.yaml /home/${LOCAL_USER}/.config/Dotfiles/sources.yaml
-RUN chmod 0700 /home/${LOCAL_USER}/.config/Dotfiles/sources.yaml
+COPY home/user/.config/Dotfiles/sources.yaml /home/${LOCAL_USER}/.config/Dotfiles/sources.yaml
+RUN chown ${LOCAL_USER}:${LOCAL_USER} /home/${LOCAL_USER}/.config/Dotfiles/sources.yaml && \
+    chmod 0700 /home/${LOCAL_USER}/.config/Dotfiles/sources.yaml
 
 ENV PATH="/home/${LOCAL_USER}/bin:${PATH}"
 ARG GIT_USERNAME="Git User"
