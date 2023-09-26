@@ -17,5 +17,5 @@ install:
     file: powerlevel10k_mode.zsh
     to: $HOME/.zsh.pre.d/powerlevel10k_mode.zsh
   - action: copy
-    file: $TEMPORARY_DIR/config.zsh
+    file: $TEMPORARY_DIR/powerlevel10k.zsh
     to: $HOME/.zsh.d/powerlevel10k.zsh

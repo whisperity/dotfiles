@@ -19,18 +19,18 @@ prepare:
     repository: "http://github.com/zsh-users/zsh-syntax-highlighting.git"
 install:
   - action: shell
-    command: sh -c 'ZSH=$HOME/.oh-my-zsh $TEMPORARY_DIR/install.sh --keep-zshrc --unattended'
+    command: sh -c 'ZSH=$HOME/.local/lib/oh-my-zsh $TEMPORARY_DIR/install.sh --keep-zshrc --unattended'
   - action: make dirs
     dirs:
       - $HOME/.zsh.pre.d
       - $HOME/.zsh.post.d
   - action: symlink
-    file: "$HOME/.oh-my-zsh/custom"
+    file: "$HOME/.local/lib/oh-my-zsh/custom"
     to: "$HOME/.zsh.d"
     relative: true
   - action: symlink
     file: "$HOME/.bash_aliases"
-    to: "$HOME/.oh-my-zsh/custom/bash_aliases.zsh"
+    to: "$HOME/.zsh.d/bash_aliases.sh"
     relative: true
   - action: copy tree
     dir: "$TEMPORARY_DIR/alias-tips"
@@ -54,5 +54,5 @@ install:
 uninstall:
   - action: shell all
     commands:
-      - chmod +x "$HOME/.oh-my-zsh/tools/uninstall.sh"
-      - bash -c 'echo "y" | $HOME/.oh-my-zsh/tools/uninstall.sh'
+      - chmod +x "$HOME/.local/lib/oh-my-zsh/tools/uninstall.sh"
+      - bash -c 'echo "y" | $HOME/.local/lib/oh-my-zsh/tools/uninstall.sh'

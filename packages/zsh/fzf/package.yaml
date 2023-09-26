@@ -5,17 +5,18 @@ prepare:
 install:
   - action: copy tree
     dir: $TEMPORARY_DIR/fzf
-    to: $HOME/.zsh.d/fzf-dir
+    to: $HOME/.zsh.d/fzf
   - action: shell
-    # Making FZF install the hook into a temporary directory eliminated by
-    # Dotfiles at the end, as we will be using Oh-My-ZSH's FZF plugin to hook.
-    command: sh -c "XDG_CONFIG_HOME=$TEMPORARY_DIR $HOME/.zsh.d/fzf-dir/install --no-key-bindings --no-completion --no-update-rc --xdg --no-bash --no-fish"
+    # Force FZF's install of the hook into a temporary directory eliminated by
+    # Dotfiles at the end of the process, as the real system will be using
+    # Oh-My-ZSH's FZF plugin to hook its execution.
+    command: sh -c "XDG_CONFIG_HOME=$TEMPORARY_DIR $HOME/.zsh.d/fzf/install --no-key-bindings --no-completion --no-update-rc --xdg --no-bash --no-fish"
   - action: copy
-    file: config.zsh
+    file: fzf.zsh
     to: $HOME/.zsh.pre.d/fzf.zsh
   - action: copy
     files:
       - fzf-contour.zsh
       - fzf-git.zsh
       - fzf-tmux.zsh
-    to: "$HOME/.oh-my-zsh/custom"
+    to: "$HOME/.zsh.d"

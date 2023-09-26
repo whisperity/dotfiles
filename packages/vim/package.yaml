@@ -6,6 +6,8 @@ install:
     dirs:
       - "$HOME/.bash.d"
       - "$HOME/.config"
+      - "$HOME/.local/share"
+      - "$HOME/.local/state"
       - "$HOME/.zsh.post.d"
       - "$HOME/.vim"
   - action: symlink
@@ -15,6 +17,10 @@ install:
   - action: symlink
     file: "$HOME/.vim"
     to: "$HOME/.local/share/nvim"
+    relative: true
+  - action: symlink
+    file: "$HOME/.vim"
+    to: "$HOME/.local/state/nvim"
     relative: true
   - action: symlink
     file: "$HOME/.vim/init.vim"

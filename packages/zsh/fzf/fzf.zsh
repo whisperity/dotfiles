@@ -1,5 +1,5 @@
 # Set fzf installation directory path
-export FZF_BASE=~/.zsh.d/fzf-dir
+export FZF_BASE=~/.zsh.d/fzf
 
 # Uncomment the following line to disable fuzzy completion
 # export DISABLE_FZF_AUTO_COMPLETION="true"

@@ -11,13 +11,13 @@ install:
     dirs:
       - $HOME/.bash.d
       - $HOME/.zsh.post.d
-      - $HOME/opt
+      - $HOME/.local/lib
   - action: copy tree
     dir: $TEMPORARY_DIR/envprobe
-    to: $HOME/opt/envprobe
+    to: $HOME/.local/lib/envprobe
   - action: copy
     file: envprobe.sh
     to: "$HOME/.bash.d/zzzzzz_loadlast_envprobe.sh"
   - action: copy
     file: envprobe.zsh
-    to: "$HOME/.zsh.post.d/zzzzzz_loadlast_envprobe.sh"
+    to: "$HOME/.zsh.post.d/zzzzzz_loadlast_envprobe.zsh"
