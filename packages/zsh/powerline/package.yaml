@@ -3,15 +3,16 @@ prepare:
   - action: git clone
     repository: "http://github.com/romkatv/powerlevel10k.git"
   - action: copy resource
-    path: config.zsh
+    path: powerlevel10k.zsh
 install:
   - action: substitute environment variables
-    file: $TEMPORARY_DIR/config.zsh
+    file: $TEMPORARY_DIR/powerlevel10k.zsh
   - action: copy tree
     dir: $TEMPORARY_DIR/powerlevel10k
     to: $HOME/.zsh.d/themes/powerlevel10k
   - action: replace
-    at: $HOME/.oh-my-zsh/custom/config.theme.zsh
+    # Need to use the full path here so "copies-as-symlinks" works.
+    at: "$HOME/.local/lib/oh-my-zsh/custom/config.theme.zsh"
     with file: config.theme.zsh
   - action: copy
     file: powerlevel10k_mode.zsh

@@ -30,7 +30,8 @@ install:
     relative: true
   - action: symlink
     file: "$HOME/.bash_aliases"
-    to: "$HOME/.zsh.d/bash_aliases.sh"
+    # Need to use the full path here so the relativeness of the symbolic link works.
+    to: "$HOME/.local/lib/oh-my-zsh/custom/00-bash_aliases.sh"
     relative: true
   - action: copy tree
     dir: "$TEMPORARY_DIR/alias-tips"

@@ -19,4 +19,5 @@ install:
       - fzf-contour.zsh
       - fzf-git.zsh
       - fzf-tmux.zsh
-    to: "$HOME/.zsh.d"
+    # Need to use the full path here so "copies-as-symlinks" works.
+    to: "$HOME/.local/lib/oh-my-zsh/custom"
