@@ -12,7 +12,7 @@ let maplocalleader = ","
 if has('nvim')
   tnoremap <C-c><C-c> <C-\><C-n>
 
-  let &shadafile = vimRootPath . "/nvim.shada"
+  let &shadafile = vimRootPath . "/shada/nvim.shada"
 else
   let &viminfofile = vimRootPath . "/viminfo/vim.viminfo"
 endif
