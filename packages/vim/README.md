@@ -27,7 +27,7 @@ Keybinds
 | `C-g`     | Fuzzy find **G**it versioned files          | mirrors Zsh keybind |
 | `C-n`     | Toggle file **n**avigator (explorer)        |                     |
 | `C-t`     | Fuzzy find in file **t**ree                 | mirrors Zsh keybind |
-| `C-x`     | Close buffer                                |                     |
+| `C-c x`   | Close currently focused buffer              |                     |
 | `C-c C-x` | Close old buffers, e.g. files in background |                     |
 | `q:`      | Command history                             |                     |
 

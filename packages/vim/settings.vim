@@ -148,7 +148,7 @@ nnoremap <silent> <Leader>tc :tabclose<CR>
 
 " Close the current buffer.
 command! Bc bp|bd#
-nnoremap <silent> <C-x> :Bc<CR>
+nnoremap <silent> <C-c>x :Bc<CR>
 
 " Destroy all buffers that are not currently visible anywhere and don't
 " contain changes.
