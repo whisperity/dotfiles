@@ -45,3 +45,7 @@ let g:vimtex_syntax_conceal_cites = {
     \ 'type': 'icon',
     \ 'icon': '📖'
     \}
+
+let g:coc_global_extensions = get(g:, 'coc_global_extensions', []) + [
+    \ 'coc-vimtex',
+    \ ]

@@ -1,0 +1,5 @@
+description: Installs Vim packages that are useful for web development
+install:
+  - action: copy
+    file: webdev.vim
+    to: "$HOME/.vim/config/webdev.vim"

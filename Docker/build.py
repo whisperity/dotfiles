@@ -2,6 +2,7 @@
 import json
 import os
 import shlex
+from typing import Type
 import urllib.request
 
 
@@ -53,7 +54,7 @@ def read_bool(prompt, default=None):
                 return False
 
 
-def read_value(prompt, requested_type=str, default=None):
+def read_value(prompt, requested_type: Type=str, default=None):
     while True:
         if requested_type is bool:
             return read_bool(prompt, default)
@@ -80,6 +81,7 @@ dotfiles_sha = get_github_repo_commit("whisperity", "Dotfiles")
 image = read_value("Docker image name", str, "whisperity/dotfiles")
 install_cpp = read_value("Install C++ development tools", bool, False)
 install_tex = read_value("Install LaTeX development tools", bool, False)
+install_web = read_value("Install Web development tools", bool, False)
 local_user = read_value("Username", str, "username")
 git_user = read_value("Git user.name", str, local_user)
 git_email = read_value("Git user.email", str,
@@ -92,6 +94,7 @@ use_symlinks = "--X-copies-as-symlinks" \
 command = ["docker", "build", ".", "-t", image,
            "--build-arg=INSTALL_CPP=YES" if install_cpp else "",
            "--build-arg=INSTALL_TEX=YES" if install_tex else "",
+           "--build-arg=INSTALL_WEB=YES" if install_web else "",
            "--build-arg=LOCAL_USER={}".format(local_user),
            "--build-arg=GIT_USERNAME={}".format(git_user),
            "--build-arg=GIT_EMAIL={}".format(git_email),
