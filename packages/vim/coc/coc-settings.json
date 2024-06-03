@@ -24,6 +24,11 @@
                   "--log=verbose",
                   "--pretty"]
   },
+  "diagnostic-languageserver": {
+    "filetypes": {
+      "sh": "shellcheck"
+    }
+  },
   "explorer": {
     "icon": {
       "enableNerdfont": true,

@@ -9,6 +9,7 @@ let g:coc_data_home = "~/.vim/coc.nvim"
 let g:coc_global_extensions = [
         \ 'coc-clangd',
         \ 'coc-cmake',
+        \ 'coc-diagnostic',
         \ 'coc-explorer',
         \ 'coc-highlight',
         \ 'coc-json',
