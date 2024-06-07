@@ -156,14 +156,13 @@ RUN export DEBIAN_FRONTEND=noninteractive; \
     fi && \
     if [ ! -z ${INSTALL_CPP} ]; then \
         su "${LOCAL_USER}" /bin/bash -c "Dotfiles ${DOTFILES_USE_SYMLINKS_INSTEAD_OF_COPIES} clangd cmake gdb ninja vim.vimspector"; \
-    fi \
+    fi && \
     if [ ! -z ${INSTALL_TEX} ]; then \
         su "${LOCAL_USER}" /bin/bash -c "Dotfiles ${DOTFILES_USE_SYMLINKS_INSTEAD_OF_COPIES} texlive vim.tex"; \
     fi && \
     if [ ! -z ${INSTALL_WEB} ]; then \
         su "${LOCAL_USER}" /bin/bash -c "Dotfiles ${DOTFILES_USE_SYMLINKS_INSTEAD_OF_COPIES} vim.webdev"; \
     fi && \
-    && \
     apt-get autoremove --purge -y && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*

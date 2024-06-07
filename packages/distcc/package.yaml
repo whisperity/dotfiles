@@ -1,6 +1,9 @@
 description: Installs tooling for distcc, the distributed C family compiler system
 dependencies:
   - ccache
+prepare:
+  - action: git clone
+    repository: "http://github.com/whisperity/DistCC-Driver.git"
 install:
   - action: shell
     $if:
@@ -16,7 +19,11 @@ install:
   - action: make dirs
     dirs:
       - $HOME/.bash.d
+      - $HOME/.local/lib
       - $HOME/.zsh.post.d
+  - action: copy tree
+    dir: $TEMPORARY_DIR/DistCC-Driver
+    to: $HOME/.local/lib/distcc-driver
   - action: copy
     file: distcc.sh
     to: "$HOME/.bash.d/distcc.sh"
