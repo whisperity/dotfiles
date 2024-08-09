@@ -29,13 +29,17 @@ if has('nvim')
   function! s:loadFocusNvim()
     " Leave everything related to the inner look of the splits as is!
     lua require("focus").setup({
-          \ colorcolumn = { enable = false },
-          \ cursorline = false,
-          \ cursorcolumn = false,
-          \ signcolumn = false,
-          \ number = false,
-          \ relativenumber = false,
-          \ hybridnumber = false,
+          \ ui = {
+            \ number = false,
+            \ relativenumber = false,
+            \ hybridnumber = false,
+            \ colorcolumn = {
+              \ enable = false
+              \ },
+            \ cursorline = false,
+            \ cursorcolumn = false,
+            \ signcolumn = false,
+            \ }
           \ })
     " Start with resizing focus mode enabled.
     " execute "FocusEnable"
@@ -57,7 +61,7 @@ if has('nvim')
 
   augroup Load__FocusNVim
     autocmd!
-    " When this file (focus.vim) is 'source'd the Lua stuff is not available
+    " When this file (focus.vim) is 'source'd, the Lua stuff is not available
     " yet, so calling require("focus") here would make the system explode.
     " Instead, register a hook that will call the setup for us. This is a
     " **CUSTOM** hook, vim-plug by itself does not expose such hooks,
