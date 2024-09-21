@@ -7,10 +7,10 @@ prepare:
 install:
   - action: make dirs
     dirs:
-      - "$HOME/bin"
+      - "$HOME/.local/bin"
   - action: copy
     file: "$TEMPORARY_DIR/diff-so-fancy"
-    to: "$HOME/bin/diff-so-fancy"
+    to: "$HOME/.local/bin/diff-so-fancy"
   - action: shell
     command: "git config --global core.pager \"diff-so-fancy | less --tabs=4 -RFX\""
 uninstall:

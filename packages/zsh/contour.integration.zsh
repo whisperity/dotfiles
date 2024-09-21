@@ -1,3 +1,5 @@
+#!/bin/zsh
+
 if [[ ! $TERM =~ "contour*" ]]
 then
   return
@@ -5,8 +7,10 @@ fi
 
 # echo "Generating Contour integration..." >&2
 
-local TEMPFILE=$(mktemp --suffix=".zsh")
-chmod +x ${TEMPFILE}
+if [[ "$(uname -s)" == "Darwin" ]];
+then
+  export PATH="/Applications/contour.app/Contents/MacOS/:$PATH"
+fi
 
 local CONTOUR_WHERE="$(whence -p contour)"
 if [[ -z "${CONTOUR_WHERE}" ]];
@@ -22,6 +26,11 @@ then
   echo "zsh.d: contour: 'cat' or 'rm' does not exist. Is this system broken?" >&2
   return
 fi
+
+local TEMPFILE=$(mktemp)
+mv ${TEMPFILE} ${TEMPFILE}.zsh
+local TEMPFILE="${TEMPFILE}.zsh"
+chmod +x ${TEMPFILE}
 
 local OLD_PATH="${PATH}"
 unset PATH

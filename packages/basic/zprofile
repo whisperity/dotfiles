@@ -6,6 +6,7 @@ if [ -f "$HOME/.ssh/.ephemeral-rcprofile" ]; then
     rm $HOME/.ssh/.ephemeral-rcprofile
 fi
 
+setopt +o nomatch
 if [ -d "$HOME/.profile.d" ]; then
   for e in $HOME/.profile.d/*; do
     if [ -f "$e" -a -r "$e" ]; then
@@ -14,6 +15,7 @@ if [ -d "$HOME/.profile.d" ]; then
   done
   unset e
 fi
+setopt -o nomatch
 
 # For comaptibility, load the Bash aliases too!
 if [ -f ~/.bash_aliases ]; then
@@ -21,11 +23,13 @@ if [ -f ~/.bash_aliases ]; then
 fi
 
 # Load additional tools maybe installed by the user.
+setopt +o nomatch
 if [ -d ~/.zsh.d ]; then
   for e in ~/.zsh.d/*; do
     if [ -f $e ]; then
       source $e
     fi
   done
+  unset e
 fi
-
+setopt -o nomatch

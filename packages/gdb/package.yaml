@@ -1,7 +1,7 @@
 description: Sets gdb to use the gdb-dashboard style.
 prepare:
   - action: git clone
-    repository: "http://github.com/cyrus-and/gdb-dashboard"
+    repository: "http://github.com/cyrus-and/gdb-dashboard.git"
 install:
   - action: copy
     file: "$TEMPORARY_DIR/gdb-dashboard/.gdbinit"

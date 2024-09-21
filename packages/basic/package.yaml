@@ -24,12 +24,11 @@ install:
       - gitconfig
       - profile
       - zprofile
-      - zshrc
     prefix: '.'
   - action: replace user input
     file: $HOME/.gitconfig
-  - action: substitute environment variables
-    file: $HOME/.zshrc
   - action: make dirs
     dirs:
       - $HOME/.ssh
+  - action: shell
+    command: chmod 0600 $HOME/.ssh

@@ -1,9 +1,9 @@
 # Some ls-like aliases for exa (new 'ls')
-alias e='exa'
-alias el='exa -l'
-alias ela='exa -al'
-alias elg='exa -al --git'
-alias tree='exa --tree'
+alias e='eza'
+alias el='eza -l'
+alias ela='eza -al'
+alias elg='eza -al --git'
+alias tree='eza --tree'
 
 # Now alias ls-like stuff to 'exa' for real
 alias l='e -F'

@@ -1,0 +1,13 @@
+description: Installs the hooks for Homebrew (does not install Homebrew itself!)
+install:
+  - action: make dirs
+    dirs:
+      - $HOME/.bash.d
+      - $HOME/.local/lib
+      - $HOME/.zsh.post.d
+  - action: copy
+    file: homebrew.sh
+    to: "$HOME/.bash.d/homebrew.sh"
+  - action: copy
+    file: homebrew.zsh
+    to: "$HOME/.zsh.pre.d/homebrew.zsh"

@@ -7,3 +7,8 @@
 
 # Vim swapfiles.
 *.sw[a-p]
+
+# macOS stupidity.
+**/.DS_Store
+**/Icon?
+!**/[iI]con[_a-zA-Z0-9]

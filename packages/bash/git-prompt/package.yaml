@@ -1,11 +1,14 @@
 description: Change Bash prompt to show Git statuses in a working directory
 prepare:
   - action: git clone
-    repository: "http://github.com/magicmonty/bash-git-prompt"
+    repository: "http://github.com/magicmonty/bash-git-prompt.git"
 install:
+  - action: make dirs
+    dirs:
+      - "$HOME/.local/lib"
   - action: copy tree
     dir: "$TEMPORARY_DIR/bash-git-prompt"
-    to: "$HOME/.bash.d/git-prompt"
+    to: "$HOME/.local/lib/bash-git-prompt"
   - action: copy
     file: git-prompt.sh
     to: "$HOME/.bash.d"

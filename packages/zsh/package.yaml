@@ -10,14 +10,18 @@ prepare:
     commands:
       - wget http://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
       - chmod +x install.sh
-      - touch $HOME/.zshrc
   - action: git clone
-    repository: "http://github.com/djui/alias-tips"
+    repository: "http://github.com/djui/alias-tips.git"
   - action: git clone
     repository: "http://github.com/zsh-users/zsh-autosuggestions.git"
   - action: git clone
     repository: "http://github.com/zsh-users/zsh-syntax-highlighting.git"
 install:
+  - action: replace
+    at: $HOME
+    with files:
+      - zshrc
+    prefix: '.'
   - action: shell
     command: sh -c 'ZSH=$HOME/.local/lib/oh-my-zsh $TEMPORARY_DIR/install.sh --keep-zshrc --unattended'
   - action: make dirs
@@ -57,3 +61,7 @@ uninstall:
     commands:
       - chmod +x "$HOME/.local/lib/oh-my-zsh/tools/uninstall.sh"
       - bash -c 'echo "y" | $HOME/.local/lib/oh-my-zsh/tools/uninstall.sh'
+  - action: shell all
+    commands:
+      - echo "Consider removing Oh-My-ZSH before reinstalling the package!" >&2
+      - echo "  rm -rfv $HOME/.local/lib/oh-my-zsh" >&2

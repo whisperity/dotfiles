@@ -6,5 +6,5 @@ GIT_PROMPT_SHOW_UNTRACKED_FILES=no
 GIT_PROMPT_THEME=Default_Ubuntu
 
 if [ -z "$no_git_prompt" ]; then
-  source ~/.bash.d/git-prompt/gitprompt.sh
+  source "$HOME/.local/lib/bash-git-prompt/gitprompt.sh"
 fi

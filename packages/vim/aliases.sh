@@ -8,8 +8,8 @@ then
         export VIM_THEME=dark
     fi
 
-    alias darkvim="VIM_THEME=dark $(command -v vim) "
-    alias lightvim="VIM_THEME=light $(command -v vim) "
+    alias darkvim="VIM_THEME=dark $(command -v nvim) "
+    alias lightvim="VIM_THEME=light $(command -v nvim) "
 
     if [[ "${VIM_THEME}" == "dark" ]]
     then

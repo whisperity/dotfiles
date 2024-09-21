@@ -34,14 +34,11 @@ install:
       - choose
     to: "$HOME/bin"
   - action: copy
-    file: exa_aliases-override.sh
-    to: "$HOME/.bash.d/exa.sh"
+    file: eza-aliases.sh
+    to: "$HOME/.bash.d/eza.sh"
   - action: copy
-    file: exa_aliases-override.sh
-    to: "$HOME/.zsh.post.d/exa.sh"
-  - action: copy
-    file: fd.plugin.zsh
-    to: "$HOME/.zsh.post.d/fd.plugin.zsh"
+    file: eza-aliases.sh
+    to: "$HOME/.zsh.post.d/eza.sh"
   - action: shell all
     commands:
       - "git config --global core.pager delta"
