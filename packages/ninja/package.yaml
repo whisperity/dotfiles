@@ -8,7 +8,7 @@ prepare:
 install:
   - action: make dirs
     dirs:
-      - $HOME/bin
+      - $HOME/.local/bin
   - action: copy
     file: $TEMPORARY_DIR/ninja
-    to: $HOME/bin/ninja
+    to: $HOME/.local/bin/ninja

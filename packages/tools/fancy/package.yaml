@@ -24,7 +24,7 @@ install:
     dirs:
       - "$HOME/.bash.d"
       - "$HOME/.zsh.post.d"
-      - "$HOME/bin"
+      - "$HOME/.local/bin"
   - action: copy
     from: $TEMPORARY_DIR
     files:
@@ -32,7 +32,7 @@ install:
       - dust
       - exa
       - choose
-    to: "$HOME/bin"
+    to: "$HOME/.local/bin"
   - action: copy
     file: eza-aliases.sh
     to: "$HOME/.bash.d/eza.sh"
