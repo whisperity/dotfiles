@@ -1,3 +1,7 @@
+if [ -x "/usr/libexec/path_helper" ]; then
+  eval "$(/usr/libexec/path_helper -s)"
+fi
+
 # Use the best editor possible :)
 export EDITOR="vim"
 export VISUAL="${EDITOR}"
