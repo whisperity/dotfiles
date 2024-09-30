@@ -4,6 +4,21 @@ install:
   - action: make dirs
     dirs:
       - "$HOME/.config/clangd"
+    $if not:
+      - os-darwin
+  - action: make dirs
+    dirs:
+      - "$HOME/Library/Preferences/clangd"
+    $if:
+      - os-darwin
+
   - action: copy
     file: config.yaml
     to: "$HOME/.config/clangd/config.yaml"
+    $if not:
+      - os-darwin
+  - action: copy
+    file: config.yaml
+    to: "$HOME/Library/Preferences/clangd/config.yaml"
+    $if:
+      - os-darwin
