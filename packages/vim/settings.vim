@@ -4,10 +4,6 @@
 " configuration files.
 let vimRootPath = expand($HOME . "/.vim")
 
-" '\' for Leader and LocalLeader are tedious on huHU layout.
-let mapleader = ","
-let maplocalleader = ","
-
 " Neovim
 if has('nvim')
   tnoremap <C-c><C-c> <C-\><C-n>

@@ -27,7 +27,7 @@ if has("autocmd")
         " As per the documentation, see `:help augroup`.
         au!
 
-        autocmd FileType markdown nnoremap <buffer> <C-f> :TableFormat<CR>
+        autocmd FileType markdown nnoremap <buffer> <LocalLeader>F :TableFormat<CR>
         autocmd FileType markdown nnoremap <buffer> <LocalLeader>mm :MarkdownPreview<CR>
     augroup END
 endif

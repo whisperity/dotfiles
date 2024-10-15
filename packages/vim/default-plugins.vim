@@ -9,9 +9,19 @@ Plug 'danro/rename.vim', { 'on': 'Rename' }
 Plug 'ntpeters/vim-better-whitespace'
 Plug 'machakann/vim-highlightedyank'
 Plug 'farmergreg/vim-lastplace'
-Plug 'matze/vim-move'
+Plug 'xolox/vim-misc'
+  \ | Plug 'xolox/vim-reload'
 
-Plug 'xolox/vim-misc' | Plug 'xolox/vim-reload'
+
+
+" Move lines and selections intelligently.
+Plug 'matze/vim-move'
+xnoremap H <Nop>
+xnoremap J <Nop>
+xnoremap K <Nop>
+xnoremap L <Nop>
+let g:move_key_modifier = 'S'
+let g:move_key_modifier_visualmode = 'S'
 
 
 

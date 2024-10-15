@@ -15,12 +15,12 @@ then
 
         alias vim="darkvim"
 
-        echo "vim: Using 'nvim' as 'vim', with VIM_THEME='dark' by default." >&2
+        echo "env/vim: Using 'nvim' as 'vim', with VIM_THEME='dark' by default." >&2
 
         if [[ -z "$GIT_EDITOR" ]]
         then
             export GIT_EDITOR="$(which nvim)"
-            echo "vim: Using 'nvim' as GIT_EDITOR." >&2
+            echo "env/vim: Using 'nvim' as GIT_EDITOR." >&2
         fi
     elif [[ "$(command -v vim)" == *"vim"* ]]
     then
@@ -29,14 +29,14 @@ then
 
         alias vim="darkvim"
 
-        echo "vim: Using 'vim', with VIM_THEME='dark' by default." >&2
+        echo "env/vim: Using 'vim', with VIM_THEME='dark' by default." >&2
 
         if [[ -z "$GIT_EDITOR" ]]
         then
             export GIT_EDITOR="$(which vim)"
-            echo "vim: Using 'vim' as GIT_EDITOR." >&2
+            echo "env/vim: Using 'vim' as GIT_EDITOR." >&2
         fi
     else
-        echo "vim: Neither 'vim' nor 'nvim' installed!" >&2
+        echo "env/vim: WARNING: Neither 'vim' nor 'nvim' installed!" >&2
     fi
 fi

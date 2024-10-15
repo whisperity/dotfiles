@@ -7,11 +7,6 @@ fi
 
 # echo "Generating Contour integration..." >&2
 
-if [[ "$(uname -s)" == "Darwin" ]];
-then
-  export PATH="/Applications/contour.app/Contents/MacOS/:$PATH"
-fi
-
 local CONTOUR_WHERE="$(whence -p contour)"
 if [[ -z "${CONTOUR_WHERE}" ]];
 then
