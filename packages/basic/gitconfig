@@ -34,8 +34,8 @@
 	textconf = hexdump -v -C
 [gc]
 	auto = 0
-	autopacklimit = 0
-	packrefs = 0
+	cruftPacks = false
+	packrefs = notbare
 [push]
 	default = simple
 [alias]
