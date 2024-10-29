@@ -2,6 +2,21 @@
   "codeLens": {
     "enable": true
   },
+  "clangd": {
+    "arguments": [
+      "--enable-config",
+      "-j=12",
+      "--log=info",
+      "--pretty",
+
+      "--background-index",
+      "--background-index-priority=low",
+      "--clang-tidy",
+      "--completion-style=detailed",
+      "--header-insertion-decorators",
+      "--pch-storage=disk",
+    ]
+  },
   "diagnostic": {
     "messageTarget": "float",
     "virtualText": true,
@@ -11,18 +26,6 @@
     "warningSign": "⚠️",
     "infoSign": "ℹ️",
     "hintSign": "💡"
-  },
-  "clangd": {
-    "arguments": ["--clang-tidy",
-                  "--completion-style=detailed",
-                  "--header-insertion-decorators",
-
-                  "--enable-config",
-                  "-j=12",
-                  "--pch-storage=disk",
-
-                  "--log=verbose",
-                  "--pretty"]
   },
   "diagnostic-languageserver": {
     "filetypes": {
@@ -39,6 +42,11 @@
         "whenOpen": true
       }
     }
+  },
+  "mlir": {
+    "pdll_server_path": "~/.vim/coc.nvim/mlir-pdll-lsp-server",
+    "server_path": "~/.vim/coc.nvim/mlir-lsp-server" ,
+    "tablegen_server_path": "~/.vim/coc.nvim/tblgen-lsp-server"
   },
   "rpc": {
     "buttonEnabled": false,
