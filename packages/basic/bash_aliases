@@ -34,3 +34,6 @@ alias common_prefix="sed -e '1{h;d;}' -e 'G;s,\(.*\).*\n\1.*,\1,;h;\$!d' "
 
 # Force XTerm mode in MC. (It's fixed in http://midnight-commander.org/ticket/4396 but it will take a while to appear in distributions...)
 alias mc='mc --xterm'
+
+# LazyGit.
+alias lg='lazygit'

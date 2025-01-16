@@ -6,6 +6,18 @@
 [core]
 	whitespace = space-before-tab,-indent-with-non-tab,trailing-space,cr-at-eol
 	editor = vim
+[diff]
+	renames = copies
+[diff "bin"]
+	textconf = hexdump -v -C
+[gc]
+	auto = 0
+	cruftPacks = false
+	packrefs = notbare
+[init]
+	defaultBranch = master
+[push]
+	default = upstream
 [color]
 	ui = true
 [color "branch"]
@@ -28,16 +40,6 @@
 	added = yellow
 	changed = green
 	untracked = cyan
-[diff]
-	renames = copies
-[diff "bin"]
-	textconf = hexdump -v -C
-[gc]
-	auto = 0
-	cruftPacks = false
-	packrefs = notbare
-[push]
-	default = simple
 [alias]
 	# SVN-esque commands
 	st = status
