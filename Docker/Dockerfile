@@ -1,5 +1,5 @@
 # Build and package the latest NeoVim for us.
-FROM ubuntu:20.04 AS neovim_build
+FROM ubuntu:24.04 AS neovim_build
 RUN export DEBIAN_FRONTEND=noninteractive; \
     apt-get update && \
     apt-get install -y \
@@ -34,7 +34,7 @@ RUN mkdir neovim_install && \
 
 
 # Build and create the environment image itself.
-FROM ubuntu:20.04
+FROM ubuntu:24.04
 ARG INSTALL_CPP
 ARG INSTALL_TEX
 ARG INSTALL_WEB
@@ -53,7 +53,7 @@ RUN update-alternatives --install /usr/bin/vi vi /usr/local/bin/nvim 60 && \
 # We do not set DEBIAN_FRONTEND as an 'ENV' because the container will
 # evenually be used interactively!
 RUN export DEBIAN_FRONTEND=noninteractive; \
-    yes | unminimize && \
+    (yes | unminimize || true) && \
     apt-get update && \
     apt-get install -y \
         curl \
@@ -68,9 +68,7 @@ RUN export DEBIAN_FRONTEND=noninteractive; \
     && \
     apt-get install -y --no-install-recommends \
         git \
-        python \
         python3 \
-        python3-distutils \
         python3-pip \
         python3-tabulate \
         python3-yaml \

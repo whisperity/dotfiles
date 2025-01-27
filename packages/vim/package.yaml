@@ -61,4 +61,4 @@ install:
     $transform:
       copies as symlinks: false
   - action: shell
-    command: "python3 -m pip install --user neovim-remote pynvim"
+    command: "python3 -m pip install --break-system-packages --user neovim-remote pynvim"

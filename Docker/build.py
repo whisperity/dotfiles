@@ -78,6 +78,8 @@ dotfiles_manager_sha = get_github_repo_commit("whisperity",
                                               "Dotfiles-Framework")
 dotfiles_sha = get_github_repo_commit("whisperity", "Dotfiles")
 
+arch = read_value("Container platform architecture", str,
+                  "linux/" + os.uname().machine)
 image = read_value("Docker image name", str, "whisperity/dotfiles")
 install_cpp = read_value("Install C++ development tools", bool, False)
 install_tex = read_value("Install LaTeX development tools", bool, False)
@@ -92,6 +94,7 @@ use_symlinks = "--X-copies-as-symlinks" \
     else ''
 
 command = ["docker", "build", ".", "-t", image,
+           "--platform", arch,
            "--build-arg=INSTALL_CPP=YES" if install_cpp else "",
            "--build-arg=INSTALL_TEX=YES" if install_tex else "",
            "--build-arg=INSTALL_WEB=YES" if install_web else "",
