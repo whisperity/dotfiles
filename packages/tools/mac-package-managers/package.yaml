@@ -1,4 +1,4 @@
-description: Installs the hooks for Homebrew (does not install Homebrew itself!)
+description: Installs hooks for Homebrew and MacPorts, but does not install the tools themselves
 install:
   - action: make dirs
     dirs:
@@ -9,5 +9,11 @@ install:
     file: homebrew.sh
     to: "$HOME/.bash.d/homebrew.sh"
   - action: copy
+    file: macports.sh
+    to: "$HOME/.bash.d/macports.sh"
+  - action: copy
     file: homebrew.zsh
     to: "$HOME/.zsh.pre.d/homebrew.zsh"
+  - action: copy
+    file: macports.zsh
+    to: "$HOME/.zsh.pre.d/macports.zsh"
