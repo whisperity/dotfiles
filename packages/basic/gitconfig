@@ -107,7 +107,19 @@
 	fall = fetch --verbose --all --prune --tags
 	ffmerge = merge --ff-only
 	cbr = rev-parse --abbrev-ref HEAD
-	conflicts = !echo $(git status --short | grep '^[DAU][DAU] ' | cut -d' ' -f2 | tr '\n' ' ')
+	conflicts = "!relativise() { \
+			while read line; do \
+				if [ \"$(uname -s)\" = \"Darwin\" ]; then \
+					grealpath --relative-to=\"$GIT_PREFIX\" \"$line\"; \
+				else \
+					realpath --relative-to=\"$GIT_PREFIX\" \"$line\"; \
+				fi; \
+			done; \
+		}; \
+		echo $(git status --short | grep '^[DAU][DAU] ' | cut -d ' ' -f 2 | relativise | tr '\n' ' ')"
+	conflicttool = "!bash -c 'cd $GIT_PREFIX; ${EDITOR} $(git conflicts)'"
+	cf = conflicts
+	cft = conflicttool
 	cum = "!sh -c 'git checkout $(git um)'" -
 
 	# - rebase to upstream/master
@@ -138,11 +150,11 @@
 	assume = update-index --assume-unchanged
 	unassume = update-index --no-assume-unchanged
 	assume-all = "!git status --short --untracked-files=no | awk '{ print $2; }' | xargs git assume"
-	assumeall = "!git assume-all"
+	assumeall = assume-all
 	unassume-all = "!git assumed | xargs git update-index --no-assume-unchanged"
-	unassumeall = "!git unassume-all"
+	unassumeall = unassume-all
 	assumed = "!git ls-files -v | grep ^h | cut -c 3-"
-	lsa = "!git assumed"
+	lsa = assumed
 
 	# =========================================================
 	# Miscellaneous
@@ -150,9 +162,9 @@
 	dump = cat-file -p
 	whoami = "!whoami() { \
 			echo \"$(git config --get user.name) <$(git config --get user.email)>\"; \
-		}; whoami" -
+		}; whoami"
 	edit-exclude = "!eexclude() { \
 			GIT_DIR=$(git rev-parse --git-dir 2>/dev/null) && \
 			${EDITOR} \"${GIT_DIR}/info/exclude\"; \
-		}; eexclude" -
+		}; eexclude"
 	size = count-objects --verbose --human-readable
