@@ -110,14 +110,14 @@
 	conflicts = "!relativise() { \
 			while read line; do \
 				if [ \"$(uname -s)\" = \"Darwin\" ]; then \
-					grealpath --relative-to=\"$GIT_PREFIX\" \"$line\"; \
+					grealpath --relative-to=\"${GIT_PREFIX:-.}\" \"$line\"; \
 				else \
-					realpath --relative-to=\"$GIT_PREFIX\" \"$line\"; \
+					realpath --relative-to=\"${GIT_PREFIX:-.}\" \"$line\"; \
 				fi; \
 			done; \
 		}; \
 		echo $(git status --short | grep '^[DAU][DAU] ' | cut -d ' ' -f 2 | relativise | tr '\n' ' ')"
-	conflicttool = "!bash -c 'cd $GIT_PREFIX; ${EDITOR} $(git conflicts)'"
+	conflicttool = "!bash -c 'cd ${GIT_PREFIX:-.}; ${EDITOR} $(git conflicts)'"
 	cf = conflicts
 	cft = conflicttool
 	cum = "!sh -c 'git checkout $(git um)'" -
