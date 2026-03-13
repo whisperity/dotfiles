@@ -25,6 +25,12 @@ let g:move_key_modifier_visualmode = 'S'
 
 
 
+" Highlight Unicode character look-alikes (homoglyphs) and let normalise them
+" to their ASCII counterparts.
+Plug 'Konfekt/vim-unicode-homoglyphs'
+
+
+
 " Code context.
 Plug 'wellle/context.vim'
 let g:context_nvim_no_redraw = 1
@@ -40,7 +46,9 @@ let g:context_nvim_no_redraw = 1
 
 
 " ChooseWin.
-Plug 't9md/vim-choosewin', { 'on': '<Plug>(choosewin)' }
+" Plug 't9md/vim-choosewin', { 'on': '<Plug>(choosewin)' }
+Plug 'whisperity/vim-choosewin', { 'branch': 'fix/neovim-guitablabel-unsupported',
+                                 \ 'on': '<Plug>(choosewin)' }
 
 " Invoke with '-'.
 nmap - <Plug>(choosewin)
@@ -48,6 +56,9 @@ nmap - <Plug>(choosewin)
 " Do not do anything if only one window is open. Unfortunately, it makes
 " tab handling broken, as the tab chooser won't show up either.
 let g:choosewin_return_on_single_win = 0
+
+" Workaround for the overlay font being broken on mutibyte buffer.
+let g:choosewin_overlay_clear_multibyte = 1
 
 " Show the letters on the overlay.
 let g:choosewin_overlay_enable = 0

@@ -72,9 +72,9 @@ if has("autocmd")
                  \ | highlight CocWarningHighlight ctermfg=DarkYellow cterm=underline guifg=#edb443 gui=underline
                  \ | highlight CocInfoHighlight    ctermfg=Blue       cterm=underline guifg=#005599 gui=underline
                  \ | highlight CocHighlightText    ctermbg=Blue                       guibg=#005599 gui=bold
-        " \ | highlight! link Error         CocErrorHighlight
+                 " \ | highlight! link Error         CocErrorHighlight
 
-        if $TERM ==? "contour-latest"
+        if $TERM ==? "contour" || $TERM ==? "contour-latest"
           " Contour supports undercurlies
           autocmd ColorScheme *
                  \   highlight CocErrorHighlight   ctermfg=Red                        guibg=NONE guifg=#ee4400 guisp=#dd0000 gui=undercurl

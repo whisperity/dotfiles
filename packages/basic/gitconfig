@@ -145,6 +145,12 @@
 			git branch --list --remotes --merged \"$upstream_name/$remote_branch_name\" | grep \"^[ \\t]*${3:-origin}/\" | grep -v \"$remote_branch_name\"; \
 		}; upstreamed" $1 $2 $3
 
+	# Show all local branches with corresponding remote-tracking-branches that
+	# do not exist on their corresponding remote anymore.
+	gone = "!gone() { \
+			git branch --list -vv | grep ': gone]' | awk '{ print $1; }'; \
+		}; gone"
+
 	# =========================================================
 	# Assume (consider changes as unchanged)
 	assume = update-index --assume-unchanged

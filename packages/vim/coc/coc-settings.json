@@ -29,7 +29,9 @@
   },
   "diagnostic-languageserver": {
     "filetypes": {
-      "sh": "shellcheck"
+      "bash": "shellcheck",
+      "sh": "shellcheck",
+      "zsh": "shellcheck",
     }
   },
   "explorer": {

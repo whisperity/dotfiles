@@ -1,8 +1,7 @@
 " Main Vim/Neovim configuration file.
 " This file should contain only the configuration options that are supported
-" by **stock** (n)vim. Individual plugins should be configured in their own
-" configuration files.
-let vimRootPath = expand($HOME . "/.vim")
+" by **stock** (n)vim.
+" Individual plugins should be configured in their own configuration files.
 
 " Neovim
 if has('nvim')
@@ -98,7 +97,13 @@ set wildignore=*.o,*.out,*.so,*~,*.pyc
 
 " Show surrounding whitespaces.
 set list
-set listchars=tab:>.,trail:.,extends:#,nbsp:.
+if has('nvim') && has('multi_byte')
+  set listchars=tab:——⇥,multispace:␣,lead:\ ,trail:␣,extends:»,precedes:«,nbsp:·
+  " eol: ⏎
+  " eol: ¶
+else
+  set listchars=tab:>.,multispace:_,lead:\ ,trail:.,extends:>,precedes:<,nbsp:.
+endif
 
 " Control the position of the new window
 set splitbelow
@@ -242,9 +247,8 @@ endif
 
 
 " Install vim-plug if not found...
-if empty(glob('~/.vim/autoload/plug.vim'))
-  silent !curl -sfLo ~/.vim/autoload/plug.vim --create-dirs
-    \ http://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+if empty(glob(vimRootPath . "/autoload/plug.vim"))
+  exec printf("silent !curl -sfLo %s/autoload/plug.vim --create-dirs http://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim", vimRootPath)
 endif
 
 " Run PlugInstall if there are missing plugins.
@@ -254,11 +258,11 @@ autocmd VimEnter * if len(filter(values(g:plugs), '!isdirectory(v:val.dir)'))
 
 
 " Start loading the packages with VimPlug!
-call plug#begin('~/.vim/bundle')
+call plug#begin(vimRootPath . "/bundle")
 autocmd! User PlugPostSetup
 
 " Load configuration files and install directives for plugins.
-for f in split(glob('~/.vim/config/*.vim'), '\n')
+for f in split(glob(vimRootPath . "/config/*.vim"), '\n')
     exe 'source' f
 endfor
 
