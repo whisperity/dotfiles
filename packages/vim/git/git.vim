@@ -4,6 +4,13 @@ Plug 'tpope/vim-fugitive'
 nmap <silent> <LocalLeader>gg :Git<CR>
 nmap <silent> <LocalLeader>gb :Git blame<CR>
 
+if has("autocmd")
+    augroup FugitiveFiletypeDefaults
+        autocmd!
+        autocmd FileType gitcommit setlocal spell spelllang=en_gb
+    augroup END
+endif
+
 
 
 " GitGutter

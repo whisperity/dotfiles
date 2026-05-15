@@ -16,8 +16,13 @@
 	packrefs = notbare
 [init]
 	defaultBranch = master
+[maintenance]
+	auto = false
 [push]
 	default = upstream
+[rebase]
+	autoStash = true
+	stat = true
 [color]
 	ui = true
 [color "branch"]
