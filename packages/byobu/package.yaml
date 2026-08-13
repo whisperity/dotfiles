@@ -1,0 +1,35 @@
+description: Installs the Byobu text-based window manager wrapper over Tmux, the
+  terminal multiplexer.
+prepare:
+  - action: git clone
+    repository: "http://github.com/tmux-plugins/tmux-resurrect"
+  - action: git clone
+    repository: "http://github.com/tmux-plugins/tmux-continuum"
+install:
+  - action: shell
+    $if:
+      - superuser
+    command: "sudo apt-get install -y --no-install-recommends byobu"
+  - action: shell any
+    $if not:
+      - superuser
+    commands:
+      - "which byobu 1>/dev/null 2>/dev/null"
+      - "echo byobu: Hooks will be installed, but no 'byobu' binary on system."
+
+  - action: make dirs
+    dirs:
+      - $HOME/.config/byobu
+  - action: copy
+    file: tmux.conf
+    to: "$HOME/.config/byobu/.tmux.conf"
+
+  - action: make dirs
+    dirs:
+      - $HOME/.config/byobu/plugins
+  - action: copy tree
+    dir: "$TEMPORARY_DIR/tmux-resurrect"
+    to: "$HOME/.config/byobu/plugins/tmux-resurrect"
+  - action: copy tree
+    dir: "$TEMPORARY_DIR/tmux-continuum"
+    to: "$HOME/.config/byobu/plugins/tmux-continuum"

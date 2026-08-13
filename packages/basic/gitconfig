@@ -3,6 +3,8 @@
 	email = $<GIT_USEREMAIL>
 [apply]
 	whitespace = fix
+[commit]
+	gpgsign = false
 [core]
 	whitespace = space-before-tab,-indent-with-non-tab,trailing-space,cr-at-eol
 	editor = vim
